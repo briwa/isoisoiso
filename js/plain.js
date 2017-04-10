@@ -1,10 +1,10 @@
-var game = new Phaser.Game(800, 400, Phaser.AUTO, 'test', null, true, false);
+var game = new Phaser.Game(600, 400, Phaser.AUTO, 'test', null, true, false);
 
 var BasicGame = function (game) { };
 
 BasicGame.Boot = function (game) { };
 
-var isoGroup, cursorPos, cursor, player;
+var isoGroup, cursorPos, cursor, player, grid, gridSize;
 
 BasicGame.Boot.prototype = {
   preload: function () {
@@ -19,6 +19,16 @@ BasicGame.Boot.prototype = {
     // This is used to set a game canvas-based offset for the 0, 0, 0 isometric coordinate - by default
     // this point would be at screen coordinates 0, 0 (top left) which is usually undesirable.
     game.iso.anchor.setTo(0.5, 0.2);
+
+    gridSize = 64;
+    grid = [
+      [0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0]
+    ];
   },
   create: function () {
 
@@ -65,11 +75,11 @@ BasicGame.Boot.prototype = {
   },
   spawnTiles: function () {
     var tile;
-    for (var xx = 0; xx < 256; xx += 38) {
-      for (var yy = 0; yy < 256; yy += 38) {
+    for (var i = 0; i < grid.length; i++) {
+      for (var j = 0; j < grid[i].length; j++) {
         // Create a tile using the new game.add.isoSprite factory method at the specified position.
         // The last parameter is the group you want to add it to (just like game.add.sprite)
-        tile = game.add.isoSprite(xx, yy, 0, 'tile', 0, isoGroup);
+        tile = game.add.isoSprite(i * 38, j * 38, 0, 'tile', 0, isoGroup);
         tile.anchor.set(0.5, 0);
       }
     }
