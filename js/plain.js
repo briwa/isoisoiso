@@ -4,7 +4,16 @@ var BasicGame = function (game) { };
 
 BasicGame.Boot = function (game) { };
 
-var isoGroup, cursorPos, cursor, player, grid, gridSize;
+var isoGroup,
+  currentPos,
+  cursorPos,
+  cursor,
+  player,
+  playerPos,
+  playerTween,
+  grid,
+  gridSize,
+  path;
 
 BasicGame.Boot.prototype = {
   preload: function () {
@@ -29,6 +38,7 @@ BasicGame.Boot.prototype = {
       [0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0]
     ];
+    path = [];
   },
   create: function () {
 
@@ -40,12 +50,32 @@ BasicGame.Boot.prototype = {
 
     // Provide a 3D position for the cursor
     cursorPos = new Phaser.Plugin.Isometric.Point3();
-
+    playerPos = new Phaser.Plugin.Isometric.Point3();
 
     // Create another cube as our 'player', and set it up just like the cubes above.
     player = game.add.isoSprite(0, 0, 0, 'cube', 0, isoGroup);
     player.tint = 0x86bfda;
     player.anchor.set(0.5);
+
+    game.input.onDown.add(function() {
+      var matrix = new PF.Grid( grid );
+      var finder = new PF.AStarFinder();
+
+      path = finder.findPath( playerPos.x, playerPos.y, Math.floor( cursorPos.x / 38 ), Math.floor( cursorPos.y / 38 ), matrix );
+
+      playerTween = game.add.tween( player );
+      for ( var i = 0; i < path.length; i++) {
+        playerTween.to({
+          isoX : path[i][0] * 38,
+          isoY : path[i][1] * 38
+        }, 1000, Phaser.Easing.Quadratic.InOut, false);
+      }
+
+      playerTween.start();
+
+      var lastTile = path[path.length - 1];
+      playerPos.set( lastTile[0], lastTile[1] );
+    });
   },
   update: function () {
     // Update the cursor position.
@@ -60,18 +90,17 @@ BasicGame.Boot.prototype = {
       if (!tile.selected && inBounds) {
         tile.selected = true;
         tile.tint = 0x86bfda;
-        game.add.tween(tile).to({ isoZ: 4 }, 200, Phaser.Easing.Quadratic.InOut, true);
       }
       // If not, revert back to how it was.
       else if (tile.selected && !inBounds) {
         tile.selected = false;
         tile.tint = 0xffffff;
-        game.add.tween(tile).to({ isoZ: 0 }, 200, Phaser.Easing.Quadratic.InOut, true);
       }
     });
   },
   render: function () {
     game.debug.text(game.time.fps || '--', 2, 14, "#000");
+    game.debug.text(path, 2, 30, "#000");
   },
   spawnTiles: function () {
     var tile;
