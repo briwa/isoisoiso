@@ -64,11 +64,11 @@ BasicGame.Boot.prototype = {
       path = finder.findPath( playerPos.x, playerPos.y, Math.floor( cursorPos.x / 38 ), Math.floor( cursorPos.y / 38 ), matrix );
 
       playerTween = game.add.tween( player );
-      for ( var i = 0; i < path.length; i++) {
+      for ( var i = 1; i < path.length; i++ ) {
         playerTween.to({
           isoX : path[i][0] * 38,
           isoY : path[i][1] * 38
-        }, 1000, Phaser.Easing.Quadratic.InOut, false);
+        }, 500, Phaser.Easing.Linear.None, false);
       }
 
       playerTween.start();
