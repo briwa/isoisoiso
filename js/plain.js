@@ -68,15 +68,23 @@ BasicGame.Boot.prototype = {
 
         path = finder.findPath( playerPos.x, playerPos.y, cursorPosX, cursorPosY, matrix );
 
-        playerTween = game.add.tween( player );
+        var tweenArr = [];
         for ( var i = 1; i < path.length; i++ ) {
-          playerTween.to({
+          var tween = game.add.tween( player );
+          tween.to({
             isoX : path[i][0] * 38,
             isoY : path[i][1] * 38
           }, 500, Phaser.Easing.Linear.None, false);
+
+          if ( tweenArr.length ) {
+            var lastTween = tweenArr[ tweenArr.length - 1 ];
+            lastTween.chain( tween );
+          }
+
+          tweenArr.push( tween );
         }
 
-        playerTween.start();
+        tweenArr[0].start();
 
         var lastTile = path[path.length - 1];
         playerPos.set( lastTile[0], lastTile[1] );
