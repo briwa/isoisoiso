@@ -58,23 +58,29 @@ BasicGame.Boot.prototype = {
     player.anchor.set(0.5);
 
     game.input.onDown.add(function() {
-      var matrix = new PF.Grid( grid );
-      var finder = new PF.AStarFinder();
+      var cursorPosX = Math.floor( cursorPos.x / 38 );
+      var cursorPosY = Math.floor( cursorPos.y / 38 );
 
-      path = finder.findPath( playerPos.x, playerPos.y, Math.floor( cursorPos.x / 38 ), Math.floor( cursorPos.y / 38 ), matrix );
+      // ignore out of bounds clicks
+      if ( cursorPosX < grid.length && cursorPosY < grid.length ) {
+        var matrix = new PF.Grid( grid );
+        var finder = new PF.AStarFinder();
 
-      playerTween = game.add.tween( player );
-      for ( var i = 1; i < path.length; i++ ) {
-        playerTween.to({
-          isoX : path[i][0] * 38,
-          isoY : path[i][1] * 38
-        }, 500, Phaser.Easing.Linear.None, false);
+        path = finder.findPath( playerPos.x, playerPos.y, cursorPosX, cursorPosY, matrix );
+
+        playerTween = game.add.tween( player );
+        for ( var i = 1; i < path.length; i++ ) {
+          playerTween.to({
+            isoX : path[i][0] * 38,
+            isoY : path[i][1] * 38
+          }, 500, Phaser.Easing.Linear.None, false);
+        }
+
+        playerTween.start();
+
+        var lastTile = path[path.length - 1];
+        playerPos.set( lastTile[0], lastTile[1] );
       }
-
-      playerTween.start();
-
-      var lastTile = path[path.length - 1];
-      playerPos.set( lastTile[0], lastTile[1] );
     });
   },
   update: function () {
