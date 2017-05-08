@@ -58,7 +58,9 @@ BasicGame.Boot.prototype = {
     player.anchor.set(0.5);
 
     var getDir = function( prev, next ) {
-      if ( prev[0] == next[0] ) {
+      if ( prev[0] == next[0] && prev[1] == next[1] ) {
+        return 'init';
+      } else if ( prev[0] == next[0] ) {
         return prev[1] > next[1] ? 'up' : 'down';
       } else if ( prev[1] == next[1] ) {
         return prev[0] > next[0] ? 'left' : 'right';
@@ -79,62 +81,47 @@ BasicGame.Boot.prototype = {
 
         if ( path.length <= 1 ) return;
 
-        var tweenedPath = path.reduce(function(acc, next) {
-          // always take the last path as the reference
-          var curr = acc[ acc.length - 1 ];
+        var tweenedPath = path.reduce(function(newPath, next) {
+          // always take the last position as the reference
+          // if there's none, use the first position as the current one
+          var currPos = newPath[ newPath.length - 1 ] || { coord : next };
 
-          // first path ever, don't bother, mark them as init
-          if ( ! curr ) {
-            acc.push({
-              arr : next,
-              dir : 'init',
-              speed : 0
-            });
+          // where is this next piece of position heading to?
+          var nextPos = { coord : next, dir : getDir( currPos.coord, next ) };
 
-            return acc;
-          }
-
-          // where is this next piece of path heading to?
-          var nextDir = getDir( curr.arr, next );
-
-          // current direction is the same with the next one
-          // meaning just add the speed, with updated x/y from the next
-          // update the direction as well in case the previous one was init
-          if ( curr.dir == 'init' || curr.dir == nextDir ) {
-            curr.arr[0] = next[0];
-            curr.arr[1] = next[1];
-            curr.dir = nextDir;
-            curr.speed++;
+          // the next position is going to the same direction
+          // also, when it's an initial position, it follows the next direction
+          // just add the speed and update the position of the current
+          // no need to register this one as new position
+          if ( currPos.dir === 'init' || nextPos.dir === currPos.dir ) {
+            currPos.speed++;
+            currPos.coord = nextPos.coord;
+            currPos.dir = nextPos.dir;
           } else {
-            // this means it's making a turn
-            // and the turning 'move' itself has 1 speed, hence the initial speed
-            acc.push({
-              arr : next,
-              dir : nextDir,
-              speed : 1
-            });
+            // register the next position as new position
+            // initial position won't have initial speed
+            // different paths mean it's taking a turn, hence the 1 initial speed
+            nextPos.speed = nextPos.dir === 'init' ? 0 : 1;
+            newPath.push(nextPos);
           }
 
-          return acc;
+          return newPath;
         }, []);
 
-        const tweenArr = [];
         for ( var i = 0; i < tweenedPath.length; i++ ) {
-          var tween = game.add.tween( player );
-          tween.to({
-            isoX : tweenedPath[i].arr[0] * 38,
-            isoY : tweenedPath[i].arr[1] * 38
-          }, tweenedPath[i].speed * 500, Phaser.Easing.Linear.None, false);
+          var curr = tweenedPath[i];
+          curr.tween = game.add.tween( player );
+          curr.tween.to({
+            isoX : curr.coord[0] * 38,
+            isoY : curr.coord[1] * 38
+          }, curr.speed * 500, Phaser.Easing.Linear.None, false);
 
-          if ( tweenArr.length ) {
-            var lastTween = tweenArr[ tweenArr.length - 1 ];
-            lastTween.chain( tween );
+          if ( tweenedPath[i - 1] ) {
+            tweenedPath[i - 1].tween.chain( curr.tween );
           }
-
-          tweenArr.push( tween );
         }
 
-        tweenArr[0].start();
+        tweenedPath[0].tween.start();
 
         var lastTile = path[path.length - 1];
         playerPos.set( lastTile[0], lastTile[1] );
