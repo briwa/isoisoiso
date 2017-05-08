@@ -49,7 +49,15 @@ BasicGame.Boot.prototype = {
     isoGroup = game.add.group();
 
     // Let's make a load of tiles on a grid.
-    this.spawnTiles();
+    var tile;
+    for (var i = 0; i < grid.length; i++) {
+      for (var j = 0; j < grid[i].length; j++) {
+        // Create a tile using the new game.add.isoSprite factory method at the specified position.
+        // The last parameter is the group you want to add it to (just like game.add.sprite)
+        tile = game.add.isoSprite(i * 38, j * 38, 0, 'tile', 0, isoGroup);
+        tile.anchor.set(0.5, 0);
+      }
+    }
 
     // Provide a 3D position for the cursor
     cursorPos = new Phaser.Plugin.Isometric.Point3();
@@ -79,7 +87,13 @@ BasicGame.Boot.prototype = {
       var cursorPosY = Math.floor( cursorPos.y / 38 );
 
       // ignore out of bounds clicks
-      if ( cursorPosX < grid.length && cursorPosY < grid.length ) {
+      // also when the player is still moving
+      if (
+        ! player.animations.currentAnim.isPlaying
+        && cursorPosX >= 0 && cursorPosY >= 0
+        && cursorPosX < grid.length
+        && cursorPosY < grid.length
+      ) {
         var matrix = new PF.Grid( grid );
         var finder = new PF.AStarFinder();
 
@@ -118,9 +132,10 @@ BasicGame.Boot.prototype = {
           var curr = path[0];
           if ( curr ) {
             playerPos.set( curr.coord[0], curr.coord[1] );
+
             var tween = game.add.tween( player ).to({
-              isoX : curr.coord[0] * 38,
-              isoY : curr.coord[1] * 38
+              isoX : playerPos.x * 38,
+              isoY : playerPos.y * 38
             }, curr.speed * 500, Phaser.Easing.Linear.None, false);
 
             tween.onStart.add(function() {
@@ -163,18 +178,6 @@ BasicGame.Boot.prototype = {
   },
   render: function () {
     game.debug.text(game.time.fps || '--', 2, 14, "#000");
-    game.debug.text(path, 2, 30, "#000");
-  },
-  spawnTiles: function () {
-    var tile;
-    for (var i = 0; i < grid.length; i++) {
-      for (var j = 0; j < grid[i].length; j++) {
-        // Create a tile using the new game.add.isoSprite factory method at the specified position.
-        // The last parameter is the group you want to add it to (just like game.add.sprite)
-        tile = game.add.isoSprite(i * 38, j * 38, 0, 'tile', 0, isoGroup);
-        tile.anchor.set(0.5, 0);
-      }
-    }
   }
 };
 
