@@ -20,6 +20,9 @@ BasicGame.Boot.prototype = {
     game.load.image('tile', 'assets/tile.png');
     game.load.image('cube', 'assets/cube.png');
 
+    // https://opengameart.org/content/isometric-people
+    game.load.spritesheet('people', 'assets/people.png', 32, 50);
+
     game.time.advancedTiming = true;
 
     // Add and enable the plug-in.
@@ -53,8 +56,11 @@ BasicGame.Boot.prototype = {
     playerPos = new Phaser.Plugin.Isometric.Point3();
 
     // Create another cube as our 'player', and set it up just like the cubes above.
-    player = game.add.isoSprite(0, 0, 0, 'cube', 0, isoGroup);
-    player.tint = 0x86bfda;
+    player = game.add.isoSprite(0, 0, 0, 'people', 0);
+    player.animations.add( 'walk-up', [ 30, 31, 32, 33, 34, 35, 36, 37, 38 ], 30, true);
+    player.animations.add( 'walk-left', [ 20, 21, 22, 23, 24, 25, 26, 27, 28 ], 30, true);
+    player.animations.add( 'walk-right', [ 10, 11, 12, 13, 14, 15, 16, 17, 18 ], 30, true);
+    player.animations.add( 'walk-down', [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ], 30, true);
     player.anchor.set(0.5);
 
     var getDir = function( prev, next ) {
@@ -108,23 +114,29 @@ BasicGame.Boot.prototype = {
           return newPath;
         }, []);
 
-        for ( var i = 0; i < tweenedPath.length; i++ ) {
-          var curr = tweenedPath[i];
-          curr.tween = game.add.tween( player );
-          curr.tween.to({
-            isoX : curr.coord[0] * 38,
-            isoY : curr.coord[1] * 38
-          }, curr.speed * 500, Phaser.Easing.Linear.None, false);
+        function startTween( path ) {
+          var curr = path[0];
+          if ( curr ) {
+            playerPos.set( curr.coord[0], curr.coord[1] );
+            var tween = game.add.tween( player ).to({
+              isoX : curr.coord[0] * 38,
+              isoY : curr.coord[1] * 38
+            }, curr.speed * 500, Phaser.Easing.Linear.None, false);
 
-          if ( tweenedPath[i - 1] ) {
-            tweenedPath[i - 1].tween.chain( curr.tween );
+            tween.onStart.add(function() {
+              player.animations.play( 'walk-' + curr.dir );
+            });
+
+            tween.onComplete.add(function() {
+              player.animations.stop( 'walk-' + curr.dir, true );
+              startTween( path.slice( 1 ) );
+            });
+
+            tween.start();
           }
         }
 
-        tweenedPath[0].tween.start();
-
-        var lastTile = path[path.length - 1];
-        playerPos.set( lastTile[0], lastTile[1] );
+        startTween( tweenedPath );
       }
     });
   },
