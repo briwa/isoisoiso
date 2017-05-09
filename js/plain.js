@@ -5,15 +5,18 @@ var BasicGame = function (game) { };
 BasicGame.Boot = function (game) { };
 
 var isoGroup,
-  currentPos,
   cursorPos,
-  cursor,
   player,
   playerPos,
-  playerTween,
-  grid,
-  gridSize,
-  path;
+  tileSize = 38,
+  grid = [
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0]
+  ];
 
 BasicGame.Boot.prototype = {
   preload: function () {
@@ -31,17 +34,6 @@ BasicGame.Boot.prototype = {
     // This is used to set a game canvas-based offset for the 0, 0, 0 isometric coordinate - by default
     // this point would be at screen coordinates 0, 0 (top left) which is usually undesirable.
     game.iso.anchor.setTo(0.5, 0.2);
-
-    gridSize = 64;
-    grid = [
-      [0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0]
-    ];
-    path = [];
   },
   create: function () {
 
@@ -54,7 +46,7 @@ BasicGame.Boot.prototype = {
       for (var j = 0; j < grid[i].length; j++) {
         // Create a tile using the new game.add.isoSprite factory method at the specified position.
         // The last parameter is the group you want to add it to (just like game.add.sprite)
-        tile = game.add.isoSprite(i * 38, j * 38, 0, 'tile', 0, isoGroup);
+        tile = game.add.isoSprite(i * tileSize, j * tileSize, 0, 'tile', 0, isoGroup);
         tile.anchor.set(0.5, 0);
       }
     }
@@ -73,7 +65,7 @@ BasicGame.Boot.prototype = {
 
     var getDir = function( prev, next ) {
       if ( prev[0] == next[0] && prev[1] == next[1] ) {
-        return 'init';
+        return null;
       } else if ( prev[0] == next[0] ) {
         return prev[1] > next[1] ? 'up' : 'down';
       } else if ( prev[1] == next[1] ) {
@@ -83,8 +75,8 @@ BasicGame.Boot.prototype = {
 
     game.input.onDown.add(function() {
       // todo: find out why cursorPosX / cursorPosY sometimes returns negative value
-      var cursorPosX = Math.floor( cursorPos.x / 38 );
-      var cursorPosY = Math.floor( cursorPos.y / 38 );
+      var cursorPosX = Math.floor( cursorPos.x / tileSize );
+      var cursorPosY = Math.floor( cursorPos.y / tileSize );
 
       // ignore out of bounds clicks
       // also when the player is still moving
@@ -97,7 +89,7 @@ BasicGame.Boot.prototype = {
         var matrix = new PF.Grid( grid );
         var finder = new PF.AStarFinder();
 
-        path = finder.findPath( playerPos.x, playerPos.y, cursorPosX, cursorPosY, matrix );
+        var path = finder.findPath( playerPos.x, playerPos.y, cursorPosX, cursorPosY, matrix );
 
         if ( path.length <= 1 ) return;
 
@@ -106,52 +98,54 @@ BasicGame.Boot.prototype = {
           // if there's none, use the first position as the current one
           var currPos = newPath[ newPath.length - 1 ] || { coord : next };
 
-          // where is this next piece of position heading to?
-          var nextPos = { coord : next, dir : getDir( currPos.coord, next ) };
-
-          // the next position is going to the same direction
-          // also, when it's an initial position, it follows the next direction
-          // just add the speed and update the position of the current
-          // no need to register this one as new position
-          if ( currPos.dir === 'init' || nextPos.dir === currPos.dir ) {
-            currPos.speed++;
-            currPos.coord = nextPos.coord;
-            currPos.dir = nextPos.dir;
-          } else {
-            // register the next position as new position
-            // initial position won't have initial speed
-            // different paths mean it's taking a turn, hence the 1 initial speed
-            nextPos.speed = nextPos.dir === 'init' ? 0 : 1;
-            newPath.push(nextPos);
-          }
+          // assign direction for the next one
+          newPath.push({ coord : next, dir : getDir( currPos.coord, next ) || 'init' });
 
           return newPath;
         }, []);
 
         function startTween( path ) {
           var curr = path[0];
-          if ( curr ) {
-            playerPos.set( curr.coord[0], curr.coord[1] );
+          if ( !curr ) return;
 
-            var tween = game.add.tween( player ).to({
-              isoX : playerPos.x * 38,
-              isoY : playerPos.y * 38
-            }, curr.speed * 500, Phaser.Easing.Linear.None, false);
+          // slice now to get the remaining path right away
+          // since we're using it for references below
+          var remainingPath = path.slice( 1 )
 
-            tween.onStart.add(function() {
-              player.animations.play( 'walk-' + curr.dir );
-            });
+          // set the position now, since the tween wont break in the middle of the action anyway
+          // the position will definitely being set to the next one
+          playerPos.set( curr.coord[0], curr.coord[1] );
+          var currDirAnim = 'walk-' + curr.dir;
 
-            tween.onComplete.add(function() {
-              player.animations.stop( 'walk-' + curr.dir, true );
-              startTween( path.slice( 1 ) );
-            });
+          var tween = game.add.tween( player ).to({
+            isoX : playerPos.x * tileSize,
+            isoY : playerPos.y * tileSize
+          }, 500, Phaser.Easing.Linear.None, false);
 
-            tween.start();
-          }
+          tween.onStart.add(function( sprite ) {
+            // if there's no more path, and the direction is the same, this means it's a one-step path
+            // direction can be the same, e.g you're facing down and you move one step down
+            // since that is the only path, we need to play the animations regardless
+            if ( ! remainingPath.length || sprite.animations.currentAnim.name !== currDirAnim ) {
+              sprite.animations.play( currDirAnim );
+            }
+          });
+
+          tween.onComplete.add(function( sprite ) {
+            // only stop when there's no more paths left
+            // we want the animation to run seamlessly
+            if ( ! remainingPath.length ) {
+              sprite.animations.stop( currDirAnim, true );
+            }
+
+            startTween( remainingPath );
+          });
+
+          tween.start();
         }
 
-        startTween( tweenedPath );
+        // do not include the first path since the first one is just the initial position
+        startTween( tweenedPath.slice( 1 ) );
       }
     });
   },
