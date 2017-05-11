@@ -5,23 +5,25 @@ const game = new Phaser.Game(600, 800, Phaser.AUTO);
 function BasicGame() { }
 BasicGame.Boot = function Boot() { };
 
-const TILESIZE = 38;
+const TILESIZE = 36;
 const GRID = [
-    [0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 1, 0, 0, 0],
+  [0, 0, 1, 1, 1, 0, 0, 0],
+  [0, 0, 0, 0, 1, 0, 1, 0],
+  [0, 0, 0, 0, 0, 0, 1, 0],
+  [0, 1, 0, 1, 0, 0, 0, 0],
+  [0, 0, 0, 1, 1, 0, 0, 0],
+  [0, 0, 0, 0, 0, 1, 1, 1],
+  [1, 1, 1, 0, 0, 0, 0, 0],
 ];
 
 BasicGame.Boot.prototype = {
   preload() {
-    game.load.image('tile', 'assets/tile.png');
-    game.load.image('cube', 'assets/cube.png');
-
     // https://opengameart.org/content/isometric-people
     game.load.spritesheet('people', 'assets/people.png', 32, 50);
+
+    // http://www.pixeljoint.com/pixelart/66809.htm
+    game.load.atlasJSONHash('tileset', 'assets/tileset.png', 'assets/tileset.json');
 
     game.time.advancedTiming = true;
 
@@ -34,17 +36,16 @@ BasicGame.Boot.prototype = {
     game.iso.anchor.setTo(0.5, 0.2);
   },
   create() {
-    // Create a group for our tiles.
-    const isoGroup = game.add.group();
-
     // Let's make a load of tiles on a grid.
-    let tile;
     for (let i = 0; i < GRID.length; i += 1) {
       for (let j = 0; j < GRID[i].length; j += 1) {
         // Create a tile using the new game.add.isoSprite factory method at the specified position.
         // The last parameter is the group you want to add it to (just like game.add.sprite)
-        tile = game.add.isoSprite(i * TILESIZE, j * TILESIZE, 0, 'tile', 0, isoGroup);
-        tile.anchor.set(0.5, 0);
+        const grid = GRID[i][j];
+        const tile = grid ? 'bush1' : 'grass';
+        const tileSprite = game.add.isoSprite(j * TILESIZE, i * TILESIZE, grid ? 13 : 0, 'tileset', tile);
+        tileSprite.anchor.set(0.5, 0);
+        tileSprite.smoothed = false;
       }
     }
 

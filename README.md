@@ -6,7 +6,9 @@ Fun stuff
 - [Phaser Isometric Plugin](http://rotates.org/phaser/iso/)
 - [pathfinding.js](https://github.com/qiao/PathFinding.js/)
 
-- Sprites from [https://opengameart.org/content/isometric-people](https://opengameart.org/content/isometric-people)
+- Sprites sources:
+  - [https://opengameart.org/content/isometric-people](https://opengameart.org/content/isometric-people)
+  - [http://www.pixeljoint.com/pixelart/66809.htm](http://www.pixeljoint.com/pixelart/66809.htm)
 
 ## Disclaimer
 For educational purposes only
