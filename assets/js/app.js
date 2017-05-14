@@ -1,4 +1,6 @@
-/* global Phaser, PF */
+import Phaser from 'phaser-ce';
+import PF from 'pathfinding';
+
 const game = new Phaser.Game(600, 800, Phaser.AUTO);
 
 // it needs this format of functions for Phaser to work
@@ -18,12 +20,12 @@ const GRID = [
 ];
 
 BasicGame.Boot.prototype = {
-  preload() {
+  preload: () => {
     // https://opengameart.org/content/isometric-people
-    game.load.spritesheet('people', 'assets/people.png', 32, 50);
+    game.load.spritesheet('people', 'assets/image/people.png', 32, 50);
 
     // http://www.pixeljoint.com/pixelart/66809.htm
-    game.load.atlasJSONHash('tileset', 'assets/tileset.png', 'assets/tileset.json');
+    game.load.atlasJSONHash('tileset', 'assets/image/tileset.png', 'assets/image/tileset.json');
 
     game.time.advancedTiming = true;
 
@@ -35,7 +37,7 @@ BasicGame.Boot.prototype = {
     // this point would be at screen coordinates 0, 0 (top left) which is usually undesirable.
     game.iso.anchor.setTo(0.5, 0.2);
   },
-  create() {
+  create: () => {
     // Let's make a load of tiles on a grid.
     for (let i = 0; i < GRID.length; i += 1) {
       for (let j = 0; j < GRID[i].length; j += 1) {
@@ -49,11 +51,11 @@ BasicGame.Boot.prototype = {
       }
     }
 
-    // Provide a 3D position for the cursor
+    // Provide a 3D position for the cursor and the player
     const cursorPos = new Phaser.Plugin.Isometric.Point3();
     const playerPos = new Phaser.Plugin.Isometric.Point3();
 
-    // Create another cube as our 'player', and set it up just like the cubes above.
+    // Use the sprite from above as player
     const player = game.add.isoSprite(0, 0, 0, 'people', 0);
     player.animations.add('walk-up', [30, 31, 32, 33, 34, 35, 36, 37, 38], 30, true);
     player.animations.add('walk-left', [20, 21, 22, 23, 24, 25, 26, 27, 28], 30, true);
@@ -157,8 +159,8 @@ BasicGame.Boot.prototype = {
       }
     });
   },
-  update() {},
-  render() {},
+  update: () => {},
+  render: () => {},
 };
 
 game.state.add('Boot', BasicGame.Boot);

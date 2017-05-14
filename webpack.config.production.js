@@ -11,15 +11,13 @@ const phaserPluginIsometric = path.join(__dirname, '/node_modules/phaser-plugin-
 module.exports = {
   entry: {
     app: path.join(__dirname, '/assets/js/app.js'),
-    vendor: ['pixi', 'p2', 'phaser-ce', 'phaser-plugin-isometric', 'webfontloader', 'pathfinding'],
+    vendor: ['pixi', 'p2', 'phaser', 'phaser-plugin-isometric', 'webfontloader', 'pathfinding'],
   },
 
   output: {
     path: path.join(__dirname, '/dist'),
     filename: 'bundle.js',
   },
-
-  devtool: 'cheap-source-map',
 
   module: {
     loaders: [
@@ -37,7 +35,7 @@ module.exports = {
       { test: /pixi\.js/, use: ['expose-loader?PIXI'] },
       { test: /phaser-split\.js$/, use: ['expose-loader?Phaser'] },
       { test: /p2\.js/, use: ['expose-loader?p2'] },
-      { test: /phaser-plugin-isometric\.js/, use: ['imports-loader?Phaser=phaser-ce'] },
+      { test: /phaser-plugin-isometric\.js/, use: ['imports-loader?Phaser=phaser'] },
     ],
   },
 
@@ -46,11 +44,18 @@ module.exports = {
       name: 'vendor',
       filename: 'vendor.bundle.js',
     }),
+    new webpack.optimize.UglifyJsPlugin({
+      drop_console: true,
+      minimize: true,
+      output: {
+        comments: false,
+      },
+    }),
   ],
 
   resolve: {
     alias: {
-      'phaser-ce': phaser,
+      phaser,
       pixi,
       p2,
       'phaser-plugin-isometric': phaserPluginIsometric,
