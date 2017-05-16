@@ -3,10 +3,6 @@ import PF from 'pathfinding';
 
 const game = new Phaser.Game(600, 800, Phaser.AUTO);
 
-// it needs this format of functions for Phaser to work
-function BasicGame() { }
-BasicGame.Boot = function Boot() { };
-
 const TILESIZE = 36;
 const GRID = [
   [0, 0, 0, 0, 1, 0, 0, 0],
@@ -19,8 +15,12 @@ const GRID = [
   [1, 1, 1, 0, 0, 0, 0, 0],
 ];
 
+// it needs this format of functions for Phaser to work
+function BasicGame() { }
+BasicGame.Boot = function Boot() { };
+
 BasicGame.Boot.prototype = {
-  preload: () => {
+  preload() {
     // https://opengameart.org/content/isometric-people
     game.load.spritesheet('people', 'assets/image/people.png', 32, 50);
 
@@ -37,7 +37,7 @@ BasicGame.Boot.prototype = {
     // this point would be at screen coordinates 0, 0 (top left) which is usually undesirable.
     game.iso.anchor.setTo(0.5, 0.2);
   },
-  create: () => {
+  create() {
     // Let's make a load of tiles on a grid.
     for (let i = 0; i < GRID.length; i += 1) {
       for (let j = 0; j < GRID[i].length; j += 1) {
@@ -159,8 +159,8 @@ BasicGame.Boot.prototype = {
       }
     });
   },
-  update: () => {},
-  render: () => {},
+  update() {},
+  render() {},
 };
 
 game.state.add('Boot', BasicGame.Boot);
