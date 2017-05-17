@@ -1,19 +1,44 @@
 import Phaser from 'phaser-ce';
 import PF from 'pathfinding';
 
-const game = new Phaser.Game(600, 800, Phaser.AUTO);
+const game = new Phaser.Game(600, 600, Phaser.AUTO);
 
 const TILESIZE = 36;
 const GRID = [
-  [0, 0, 0, 0, 1, 0, 0, 0],
+  [0, 0, 0, 0, 2, 0, 0, 0],
+  [0, 0, 1, 1, 3, 0, 0, 0],
+  [0, 0, 0, 0, 2, 0, 2, 0],
+  [0, 0, 0, 0, 0, 0, 1, 1],
+  [3, 2, 0, 0, 0, 0, 0, 0],
   [0, 0, 1, 1, 1, 0, 0, 0],
-  [0, 0, 0, 0, 1, 0, 1, 0],
-  [0, 0, 0, 0, 0, 0, 1, 0],
-  [0, 1, 0, 1, 0, 0, 0, 0],
-  [0, 0, 0, 1, 1, 0, 0, 0],
-  [0, 0, 0, 0, 0, 1, 1, 1],
-  [1, 1, 1, 0, 0, 0, 0, 0],
+  [0, 0, 0, 2, 0, 0, 1, 1],
+  [1, 1, 0, 0, 0, 0, 0, 0],
 ];
+
+const TILE = [
+  {
+    name: 'grass',
+    isoZ: 0,
+    anchor: [0.5, 0],
+  },
+  {
+    name: 'wall',
+    isoZ: 4,
+    anchor: [0.5, 0.5],
+  },
+  {
+    name: 'bush1',
+    isoZ: 13,
+    anchor: [0.5, 0],
+  },
+  {
+    name: 'bush2',
+    isoZ: 13,
+    anchor: [0.5, 0],
+  },
+];
+
+let isoGroup;
 
 // it needs this format of functions for Phaser to work
 function BasicGame() { }
@@ -38,15 +63,17 @@ BasicGame.Boot.prototype = {
     game.iso.anchor.setTo(0.5, 0.2);
   },
   create() {
+    isoGroup = game.add.group();
+
     // Let's make a load of tiles on a grid.
     for (let i = 0; i < GRID.length; i += 1) {
       for (let j = 0; j < GRID[i].length; j += 1) {
         // Create a tile using the new game.add.isoSprite factory method at the specified position.
         // The last parameter is the group you want to add it to (just like game.add.sprite)
         const grid = GRID[i][j];
-        const tile = grid ? 'bush1' : 'grass';
-        const tileSprite = game.add.isoSprite(j * TILESIZE, i * TILESIZE, grid ? 13 : 0, 'tileset', tile);
-        tileSprite.anchor.set(0.5, 0);
+        const tile = TILE[grid];
+        const tileSprite = game.add.isoSprite(j * TILESIZE, i * TILESIZE, tile.isoZ, 'tileset', tile.name, isoGroup);
+        tileSprite.anchor.set(tile.anchor[0], tile.anchor[1]);
         tileSprite.smoothed = false;
       }
     }
@@ -56,7 +83,7 @@ BasicGame.Boot.prototype = {
     const playerPos = new Phaser.Plugin.Isometric.Point3();
 
     // Use the sprite from above as player
-    const player = game.add.isoSprite(0, 0, 0, 'people', 0);
+    const player = game.add.isoSprite(0, 0, 0, 'people', 0, isoGroup);
     player.animations.add('walk-up', [30, 31, 32, 33, 34, 35, 36, 37, 38], 30, true);
     player.animations.add('walk-left', [20, 21, 22, 23, 24, 25, 26, 27, 28], 30, true);
     player.animations.add('walk-right', [10, 11, 12, 13, 14, 15, 16, 17, 18], 30, true);
@@ -159,7 +186,9 @@ BasicGame.Boot.prototype = {
       }
     });
   },
-  update() {},
+  update() {
+    game.iso.topologicalSort(isoGroup);
+  },
   render() {},
 };
 
