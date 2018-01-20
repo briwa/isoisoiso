@@ -20,20 +20,24 @@ const vendorEntries = [
 
 module.exports = {
   entry: {
-    app: path.resolve(__dirname, 'assets/js/app.js'),
+    app: path.resolve(__dirname, 'src/app/index.js'),
     vendor: vendorEntries,
   },
 
   output: {
-    path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+
+  devServer: {
+    publicPath: '/dist/',
   },
 
   devtool: 'cheap-source-map',
 
   module: {
     rules: [
-      { test: /\.js$/, use: ['babel-loader'], include: path.join(__dirname, 'assets/js') },
+      { test: /\.js$/, use: ['babel-loader'], include: path.join(__dirname, 'src/app') },
       { test: /pixi\.js/, use: ['expose-loader?PIXI'] },
       { test: /phaser-split\.js$/, use: ['expose-loader?Phaser'] },
       { test: /p2\.js/, use: ['expose-loader?p2'] },

@@ -47,10 +47,10 @@ BasicGame.Boot = function Boot() { };
 BasicGame.Boot.prototype = {
   preload() {
     // https://opengameart.org/content/isometric-people
-    game.load.spritesheet('people', 'assets/image/people.png', 32, 50);
+    game.load.spritesheet('people', 'assets/images/people.png', 32, 50);
 
     // http://www.pixeljoint.com/pixelart/66809.htm
-    game.load.atlasJSONHash('tileset', 'assets/image/tileset.png', 'assets/image/tileset.json');
+    game.load.atlasJSONHash('tileset', 'assets/images/tileset.png', 'assets/images/tileset.json');
 
     game.time.advancedTiming = true;
 
