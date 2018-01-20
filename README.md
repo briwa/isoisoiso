@@ -1,12 +1,18 @@
 ## Isometric map with PhaserJS
 
-Fun stuff
+A simple demo on how to make game using [Phaser](https://www.phaser.io) in an isometric layout using [Phaser Isometric Plugin](http://rotates.org/phaser/iso/). Pathfinding is made available using [pathfinding.js](https://github.com/qiao/PathFinding.js/).
 
-- [Phaser](https://www.phaser.io)
-- [Phaser Isometric Plugin](http://rotates.org/phaser/iso/)
-- [pathfinding.js](https://github.com/qiao/PathFinding.js/)
+## How to run
+```bash
+npm run watch
+```
+Then separately run a server that servers `index.html`
+```bash
+http-server
+```
 
-- Sprites sources:
+## Assets sources
+
   - [https://opengameart.org/content/isometric-people](https://opengameart.org/content/isometric-people)
   - [http://www.pixeljoint.com/pixelart/66809.htm](http://www.pixeljoint.com/pixelart/66809.htm)
 

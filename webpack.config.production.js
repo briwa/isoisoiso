@@ -1,6 +1,8 @@
 const path = require('path');
 const webpack = require('webpack');
 
+// had to do this for phaser custom bundle
+// for more info: https://github.com/photonstorm/phaser-ce#webpack
 const phaserModule = path.join(__dirname, '/node_modules/phaser-ce/');
 const phaser = path.join(phaserModule, 'build/custom/phaser-split.js');
 const pixi = path.join(phaserModule, 'build/custom/pixi.js');
