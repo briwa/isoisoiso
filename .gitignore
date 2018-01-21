@@ -1,5 +1,5 @@
 npm-debug*
+<<<<<<< HEAD
 node_modules
 coverage
-
-dist
+>>>>>>> 90f167b... Un-ignore dist to serve js files
