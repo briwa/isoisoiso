@@ -1,5 +1,18 @@
+// TODO:
+// - webpack blocks?
+
 const path = require('path');
 const webpack = require('webpack');
+
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+// we can optimize this by only extracting to file in production
+// but for now, just do it for both env
+// info: https://github.com/webpack-contrib/sass-loader#in-production
+const extractSass = new ExtractTextPlugin({
+  filename: 'style.css',
+  disable: false,
+});
 
 // had to do this for phaser custom bundle
 // for more info: https://github.com/photonstorm/phaser-ce#webpack
@@ -20,22 +33,59 @@ const vendorEntries = [
 
 module.exports = {
   entry: {
-    app: path.resolve(__dirname, 'src/app/index.js'),
+    app: [
+      path.resolve(__dirname, 'src/app/index.js'),
+      path.resolve(__dirname, 'src/styles/main.scss'),
+    ],
     vendor: vendorEntries,
   },
 
   output: {
-    path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist'),
   },
 
   module: {
     rules: [
-      { test: /\.js$/, use: ['babel-loader'], include: path.join(__dirname, 'src/app') },
-      { test: /pixi\.js/, use: ['expose-loader?PIXI'] },
-      { test: /phaser-split\.js$/, use: ['expose-loader?Phaser'] },
-      { test: /p2\.js/, use: ['expose-loader?p2'] },
-      { test: /phaser-plugin-isometric\.js/, use: ['imports-loader?Phaser=phaser-ce'] },
+      {
+        test: /\.js$/,
+        use: ['babel-loader'],
+        exclude: /node_modules/,
+        include: path.join(__dirname, 'src/app'),
+      },
+      {
+        test: /pixi\.js/,
+        use: ['expose-loader?PIXI'],
+      },
+      {
+        test: /phaser-split\.js$/,
+        use: ['expose-loader?Phaser'],
+      },
+      {
+        test: /p2\.js/,
+        use: ['expose-loader?p2'],
+      },
+      {
+        test: /phaser-plugin-isometric\.js/,
+        use: ['imports-loader?Phaser=phaser-ce'],
+      },
+      {
+        test: /\.scss$/,
+        exclude: /node_modules/,
+        include: path.join(__dirname, 'src/styles'),
+        use: extractSass.extract({
+          use: [
+            'css-loader',
+            {
+              loader: 'sass-loader',
+              query: {
+                sourceMap: false,
+              },
+            },
+          ],
+          fallback: 'style-loader',
+        }),
+      },
     ],
   },
 
@@ -52,6 +102,8 @@ module.exports = {
       name: 'vendor',
       filename: 'vendor.bundle.js',
     }),
+
+    extractSass,
   ],
 
   resolve: {
