@@ -1,12 +1,12 @@
 import Phaser from 'phaser-ce';
-import Boot from './states/boot';
+import Play from './states/play';
 
 class Game extends Phaser.Game {
   constructor() {
     super(600, 600, Phaser.AUTO);
 
-    this.state.add('Boot', Boot, false);
-    this.state.start('Boot');
+    this.state.add('Play', Play, false);
+    this.state.start('Play');
   }
 }
 
