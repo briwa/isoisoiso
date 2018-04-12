@@ -1,4 +1,6 @@
 import Phaser from 'phaser-ce';
+import PF from 'pathfinding';
+
 import Player from '../chars/player';
 
 import { TILESIZE, GRID, TILE } from '../maps/default';
@@ -8,6 +10,9 @@ class Play extends Phaser.State {
     super();
 
     this.isoGroup = null;
+    this.gridCursor = new Phaser.Plugin.Isometric.Point3();
+
+    this.player = null;
   }
 
   preload() {
@@ -44,14 +49,60 @@ class Play extends Phaser.State {
       }
     }
 
-    const newPlayer = new Player(this.game, 0, 0, 0, 'people', 0, this.isoGroup);
+    this.player = new Player(this.game, 0, 0, 0, 'people', 0, this.isoGroup);
 
-    this.game.input.onDown.add((pointer) => {
-      newPlayer.move(pointer.position);
+    this.game.input.onDown.add(() => {
+      // todo: find out why cursor.x / cursor.y sometimes returns negative value
+      const cursor = {
+        x: Math.floor(this.gridCursor.x / TILESIZE),
+        y: Math.floor(this.gridCursor.y / TILESIZE),
+      };
+
+      // ignore out of bounds clicks
+      if (cursor.x >= 0 && cursor.y >= 0 && cursor.x < GRID.length && cursor.y < GRID.length) {
+        const matrix = new PF.Grid(GRID);
+        const finder = new PF.AStarFinder();
+
+        const paths = finder.findPath(
+          this.player.currPos.x, this.player.currPos.y,
+          cursor.x, cursor.y,
+          matrix,
+        );
+
+        this.player.move(paths);
+      }
     });
   }
 
   update() {
+    // Update the cursor position.
+    // It's important to understand that screen-to-isometric projection means
+    // you have to specify a z position manually, as this cannot be easily
+    // determined from the 2D pointer position without extra trickery.
+    // By default, the z position is 0 if not set.
+    this.game.iso.unproject(this.game.input.activePointer.position, this.gridCursor);
+
+    this.isoGroup.forEach((t) => {
+      const tile = t;
+      const inBounds = tile.isoBounds.containsXY(this.gridCursor.x, this.gridCursor.y);
+
+      // Test to see if the 3D position from above intersects
+      // with the automatically generated IsoSprite tile bounds.
+      if (!tile.selected && inBounds) {
+        // If it does, do a little animation and tint change.
+        tile.selected = true;
+        if (!tile.inPath) {
+          tile.tint = 0x86bfda;
+        }
+      } else if (tile.selected && !inBounds) {
+        // If not, revert back to how it was.
+        tile.selected = false;
+        if (!tile.inPath) {
+          tile.tint = 0xffffff;
+        }
+      }
+    });
+
     this.game.iso.topologicalSort(this.isoGroup);
   }
 }
