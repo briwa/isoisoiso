@@ -1,17 +1,7 @@
 import Phaser from 'phaser-ce';
 import PF from 'pathfinding';
 
-const TILESIZE = 36;
-const GRID = [
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 3, 0, 0, 0],
-  [0, 0, 1, 1, 3, 0, 0, 0],
-  [0, 0, 1, 1, 3, 2, 0, 0],
-  [3, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 3, 0, 0],
-];
+import { TILESIZE, GRID } from '../maps/default';
 
 const getDir = (prev, next) => {
   if (prev[0] === next[0] && prev[1] === next[1]) {

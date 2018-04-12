@@ -1,42 +1,7 @@
 import Phaser from 'phaser-ce';
-import PF from 'pathfinding';
-
 import Player from '../chars/player';
 
-const TILESIZE = 36;
-const GRID = [
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 3, 0, 0, 0],
-  [0, 0, 1, 1, 3, 0, 0, 0],
-  [0, 0, 1, 1, 3, 2, 0, 0],
-  [3, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 3, 0, 0],
-];
-
-const TILE = [
-  {
-    name: 'grass',
-    isoZ: 0,
-    anchor: [0.5, 0],
-  },
-  {
-    name: 'wall',
-    isoZ: 4,
-    anchor: [0.5, 0.5],
-  },
-  {
-    name: 'bush1',
-    isoZ: 13,
-    anchor: [0.5, 0],
-  },
-  {
-    name: 'bush2',
-    isoZ: 13,
-    anchor: [0.5, 0],
-  },
-];
+import { TILESIZE, GRID, TILE } from '../maps/default';
 
 class Play extends Phaser.State {
   constructor() {
