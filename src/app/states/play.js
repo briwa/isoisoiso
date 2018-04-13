@@ -13,6 +13,7 @@ class Play extends Phaser.State {
     this.gridCursor = new Phaser.Plugin.Isometric.Point3();
 
     this.player = null;
+    this.activePaths = [];
   }
 
   preload() {
@@ -69,7 +70,11 @@ class Play extends Phaser.State {
           matrix,
         );
 
-        this.player.move(paths);
+        this.activePaths = paths;
+
+        this.player.move(paths, () => {
+          this.activePaths = [];
+        });
       }
     });
   }
@@ -85,25 +90,42 @@ class Play extends Phaser.State {
     this.isoGroup.forEach((t) => {
       const tile = t;
       const inBounds = tile.isoBounds.containsXY(this.gridCursor.x, this.gridCursor.y);
+      const moving = this.activePaths.length > 0;
+
+      if (moving) {
+        // TODO: optimize this, can we do something like this.activePaths.x.indexOf(tile.x) >= 0?
+        this.activePaths.forEach((p) => {
+          const inPath = tile.isoBounds.containsXY(p[0] * TILESIZE, p[1] * TILESIZE);
+
+          if (!tile.inPath && inPath) {
+            // If it does, do a little animation and tint change.
+            tile.inPath = true;
+          }
+        });
+      } else {
+        tile.inPath = false;
+      }
 
       // Test to see if the 3D position from above intersects
       // with the automatically generated IsoSprite tile bounds.
-      if (!tile.selected && inBounds) {
+      if (tile.inPath) {
+        tile.tint = 0xff0000;
+      } else if (!tile.selected && inBounds && !tile.inPath) {
         // If it does, do a little animation and tint change.
         tile.selected = true;
-        if (!tile.inPath) {
-          tile.tint = 0x86bfda;
-        }
-      } else if (tile.selected && !inBounds) {
+        tile.tint = 0x86bfda;
+      } else if ((tile.selected && !inBounds) || !moving) {
         // If not, revert back to how it was.
         tile.selected = false;
-        if (!tile.inPath) {
-          tile.tint = 0xffffff;
-        }
+        tile.tint = 0xffffff;
       }
     });
 
     this.game.iso.topologicalSort(this.isoGroup);
+  }
+
+  render() {
+    this.game.debug.text(JSON.stringify(this.activePaths), 0, 32);
   }
 }
 

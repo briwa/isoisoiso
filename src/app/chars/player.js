@@ -31,7 +31,7 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
     this.currPos = new Phaser.Plugin.Isometric.Point3();
   }
 
-  move(paths) {
+  move(paths, doneCb = () => {}) {
     // shouldn't be moving when on the move
     if (this.animations.currentAnim.isPlaying || paths.length === 0) return false;
 
@@ -45,14 +45,19 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
         newPath.push({ coord: next, dir: getDir(currPos.coord, next) || 'init' });
 
         return newPath;
-      }, []).slice(1)); // skip first path since the first one is just the initial position
+      }, []).slice(1), // skip first path since the first one is just the initial position
+      doneCb);
 
     return true;
   }
 
-  startTween(paths) {
+  startTween(paths, doneCb) {
     const curr = paths[0];
-    if (!curr) return;
+    if (!curr) {
+      // no more paths left, means it's stopped moving
+      doneCb();
+      return;
+    }
 
     // slice now to get the remaining path right away
     // since we're using it for references below
@@ -85,7 +90,7 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
         sprite.animations.stop(currDirAnim, true);
       }
 
-      this.startTween(remainingPath);
+      this.startTween(remainingPath, doneCb);
     });
 
     tween.start();
