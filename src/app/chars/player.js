@@ -2,17 +2,29 @@ import Phaser from 'phaser-ce';
 
 import { TILESIZE } from '../maps/default';
 
-const getDir = (prev, next) => {
-  if (prev[0] === next[0] && prev[1] === next[1]) {
-    return null;
-  } else if (prev[0] === next[0]) {
-    return prev[1] > next[1] ? 'up' : 'down';
-  } else if (prev[1] === next[1]) {
-    return prev[0] > next[0] ? 'left' : 'right';
-  }
+const DURATION = 500;
 
+const getDir = (prev, next) => {
+  if (prev[0] === next[0]) return prev[1] > next[1] ? 'up' : 'down';
+  if (prev[1] === next[1]) return prev[0] > next[0] ? 'left' : 'right';
   return false;
 };
+
+function shapePaths(paths, initialDuration = DURATION) {
+  const initialPath = paths[0];
+  return paths.slice(1).reduce((newPath, next, idx) => {
+    // always take the last position as the reference
+    // if there's none, use the first position as the current one
+    const currPos = newPath[newPath.length - 1] || { coord: initialPath };
+
+    // assign direction for the next one
+    const dir = getDir(currPos.coord, next);
+    const duration = idx === 0 ? initialDuration : DURATION;
+    newPath.push({ coord: next, dir, duration });
+
+    return newPath;
+  }, []);
+}
 
 class Player extends Phaser.Plugin.Isometric.IsoSprite {
   constructor(game, x, y, z, key, frame, group) {
@@ -29,33 +41,36 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
     this.animations.add('walk-down', [0, 1, 2, 3, 4, 5, 6, 7, 8], 30, true);
 
     this.currPos = new Phaser.Plugin.Isometric.Point3();
+    this.currTween = null;
+    this.currPath = null;
   }
 
-  move(paths, doneCb = () => {}) {
+  move(paths, doneCb) {
+    if (paths.length === 0) {
+      return;
+    }
+
     // shouldn't be moving when on the move
-    if (this.animations.currentAnim.isPlaying || paths.length === 0) return false;
+    if (this.animations.currentAnim.isPlaying) {
+      this.currTween.stop();
+      const initialDuration = DURATION * (1 - this.currTween.timeline[0].percent);
 
-    this.startTween(
-      paths.reduce((newPath, next) => {
-        // always take the last position as the reference
-        // if there's none, use the first position as the current one
-        const currPos = newPath[newPath.length - 1] || { coord: next };
+      const newX = this.isoPosition.x / TILESIZE;
+      const newY = this.isoPosition.y / TILESIZE;
 
-        // assign direction for the next one
-        newPath.push({ coord: next, dir: getDir(currPos.coord, next) || 'init' });
+      const newPaths = [[newX, newY]].concat(paths);
 
-        return newPath;
-      }, []).slice(1), // skip first path since the first one is just the initial position
-      doneCb);
-
-    return true;
+      this.startTween(shapePaths(newPaths, initialDuration), doneCb);
+    } else {
+      this.startTween(shapePaths(paths), doneCb);
+    }
   }
 
   startTween(paths, doneCb) {
     const curr = paths[0];
     if (!curr) {
       // no more paths left, means it's stopped moving
-      doneCb();
+      if (doneCb) doneCb();
       return;
     }
 
@@ -68,12 +83,12 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
     this.currPos.set(curr.coord[0], curr.coord[1]);
     const currDirAnim = `walk-${curr.dir}`;
 
-    const tween = this.game.add.tween(this).to({
+    this.currTween = this.game.add.tween(this).to({
       isoX: this.currPos.x * TILESIZE,
       isoY: this.currPos.y * TILESIZE,
-    }, 500, Phaser.Easing.Linear.None, false);
+    }, curr.duration, Phaser.Easing.Linear.None, false);
 
-    tween.onStart.add((sprite) => {
+    this.currTween.onStart.add((sprite) => {
       // do not play the same animation twice
       // if this is the first movement (from static to moving),
       // always play the animation regardless
@@ -83,7 +98,7 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
       }
     });
 
-    tween.onComplete.add((sprite) => {
+    this.currTween.onComplete.add((sprite) => {
       // only stop when there's no more paths left
       // we want the animation to run seamlessly
       if (!remainingPath.length) {
@@ -93,7 +108,7 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
       this.startTween(remainingPath, doneCb);
     });
 
-    tween.start();
+    this.currTween.start();
   }
 }
 

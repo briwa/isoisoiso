@@ -9,7 +9,9 @@ class Play extends Phaser.State {
   constructor() {
     super();
 
-    this.isoGroup = null;
+    this.mapGroup = null;
+    this.charGroup = null;
+
     this.gridCursor = new Phaser.Plugin.Isometric.Point3();
 
     this.player = null;
@@ -35,7 +37,8 @@ class Play extends Phaser.State {
   }
 
   create() {
-    this.isoGroup = this.game.add.group();
+    this.mapGroup = this.game.add.group();
+    this.charGroup = this.game.add.group();
 
     // Let's make a load of tiles on a grid.
     for (let i = 0; i < GRID.length; i += 1) {
@@ -44,13 +47,13 @@ class Play extends Phaser.State {
         // The last parameter is the group you want to add it to (just like game.add.sprite)
         const grid = GRID[i][j];
         const tile = TILE[grid];
-        const tileSprite = this.game.add.isoSprite(j * TILESIZE, i * TILESIZE, tile.isoZ, 'tileset', tile.name, this.isoGroup);
+        const tileSprite = this.game.add.isoSprite(j * TILESIZE, i * TILESIZE, tile.isoZ, 'tileset', tile.name, this.mapGroup);
         tileSprite.anchor.set(tile.anchor[0], tile.anchor[1]);
         tileSprite.smoothed = false;
       }
     }
 
-    this.player = new Player(this.game, 0, 0, 0, 'people', 0, this.isoGroup);
+    this.player = new Player(this.game, 0, 0, 0, 'people', 0, this.charGroup);
 
     this.game.input.onDown.add(() => {
       // todo: find out why cursor.x / cursor.y sometimes returns negative value
@@ -87,45 +90,36 @@ class Play extends Phaser.State {
     // By default, the z position is 0 if not set.
     this.game.iso.unproject(this.game.input.activePointer.position, this.gridCursor);
 
-    this.isoGroup.forEach((t) => {
+    this.mapGroup.forEach((t) => {
       const tile = t;
       const inBounds = tile.isoBounds.containsXY(this.gridCursor.x, this.gridCursor.y);
-      const moving = this.activePaths.length > 0;
 
-      if (moving) {
-        // TODO: optimize this, can we do something like this.activePaths.x.indexOf(tile.x) >= 0?
-        this.activePaths.forEach((p) => {
-          const inPath = tile.isoBounds.containsXY(p[0] * TILESIZE, p[1] * TILESIZE);
-
-          if (!tile.inPath && inPath) {
-            // If it does, do a little animation and tint change.
-            tile.inPath = true;
-          }
-        });
+      if (tile.inPath) {
+        // Clear tint from previous path
+        tile.tint = 0xffffff;
+      }
+      const x = tile.isoX / TILESIZE;
+      const y = tile.isoY / TILESIZE;
+      const inPath = this.activePaths.some(point => point[0] === x && point[1] === y);
+      if (inPath) {
+        tile.tint = 0xff0000;
+        tile.inPath = true;
       } else {
         tile.inPath = false;
       }
 
-      // Test to see if the 3D position from above intersects
-      // with the automatically generated IsoSprite tile bounds.
-      if (tile.inPath) {
-        tile.tint = 0xff0000;
-      } else if (!tile.selected && inBounds && !tile.inPath) {
+      if (!tile.selected && inBounds && !tile.inPath) {
         // If it does, do a little animation and tint change.
         tile.selected = true;
         tile.tint = 0x86bfda;
-      } else if ((tile.selected && !inBounds) || !moving) {
+      } else if (tile.selected && !inBounds) {
         // If not, revert back to how it was.
         tile.selected = false;
         tile.tint = 0xffffff;
       }
     });
 
-    this.game.iso.topologicalSort(this.isoGroup);
-  }
-
-  render() {
-    this.game.debug.text(JSON.stringify(this.activePaths), 0, 32);
+    this.game.iso.topologicalSort(this.mapGroup);
   }
 }
 
