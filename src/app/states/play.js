@@ -1,6 +1,7 @@
 import Phaser from 'phaser-ce';
 
 import Player from '../chars/player';
+import Npc from '../chars/npc';
 import { TILESIZE, GRID, TILE } from '../maps/default';
 
 class Play extends Phaser.State {
@@ -18,7 +19,7 @@ class Play extends Phaser.State {
 
   preload() {
     // https://opengameart.org/content/isometric-people
-    this.game.load.spritesheet('people', 'assets/images/people.png', 32, 50);
+    this.game.load.spritesheet('people', 'assets/images/people.png', 32, 49);
 
     // http://www.pixeljoint.com/pixelart/66809.htm
     this.game.load.atlasJSONHash('tileset', 'assets/images/tileset.png', 'assets/images/tileset.json');
@@ -51,7 +52,21 @@ class Play extends Phaser.State {
       }
     }
 
-    this.player = new Player(this.game, 0, 0, 0, 'people', 0, this.charGroup);
+    this.player = new Player({
+      game: this.game,
+      x: 0,
+      y: 0,
+      z: 0,
+      sprite: 'people',
+      delimiter: 0,
+      group: this.charGroup,
+    });
+
+    this.npc = new Npc({
+      game: this.game,
+      group: this.charGroup,
+    });
+    this.npc.moveTrack(GRID);
 
     this.game.input.onDown.add(() => {
       // todo: find out why cursor.x / cursor.y sometimes returns negative value
