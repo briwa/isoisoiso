@@ -66,7 +66,7 @@ class Play extends Phaser.State {
       game: this.game,
       group: this.charGroup,
     });
-    this.npc.moveTrack(GRID);
+    this.npc.moveTrack(GRID, this.player);
 
     this.game.input.onDown.add(() => {
       // todo: find out why cursor.x / cursor.y sometimes returns negative value
@@ -81,6 +81,11 @@ class Play extends Phaser.State {
           x: cursor.x,
           y: cursor.y,
           grid: GRID,
+          check: (x, y) => {
+            const playerX = Math.ceil(this.npc.isoPosition.x / TILESIZE);
+            const playerY = Math.ceil(this.npc.isoPosition.y / TILESIZE);
+            return x === playerX && y === playerY;
+          },
           start: (paths) => {
             this.activePaths = paths;
           },

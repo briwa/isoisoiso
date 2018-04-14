@@ -6,8 +6,8 @@ import { TILESIZE } from '../maps/default';
 class Npc extends Player {
   constructor({ game, group }) {
     const track = [
-      [3, 3],
-      [6, 3],
+      [1, 3],
+      [7, 3],
     ];
 
     const z = 0;
@@ -29,25 +29,42 @@ class Npc extends Player {
     this.track = track;
   }
 
-  moveTrack(grid) {
+  moveTrack(grid, player) {
     this.move({
       x: this.track[this.index][0],
       y: this.track[this.index][1],
       grid,
-      done: () => {
-        this.forward =
-          (this.forward && !!this.track[this.index + 1]) ||
-          (!this.forward && !this.track[this.index - 1]);
+      check: (x, y) => {
+        const playerX = Math.ceil(player.isoPosition.x / TILESIZE);
+        const playerY = Math.ceil(player.isoPosition.y / TILESIZE);
+        const isColliding = x === playerX && y === playerY;
 
-        if (this.forward) {
-          this.index += 1;
-        } else {
-          this.index -= 1;
+        // wait one sec then continue moving as per usual
+        if (isColliding) {
+          setTimeout(() => {
+            this.moveTrack(grid, player);
+          }, 1000);
         }
 
-        this.moveTrack(grid);
+        return isColliding;
+      },
+      done: () => {
+        this.setNextIndex();
+        this.moveTrack(grid, player);
       },
     });
+  }
+
+  setNextIndex() {
+    this.forward =
+      (this.forward && !!this.track[this.index + 1]) ||
+      (!this.forward && !this.track[this.index - 1]);
+
+    if (this.forward) {
+      this.index += 1;
+    } else {
+      this.index -= 1;
+    }
   }
 }
 

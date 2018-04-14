@@ -55,9 +55,15 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
     this.animations.add('walk-down', [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => i + delimiter), 30, true);
 
     this.currTween = null;
+    this.bounds = {
+      up: [],
+      down: [],
+      left: [],
+      right: [],
+    };
   }
 
-  move({ x, y, grid, start, done }) {
+  move({ x, y, grid, check, start, done }) {
     let initialDuration = DURATION;
 
     // the current exact position when move is called
@@ -92,23 +98,32 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
       moving ? [[currPos.x, currPos.y]].concat(paths) : paths,
       initialDuration);
 
-    this.startTween(tweens, done);
+    this.startTween(tweens, check, done);
 
     if (start) start(paths);
   }
 
-  startTween(paths, doneCb) {
+  startTween(paths, check, done) {
     const curr = paths[0];
     if (!curr) {
       // no more paths left, means it's stopped moving
-      if (doneCb) doneCb();
+      if (done) done();
       return;
     }
+
+    const currDirAnim = `walk-${curr.dir}`;
+
+    if (check && check(curr.coord[0], curr.coord[1]) && this.currTween) {
+      this.currTween.stop();
+      this.animations.stop(currDirAnim, true);
+      return;
+    }
+
+    this.setBounds(curr.coord[0], curr.coord[1]);
 
     // slice now to get the remaining path right away
     // since we're using it for references below
     const remainingPath = paths.slice(1);
-    const currDirAnim = `walk-${curr.dir}`;
 
     this.currTween = this.game.add.tween(this).to({
       isoX: curr.coord[0] * TILESIZE,
@@ -132,7 +147,7 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
         sprite.animations.stop(currDirAnim, true);
       }
 
-      this.startTween(remainingPath, doneCb);
+      this.startTween(remainingPath, check, done);
     });
 
     this.currTween.start();
@@ -150,6 +165,24 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
         this.randomMove({ grid });
       },
     });
+  }
+
+  setBounds(x, y) {
+    this.bounds.up = [x, y - 1];
+    this.bounds.down = [x, y + 1];
+    this.bounds.left = [x - 1, y];
+    this.bounds.right = [x + 1, y];
+  }
+
+  isInbound(x, y, dir) {
+    if (dir) {
+      return this.bounds[dir][0] === x && this.bounds[dir][1] === y;
+    }
+
+    return (this.bounds.up[0] === x && this.bounds.up[1] === y) ||
+      (this.bounds.down[0] === x && this.bounds.down[1] === y) ||
+      (this.bounds.left[0] === x && this.bounds.left[1] === y) ||
+      (this.bounds.right[0] === x && this.bounds.right[1] === y);
   }
 }
 
