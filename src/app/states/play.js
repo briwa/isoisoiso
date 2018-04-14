@@ -1,8 +1,6 @@
 import Phaser from 'phaser-ce';
-import PF from 'pathfinding';
 
 import Player from '../chars/player';
-
 import { TILESIZE, GRID, TILE } from '../maps/default';
 
 class Play extends Phaser.State {
@@ -64,19 +62,16 @@ class Play extends Phaser.State {
 
       // ignore out of bounds clicks
       if (cursor.x >= 0 && cursor.y >= 0 && cursor.x < GRID.length && cursor.y < GRID.length) {
-        const matrix = new PF.Grid(GRID);
-        const finder = new PF.AStarFinder();
-
-        const paths = finder.findPath(
-          this.player.currPos.x, this.player.currPos.y,
-          cursor.x, cursor.y,
-          matrix,
-        );
-
-        this.activePaths = paths;
-
-        this.player.move(paths, () => {
-          this.activePaths = [];
+        this.player.move({
+          x: cursor.x,
+          y: cursor.y,
+          grid: GRID,
+          start: (paths) => {
+            this.activePaths = paths;
+          },
+          done: () => {
+            this.activePaths = [];
+          },
         });
       }
     });

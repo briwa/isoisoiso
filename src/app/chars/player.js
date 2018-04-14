@@ -1,5 +1,7 @@
 import Phaser from 'phaser-ce';
+import PF from 'pathfinding';
 
+// todo: find a way to extract this out of the class component
 import { TILESIZE } from '../maps/default';
 
 const DURATION = 500;
@@ -26,6 +28,17 @@ function shapePaths(paths, initialDuration = DURATION) {
   }, []);
 }
 
+function findPath(startX, startY, endX, endY, grid) {
+  const matrix = new PF.Grid(grid);
+  const finder = new PF.AStarFinder();
+
+  return finder.findPath(
+    startX, startY,
+    endX, endY,
+    matrix,
+  );
+}
+
 class Player extends Phaser.Plugin.Isometric.IsoSprite {
   constructor(game, x, y, z, key, frame, group) {
     super(game, x, y, z, key, frame);
@@ -40,30 +53,40 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
     this.animations.add('walk-right', [10, 11, 12, 13, 14, 15, 16, 17, 18], 30, true);
     this.animations.add('walk-down', [0, 1, 2, 3, 4, 5, 6, 7, 8], 30, true);
 
-    this.currPos = new Phaser.Plugin.Isometric.Point3();
     this.currTween = null;
-    this.currPath = null;
   }
 
-  move(paths, doneCb) {
-    if (paths.length === 0) {
-      return;
-    }
+  move({ x, y, grid, start, done }) {
+    let initialDuration = DURATION;
 
-    // shouldn't be moving when on the move
-    if (this.animations.currentAnim.isPlaying) {
+    const currPos = {
+      x: this.isoPosition.x / TILESIZE,
+      y: this.isoPosition.y / TILESIZE,
+    };
+
+    const startPos = {
+      x: currPos.x,
+      y: currPos.y,
+    };
+
+    const moving = this.animations.currentAnim.isPlaying;
+
+    if (moving) {
       this.currTween.stop();
-      const initialDuration = DURATION * (1 - this.currTween.timeline[0].percent);
+      initialDuration = DURATION * (1 - this.currTween.timeline[0].percent);
 
-      const newX = this.isoPosition.x / TILESIZE;
-      const newY = this.isoPosition.y / TILESIZE;
-
-      const newPaths = [[newX, newY]].concat(paths);
-
-      this.startTween(shapePaths(newPaths, initialDuration), doneCb);
-    } else {
-      this.startTween(shapePaths(paths), doneCb);
+      startPos.x = this.currTween.timeline[0].vEnd.isoX / TILESIZE;
+      startPos.y = this.currTween.timeline[0].vEnd.isoY / TILESIZE;
     }
+
+    const paths = findPath(startPos.x, startPos.y, x, y, grid);
+    const tweens = shapePaths(
+      moving ? [[currPos.x, currPos.y]].concat(paths) : paths,
+      initialDuration);
+
+    this.startTween(tweens, done);
+
+    if (start) start(paths);
   }
 
   startTween(paths, doneCb) {
@@ -77,15 +100,11 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
     // slice now to get the remaining path right away
     // since we're using it for references below
     const remainingPath = paths.slice(1);
-
-    // set the position now, since the tween wont break in the middle of the action anyway
-    // the position will definitely being set to the next one
-    this.currPos.set(curr.coord[0], curr.coord[1]);
     const currDirAnim = `walk-${curr.dir}`;
 
     this.currTween = this.game.add.tween(this).to({
-      isoX: this.currPos.x * TILESIZE,
-      isoY: this.currPos.y * TILESIZE,
+      isoX: curr.coord[0] * TILESIZE,
+      isoY: curr.coord[1] * TILESIZE,
     }, curr.duration, Phaser.Easing.Linear.None, false);
 
     this.currTween.onStart.add((sprite) => {
@@ -109,6 +128,20 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
     });
 
     this.currTween.start();
+  }
+
+  randomMove({ grid }) {
+    const randomX = Math.floor(Math.random() * grid.length);
+    const randomY = Math.floor(Math.random() * grid.length);
+
+    this.move({
+      grid,
+      x: randomX,
+      y: randomY,
+      done: () => {
+        this.randomMove({ grid });
+      },
+    });
   }
 }
 
