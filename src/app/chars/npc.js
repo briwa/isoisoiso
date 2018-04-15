@@ -35,8 +35,8 @@ class Npc extends Player {
       let nextPosX = this.track[this.index][0];
       let nextPosY = this.track[this.index][1];
 
-      const playerX = Math.ceil(player.currPos().x);
-      const playerY = Math.ceil(player.currPos().y);
+      const playerX = Math.ceil(player.currentPos().x);
+      const playerY = Math.ceil(player.currentPos().y);
 
       if (nextPosX === playerX && nextPosY === playerY) {
         if (nextPosX === playerX) {

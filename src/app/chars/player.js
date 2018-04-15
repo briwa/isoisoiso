@@ -6,43 +6,43 @@ import { TILESIZE } from '../maps/default';
 
 const DURATION = 500;
 
-const getDir = (prev, next) => {
-  if (prev[0] === next[0]) return prev[1] > next[1] ? 'up' : 'down';
-  if (prev[1] === next[1]) return prev[0] > next[0] ? 'left' : 'right';
-  return false;
-};
+function shapePaths(paths, initialSpeed) {
+  const initialPos = {
+    x: paths[0][0],
+    y: paths[0][1],
+  };
 
-function shapePaths(paths, initialDuration = DURATION) {
-  const initialPath = paths[0];
+  const getDir = (prev, next) => {
+    if (prev.x === next.x) return prev.y > next.y ? 'up' : 'down';
+    if (prev.y === next.y) return prev.x > next.x ? 'left' : 'right';
+    return false;
+  };
+
   return paths.slice(1).reduce((newPath, next, idx) => {
     // always take the last position as the reference
     // if there's none, use the first position as the current one
-    const currPos = newPath[newPath.length - 1] || { coord: initialPath };
+    const current = newPath[newPath.length - 1] || { pos: initialPos };
 
     // assign direction for the next one
-    const dir = getDir(currPos.coord, next);
-    const duration = idx === 0 ? initialDuration : DURATION;
-    newPath.push({ coord: next, dir, duration });
+    const nextPos = {
+      x: next[0],
+      y: next[1],
+    };
+
+    const direction = getDir(current.pos, nextPos);
+    const speed = idx === 0 ? initialSpeed : 1;
+    newPath.push({
+      pos: nextPos,
+      direction,
+      speed,
+    });
 
     return newPath;
   }, []);
 }
 
-class Player extends Phaser.Plugin.Isometric.IsoSprite {
+class Player {
   constructor({ game, x, y, z, sprite, group, delimiter, map }) {
-    super(game, x, y, z, sprite, delimiter);
-    group.add(this);
-
-    this.game = game;
-
-    this.anchor.set(0.5);
-
-    this.animations.add('walk-up', [30, 31, 32, 33, 34, 35, 36, 37, 38].map(i => i + delimiter), 30, true);
-    this.animations.add('walk-left', [20, 21, 22, 23, 24, 25, 26, 27, 28].map(i => i + delimiter), 30, true);
-    this.animations.add('walk-right', [10, 11, 12, 13, 14, 15, 16, 17, 18].map(i => i + delimiter), 30, true);
-    this.animations.add('walk-down', [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => i + delimiter), 30, true);
-
-    this.currTween = null;
     this.bounds = {
       up: [],
       down: [],
@@ -50,43 +50,62 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
       right: [],
     };
 
-    this.map = map;
-    this.map.setWalkable(x / TILESIZE, y / TILESIZE, false);
+    this.tweens = [];
+    this.currentTween = null;
+    this.speed = 1; // by default the speed is 100%, not slowed down or doubled up
+
+    if (game && group) {
+      // sprite setup
+      this.game = game;
+      this.sprite = this.game.add.isoSprite(x, y, z, sprite, delimiter, group);
+
+      // animation setup
+      this.sprite.anchor.set(0.5);
+      this.sprite.animations.add('walk-up', [30, 31, 32, 33, 34, 35, 36, 37, 38].map(i => i + delimiter), 30, true);
+      this.sprite.animations.add('walk-left', [20, 21, 22, 23, 24, 25, 26, 27, 28].map(i => i + delimiter), 30, true);
+      this.sprite.animations.add('walk-right', [10, 11, 12, 13, 14, 15, 16, 17, 18].map(i => i + delimiter), 30, true);
+      this.sprite.animations.add('walk-down', [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => i + delimiter), 30, true);
+    }
+
+    if (map) {
+      // map setup
+      this.map = map;
+      this.map.setWalkable(x / TILESIZE, y / TILESIZE, false);
+    }
   }
 
   move({ x, y, check, start, done }) {
-    let initialDuration = DURATION;
+    let initialSpeed = 1;
 
     // in normal case, we use the current position as the start of position
     // to be used for pathfinding
     const startPos = {
-      x: this.currPos(true).x,
-      y: this.currPos(true).y,
+      x: this.currentPos(true).x,
+      y: this.currentPos(true).y,
     };
 
-    const moving = this.animations.currentAnim.isPlaying;
+    const moving = this.tweens.length > 0;
 
     if (moving) {
-      this.currTween.stop();
-      this.animations.stop(this.animations.currentAnim.name, true);
+      this.stopAnimation();
 
       // when moving, the start of the new paths is no longer the current position,
       // it's the end of the animation's position
-      startPos.x = this.currTween.timeline[0].vEnd.isoX / TILESIZE;
-      startPos.y = this.currTween.timeline[0].vEnd.isoY / TILESIZE;
+      startPos.x = this.tweens[0].pos.x;
+      startPos.y = this.tweens[0].pos.y;
 
       // the currently running tween needs to be continued
-      initialDuration = DURATION * (1 - this.currTween.timeline[0].percent);
+      initialSpeed = 1 - this.currentTween.timeline[0].percent;
     }
 
     const paths = this.map.findPath(startPos.x, startPos.y, x, y);
 
     this.tweens = shapePaths(
-      moving ? [[this.currPos().x, this.currPos().y]].concat(paths) : paths,
-      initialDuration);
+      moving ? [[this.currentPos().x, this.currentPos().y]].concat(paths) : paths,
+      initialSpeed);
 
     // no need to proceed when there's no paths
-    if (this.tweens.length === 1) {
+    if (this.tweens.length === 0) {
       if (done) done();
       return;
     }
@@ -97,62 +116,35 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
   }
 
   startTween(check, done) {
-    const curr = this.tweens[0];
-    if (!curr) {
+    const current = this.tweens[0];
+    if (!current) {
       // no more paths left, means it's stopped moving
       if (done) done();
       return;
     }
 
-    const currDirAnim = `walk-${curr.dir}`;
-
-    if (check && check(curr.coord[0], curr.coord[1]) && this.currTween) {
-      this.currTween.stop();
-      this.animations.stop(currDirAnim, true);
+    if (check && check(current.pos.x, current.pos.y) && this.currentTween) {
+      this.stopAnimation();
       return;
     }
 
     // record bounds
-    this.map.setWalkable(this.currPos(true).x, this.currPos(true).y, true);
-    this.setBounds(curr.coord[0], curr.coord[1]);
+    this.map.setWalkable(this.currentPos(true).x, this.currentPos(true).y, true);
+    this.setBounds(current.pos.x, current.pos.y);
 
-    // slice now to get the remaining path right away
-    // since we're using it for references below
-    this.tweens = this.tweens.slice(1);
-
-    this.currTween = this.game.add.tween(this).to({
-      isoX: curr.coord[0] * TILESIZE,
-      isoY: curr.coord[1] * TILESIZE,
-    }, curr.duration, Phaser.Easing.Linear.None, false);
-
-    this.currTween.onStart.add((sprite) => {
-      // do not play the same animation twice
-      // if this is the first movement (from static to moving),
-      // always play the animation regardless
-      const currentAnim = sprite.animations.currentAnim;
-      if (!currentAnim.isPlaying || currentAnim.name !== currDirAnim) {
-        sprite.animations.play(currDirAnim);
-      }
+    this.currentTween = this.tweenTo({
+      done,
+      check,
+      x: current.pos.x,
+      y: current.pos.y,
+      speed: current.speed * DURATION,
+      direction: current.direction,
     });
-
-    this.currTween.onComplete.add((sprite) => {
-      // only stop when there's no more paths left
-      // we want the animation to run seamlessly
-      if (!this.tweens.length) {
-        sprite.animations.stop(currDirAnim, true);
-      }
-
-      this.map.setWalkable(curr.coord[0], curr.coord[1], false);
-
-      this.startTween(check, done);
-    });
-
-    this.currTween.start();
   }
 
-  currPos(floor) {
-    const x = this.isoPosition.x / TILESIZE;
-    const y = this.isoPosition.y / TILESIZE;
+  currentPos(floor) {
+    const x = this.sprite.isoPosition.x / TILESIZE;
+    const y = this.sprite.isoPosition.y / TILESIZE;
     return {
       x: floor ? Math.floor(x) : x,
       y: floor ? Math.floor(y) : y,
@@ -175,6 +167,48 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
       (this.bounds.down[0] === x && this.bounds.down[1] === y) ||
       (this.bounds.left[0] === x && this.bounds.left[1] === y) ||
       (this.bounds.right[0] === x && this.bounds.right[1] === y);
+  }
+
+  // phaser side effects
+  stopAnimation() {
+    if (this.currentTween) this.currentTween.stop();
+    this.sprite.animations.stop(this.sprite.animations.currentAnim.name, true);
+  }
+
+  tweenTo({ x, y, speed, direction, check, done }) {
+    const tween = this.game.add.tween(this.sprite).to({
+      isoX: x * TILESIZE,
+      isoY: y * TILESIZE,
+    }, speed, Phaser.Easing.Linear.None, true);
+
+    const currentDirection = `walk-${direction}`;
+
+    tween.onStart.add(() => {
+      // do not play the same animation twice
+      // if this is the first movement (from static to moving),
+      // always play the animation regardless
+      const currentAnim = this.sprite.animations.currentAnim;
+      if (!currentAnim.isPlaying || currentAnim.name !== currentDirection) {
+        this.sprite.animations.play(currentDirection);
+      }
+    });
+
+    tween.onComplete.add(() => {
+      // remove the tween that is already done
+      this.tweens = this.tweens.slice(1);
+
+      // only stop when there's no more paths left
+      // we want the animation to run seamlessly
+      if (!this.tweens.length) {
+        this.sprite.animations.stop(currentDirection, true);
+      }
+
+      this.map.setWalkable(x, y, false);
+
+      this.startTween(check, done);
+    });
+
+    return tween;
   }
 }
 
