@@ -82,11 +82,6 @@ class Play extends Phaser.State {
         this.player.move({
           x: cursor.x,
           y: cursor.y,
-          check: (x, y) => {
-            const playerX = Math.ceil(this.npc.isoPosition.x / TILESIZE);
-            const playerY = Math.ceil(this.npc.isoPosition.y / TILESIZE);
-            return x === playerX && y === playerY;
-          },
           start: (paths) => {
             this.activePaths = paths;
           },

@@ -31,28 +31,37 @@ class Npc extends Player {
   }
 
   moveTrack(player) {
-    this.move({
-      x: this.track[this.index][0],
-      y: this.track[this.index][1],
-      check: (x, y) => {
-        const playerX = Math.ceil(player.isoPosition.x / TILESIZE);
-        const playerY = Math.ceil(player.isoPosition.y / TILESIZE);
-        const isColliding = x === playerX && y === playerY;
+    setTimeout(() => {
+      let nextPosX = this.track[this.index][0];
+      let nextPosY = this.track[this.index][1];
 
-        // wait one sec then continue moving as per usual
-        if (isColliding) {
-          setTimeout(() => {
-            this.moveTrack(player);
-          }, 1000);
+      const playerX = Math.ceil(player.currPos().x);
+      const playerY = Math.ceil(player.currPos().y);
+
+      if (nextPosX === playerX && nextPosY === playerY) {
+        if (nextPosX === playerX) {
+          nextPosX -= 1;
+        } else if (nextPosY === playerY) {
+          nextPosY -= 1;
         }
+      }
 
-        return isColliding;
-      },
-      done: () => {
-        this.setNextIndex();
-        this.moveTrack(player);
-      },
-    });
+      this.move({
+        x: nextPosX,
+        y: nextPosY,
+        check: (x, y) => {
+          const isColliding = x === playerX && y === playerY;
+
+          // wait one sec then continue moving as per usual
+          if (isColliding) this.moveTrack(player);
+          return isColliding;
+        },
+        done: () => {
+          this.setNextIndex();
+          this.moveTrack(player);
+        },
+      });
+    }, 2000);
   }
 
   setNextIndex() {

@@ -43,4 +43,7 @@ export const MAP = {
 
     return finder.findPath(x, y, x1, y1, matrix);
   },
+  setWalkable(x, y, walkable) {
+    GRID[y][x] = walkable ? 0 : 9;
+  },
 };

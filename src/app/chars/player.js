@@ -51,6 +51,7 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
     };
 
     this.map = map;
+    this.map.setWalkable(x / TILESIZE, y / TILESIZE, false);
   }
 
   move({ x, y, check, start, done }) {
@@ -59,14 +60,15 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
     // in normal case, we use the current position as the start of position
     // to be used for pathfinding
     const startPos = {
-      x: this.currPos().x,
-      y: this.currPos().y,
+      x: this.currPos(true).x,
+      y: this.currPos(true).y,
     };
 
     const moving = this.animations.currentAnim.isPlaying;
 
     if (moving) {
       this.currTween.stop();
+      this.animations.stop(this.animations.currentAnim.name, true);
 
       // when moving, the start of the new paths is no longer the current position,
       // it's the end of the animation's position
@@ -79,23 +81,23 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
 
     const paths = this.map.findPath(startPos.x, startPos.y, x, y);
 
-    // no need to proceed when there's no paths
-    if (paths.length === 0) {
-      done();
-      return;
-    }
-
-    const tweens = shapePaths(
+    this.tweens = shapePaths(
       moving ? [[this.currPos().x, this.currPos().y]].concat(paths) : paths,
       initialDuration);
 
-    this.startTween(tweens, check, done);
+    // no need to proceed when there's no paths
+    if (this.tweens.length === 1) {
+      if (done) done();
+      return;
+    }
+
+    this.startTween(check, done);
 
     if (start) start(paths);
   }
 
-  startTween(tweens, check, done) {
-    const curr = tweens[0];
+  startTween(check, done) {
+    const curr = this.tweens[0];
     if (!curr) {
       // no more paths left, means it's stopped moving
       if (done) done();
@@ -110,11 +112,13 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
       return;
     }
 
+    // record bounds
+    this.map.setWalkable(this.currPos(true).x, this.currPos(true).y, true);
     this.setBounds(curr.coord[0], curr.coord[1]);
 
     // slice now to get the remaining path right away
     // since we're using it for references below
-    const remainingPath = tweens.slice(1);
+    this.tweens = this.tweens.slice(1);
 
     this.currTween = this.game.add.tween(this).to({
       isoX: curr.coord[0] * TILESIZE,
@@ -134,11 +138,13 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
     this.currTween.onComplete.add((sprite) => {
       // only stop when there's no more paths left
       // we want the animation to run seamlessly
-      if (!remainingPath.length) {
+      if (!this.tweens.length) {
         sprite.animations.stop(currDirAnim, true);
       }
 
-      this.startTween(remainingPath, check, done);
+      this.map.setWalkable(curr.coord[0], curr.coord[1], false);
+
+      this.startTween(check, done);
     });
 
     this.currTween.start();
