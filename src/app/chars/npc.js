@@ -6,8 +6,8 @@ import { TILESIZE } from '../maps/default';
 class Npc extends Player {
   constructor({ game, group, map }) {
     const track = [
-      [1, 3],
       [7, 3],
+      [1, 3],
     ];
 
     const z = 0;
@@ -16,8 +16,8 @@ class Npc extends Player {
 
     super({
       game,
-      x: track[0][0] * TILESIZE,
-      y: track[0][1] * TILESIZE,
+      x: track[1][0] * TILESIZE,
+      y: track[1][1] * TILESIZE,
       z,
       sprite,
       delimiter,
@@ -49,14 +49,7 @@ class Npc extends Player {
       this.move({
         x: nextPosX,
         y: nextPosY,
-        check: (x, y) => {
-          const isColliding = x === playerX && y === playerY;
-
-          // wait one sec then continue moving as per usual
-          if (isColliding) this.moveTrack(player);
-          return isColliding;
-        },
-        done: () => {
+        onFinished: () => {
           this.setNextIndex();
           this.moveTrack(player);
         },

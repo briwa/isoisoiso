@@ -82,10 +82,10 @@ class Play extends Phaser.State {
         this.player.move({
           x: cursor.x,
           y: cursor.y,
-          start: (paths) => {
+          onStart: (paths) => {
             this.activePaths = paths;
           },
-          done: () => {
+          onFinished: () => {
             this.activePaths = [];
           },
         });

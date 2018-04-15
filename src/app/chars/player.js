@@ -6,35 +6,46 @@ import { TILESIZE } from '../maps/default';
 
 const DURATION = 500;
 
-function shapePaths(paths, initialSpeed) {
+function shapePaths(paths) {
   const initialPos = {
     x: paths[0][0],
     y: paths[0][1],
   };
 
-  const getDir = (prev, next) => {
-    if (prev.x === next.x) return prev.y > next.y ? 'up' : 'down';
-    if (prev.y === next.y) return prev.x > next.x ? 'left' : 'right';
+  const getDirection = (prev, next) => {
+    if (prev.x === next.x) {
+      return {
+        direction: prev.y > next.y ? 'up' : 'down',
+        speed: Math.abs(next.y - prev.y),
+      };
+    }
+
+    if (prev.y === next.y) {
+      return {
+        direction: prev.x > next.x ? 'left' : 'right',
+        speed: Math.abs(next.x - prev.x),
+      };
+    }
+
     return false;
   };
 
-  return paths.slice(1).reduce((newPath, next, idx) => {
+  return paths.slice(1).reduce((newPath, next) => {
     // always take the last position as the reference
     // if there's none, use the first position as the current one
-    const current = newPath[newPath.length - 1] || { pos: initialPos };
+    const current = newPath[newPath.length - 1] || { position: initialPos };
 
     // assign direction for the next one
-    const nextPos = {
+    const nextPosition = {
       x: next[0],
       y: next[1],
     };
 
-    const direction = getDir(current.pos, nextPos);
-    const speed = idx === 0 ? initialSpeed : 1;
+    const { direction, speed } = getDirection(current.position, nextPosition);
     newPath.push({
-      pos: nextPos,
-      direction,
+      position: nextPosition,
       speed,
+      direction,
     });
 
     return newPath;
@@ -74,9 +85,7 @@ class Player {
     }
   }
 
-  move({ x, y, check, start, done }) {
-    let initialSpeed = 1;
-
+  move({ x, y, onStart, onFinished }) {
     // in normal case, we use the current position as the start of position
     // to be used for pathfinding
     const startPos = {
@@ -91,64 +100,63 @@ class Player {
 
       // when moving, the start of the new paths is no longer the current position,
       // it's the end of the animation's position
-      startPos.x = this.tweens[0].pos.x;
-      startPos.y = this.tweens[0].pos.y;
-
-      // the currently running tween needs to be continued
-      initialSpeed = 1 - this.currentTween.timeline[0].percent;
+      startPos.x = this.tweens[0].position.x;
+      startPos.y = this.tweens[0].position.y;
     }
 
     const paths = this.map.findPath(startPos.x, startPos.y, x, y);
+    const finalPaths = moving ? [[this.currentPos().x, this.currentPos().y]].concat(paths) : paths;
 
-    this.tweens = shapePaths(
-      moving ? [[this.currentPos().x, this.currentPos().y]].concat(paths) : paths,
-      initialSpeed);
+    this.tweens = shapePaths(finalPaths);
 
     // no need to proceed when there's no paths
     if (this.tweens.length === 0) {
-      if (done) done();
+      if (onFinished) onFinished();
       return;
     }
 
-    this.startTween(check, done);
+    this.startTween(onFinished);
 
-    if (start) start(paths);
+    if (onStart) onStart(paths);
   }
 
-  startTween(check, done) {
+  startTween(onFinished) {
     const current = this.tweens[0];
-    if (!current) {
-      // no more paths left, means it's stopped moving
-      if (done) done();
-      return;
-    }
 
-    if (check && check(current.pos.x, current.pos.y) && this.currentTween) {
-      this.stopAnimation();
-      return;
-    }
-
-    // record bounds
+    // update walkable tile and bounds
     this.map.setWalkable(this.currentPos(true).x, this.currentPos(true).y, true);
-    this.setBounds(current.pos.x, current.pos.y);
+    this.setBounds(current.position.x, current.position.y);
 
-    this.currentTween = this.tweenTo({
-      done,
-      check,
-      x: current.pos.x,
-      y: current.pos.y,
+    const nowTweening = this.tweenTo({
+      x: current.position.x,
+      y: current.position.y,
       speed: current.speed * DURATION,
       direction: current.direction,
-    });
-  }
+      onStart: () => {
+        this.playAnimation(`walk-${current.direction}`);
+      },
+      onComplete: () => {
+        // remove the tween that is already done
+        this.tweens = this.tweens.slice(1);
+        const next = this.tweens[0];
 
-  currentPos(floor) {
-    const x = this.sprite.isoPosition.x / TILESIZE;
-    const y = this.sprite.isoPosition.y / TILESIZE;
-    return {
-      x: floor ? Math.floor(x) : x,
-      y: floor ? Math.floor(y) : y,
-    };
+        // only stop when there's no more paths left
+        // we want the animation to run seamlessly
+        if (!this.tweens.length) this.stopAnimation();
+
+        this.map.setWalkable(current.position.x, current.position.y, false);
+
+        // do not go to the next one when failed, or when there's no tweens left
+        if (next) {
+          this.startTween(onFinished);
+        } else if (onFinished) {
+          onFinished(this.tweens);
+        }
+      },
+    });
+
+    // store the current tween for future usage
+    this.currentTween = nowTweening.tween;
   }
 
   setBounds(x, y) {
@@ -169,46 +177,47 @@ class Player {
       (this.bounds.right[0] === x && this.bounds.right[1] === y);
   }
 
+  // -----------------------------------------------
   // phaser side effects
+  // -----------------------------------------------
+  currentPos(floor) {
+    const x = this.sprite.isoPosition.x / TILESIZE;
+    const y = this.sprite.isoPosition.y / TILESIZE;
+    return {
+      x: floor ? Math.floor(x) : x,
+      y: floor ? Math.floor(y) : y,
+    };
+  }
+
+  // do not play the same animation twice
+  // if this is the first movement (from static to moving),
+  // always play the animation regardless
+  playAnimation(animationName) {
+    const currentAnim = this.sprite.animations.currentAnim;
+    if (!currentAnim.isPlaying || currentAnim.name !== animationName) {
+      this.sprite.animations.play(animationName);
+    }
+  }
+
   stopAnimation() {
-    if (this.currentTween) this.currentTween.stop();
+    if (this.currentTween && this.currentTween.isRunning) this.currentTween.stop();
     this.sprite.animations.stop(this.sprite.animations.currentAnim.name, true);
   }
 
-  tweenTo({ x, y, speed, direction, check, done }) {
+  tweenTo({ x, y, speed, onStart, onComplete }) {
     const tween = this.game.add.tween(this.sprite).to({
       isoX: x * TILESIZE,
       isoY: y * TILESIZE,
     }, speed, Phaser.Easing.Linear.None, true);
 
-    const currentDirection = `walk-${direction}`;
+    tween.onStart.add(onStart);
+    tween.onComplete.add(onComplete);
 
-    tween.onStart.add(() => {
-      // do not play the same animation twice
-      // if this is the first movement (from static to moving),
-      // always play the animation regardless
-      const currentAnim = this.sprite.animations.currentAnim;
-      if (!currentAnim.isPlaying || currentAnim.name !== currentDirection) {
-        this.sprite.animations.play(currentDirection);
-      }
-    });
-
-    tween.onComplete.add(() => {
-      // remove the tween that is already done
-      this.tweens = this.tweens.slice(1);
-
-      // only stop when there's no more paths left
-      // we want the animation to run seamlessly
-      if (!this.tweens.length) {
-        this.sprite.animations.stop(currentDirection, true);
-      }
-
-      this.map.setWalkable(x, y, false);
-
-      this.startTween(check, done);
-    });
-
-    return tween;
+    return {
+      tween,
+      onStart,
+      onComplete,
+    };
   }
 }
 
