@@ -4,7 +4,7 @@ import Player from './player';
 import { TILESIZE } from '../maps/default';
 
 class Npc extends Player {
-  constructor({ game, group }) {
+  constructor({ game, group, map }) {
     const track = [
       [1, 3],
       [7, 3],
@@ -22,6 +22,7 @@ class Npc extends Player {
       sprite,
       delimiter,
       group,
+      map,
     });
 
     this.index = 0;
@@ -29,11 +30,10 @@ class Npc extends Player {
     this.track = track;
   }
 
-  moveTrack(grid, player) {
+  moveTrack(player) {
     this.move({
       x: this.track[this.index][0],
       y: this.track[this.index][1],
-      grid,
       check: (x, y) => {
         const playerX = Math.ceil(player.isoPosition.x / TILESIZE);
         const playerY = Math.ceil(player.isoPosition.y / TILESIZE);
@@ -42,7 +42,7 @@ class Npc extends Player {
         // wait one sec then continue moving as per usual
         if (isColliding) {
           setTimeout(() => {
-            this.moveTrack(grid, player);
+            this.moveTrack(player);
           }, 1000);
         }
 
@@ -50,7 +50,7 @@ class Npc extends Player {
       },
       done: () => {
         this.setNextIndex();
-        this.moveTrack(grid, player);
+        this.moveTrack(player);
       },
     });
   }

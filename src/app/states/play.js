@@ -2,7 +2,7 @@ import Phaser from 'phaser-ce';
 
 import Player from '../chars/player';
 import Npc from '../chars/npc';
-import { TILESIZE, GRID, TILE } from '../maps/default';
+import { TILESIZE, GRID, TILE, MAP } from '../maps/default';
 
 class Play extends Phaser.State {
   constructor() {
@@ -60,13 +60,15 @@ class Play extends Phaser.State {
       sprite: 'people',
       delimiter: 0,
       group: this.charGroup,
+      map: MAP,
     });
 
     this.npc = new Npc({
       game: this.game,
       group: this.charGroup,
+      map: MAP,
     });
-    this.npc.moveTrack(GRID, this.player);
+    this.npc.moveTrack(this.player);
 
     this.game.input.onDown.add(() => {
       // todo: find out why cursor.x / cursor.y sometimes returns negative value
@@ -80,7 +82,6 @@ class Play extends Phaser.State {
         this.player.move({
           x: cursor.x,
           y: cursor.y,
-          grid: GRID,
           check: (x, y) => {
             const playerX = Math.ceil(this.npc.isoPosition.x / TILESIZE);
             const playerY = Math.ceil(this.npc.isoPosition.y / TILESIZE);

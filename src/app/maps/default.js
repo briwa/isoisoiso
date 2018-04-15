@@ -1,3 +1,5 @@
+import PF from 'pathfinding';
+
 export const TILESIZE = 36;
 
 export const GRID = [
@@ -33,3 +35,12 @@ export const TILE = [
     anchor: [0.5, 0],
   },
 ];
+
+export const MAP = {
+  findPath(x, y, x1, y1) {
+    const matrix = new PF.Grid(GRID);
+    const finder = new PF.AStarFinder();
+
+    return finder.findPath(x, y, x1, y1, matrix);
+  },
+};

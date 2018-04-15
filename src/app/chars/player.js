@@ -1,5 +1,4 @@
 import Phaser from 'phaser-ce';
-import PF from 'pathfinding';
 
 // people sprite every 43 frames
 // todo: find a way to extract this out of the class component
@@ -29,19 +28,8 @@ function shapePaths(paths, initialDuration = DURATION) {
   }, []);
 }
 
-function findPath(startX, startY, endX, endY, grid) {
-  const matrix = new PF.Grid(grid);
-  const finder = new PF.AStarFinder();
-
-  return finder.findPath(
-    startX, startY,
-    endX, endY,
-    matrix,
-  );
-}
-
 class Player extends Phaser.Plugin.Isometric.IsoSprite {
-  constructor({ game, x, y, z, sprite, group, delimiter }) {
+  constructor({ game, x, y, z, sprite, group, delimiter, map }) {
     super(game, x, y, z, sprite, delimiter);
     group.add(this);
 
@@ -61,22 +49,18 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
       left: [],
       right: [],
     };
+
+    this.map = map;
   }
 
-  move({ x, y, grid, check, start, done }) {
+  move({ x, y, check, start, done }) {
     let initialDuration = DURATION;
-
-    // the current exact position when move is called
-    const currPos = {
-      x: this.isoPosition.x / TILESIZE,
-      y: this.isoPosition.y / TILESIZE,
-    };
 
     // in normal case, we use the current position as the start of position
     // to be used for pathfinding
     const startPos = {
-      x: currPos.x,
-      y: currPos.y,
+      x: this.currPos().x,
+      y: this.currPos().y,
     };
 
     const moving = this.animations.currentAnim.isPlaying;
@@ -93,9 +77,16 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
       initialDuration = DURATION * (1 - this.currTween.timeline[0].percent);
     }
 
-    const paths = findPath(startPos.x, startPos.y, x, y, grid);
+    const paths = this.map.findPath(startPos.x, startPos.y, x, y);
+
+    // no need to proceed when there's no paths
+    if (paths.length === 0) {
+      done();
+      return;
+    }
+
     const tweens = shapePaths(
-      moving ? [[currPos.x, currPos.y]].concat(paths) : paths,
+      moving ? [[this.currPos().x, this.currPos().y]].concat(paths) : paths,
       initialDuration);
 
     this.startTween(tweens, check, done);
@@ -103,8 +94,8 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
     if (start) start(paths);
   }
 
-  startTween(paths, check, done) {
-    const curr = paths[0];
+  startTween(tweens, check, done) {
+    const curr = tweens[0];
     if (!curr) {
       // no more paths left, means it's stopped moving
       if (done) done();
@@ -123,7 +114,7 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
 
     // slice now to get the remaining path right away
     // since we're using it for references below
-    const remainingPath = paths.slice(1);
+    const remainingPath = tweens.slice(1);
 
     this.currTween = this.game.add.tween(this).to({
       isoX: curr.coord[0] * TILESIZE,
@@ -153,18 +144,13 @@ class Player extends Phaser.Plugin.Isometric.IsoSprite {
     this.currTween.start();
   }
 
-  randomMove({ grid }) {
-    const randomX = Math.floor(Math.random() * grid.length);
-    const randomY = Math.floor(Math.random() * grid.length);
-
-    this.move({
-      grid,
-      x: randomX,
-      y: randomY,
-      done: () => {
-        this.randomMove({ grid });
-      },
-    });
+  currPos(floor) {
+    const x = this.isoPosition.x / TILESIZE;
+    const y = this.isoPosition.y / TILESIZE;
+    return {
+      x: floor ? Math.floor(x) : x,
+      y: floor ? Math.floor(y) : y,
+    };
   }
 
   setBounds(x, y) {
