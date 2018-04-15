@@ -2,7 +2,7 @@ import Phaser from 'phaser-ce';
 
 import Player from '../chars/player';
 import Npc from '../chars/npc';
-import { TILESIZE, GRID, TILE, MAP } from '../maps/default';
+import { TILESIZE, GRID, TILE, DefaultMap } from '../maps/default';
 
 class Play extends Phaser.State {
   constructor() {
@@ -36,6 +36,7 @@ class Play extends Phaser.State {
   }
 
   create() {
+    this.map = new DefaultMap();
     this.mapGroup = this.game.add.group();
     this.charGroup = this.game.add.group();
 
@@ -53,20 +54,17 @@ class Play extends Phaser.State {
     }
 
     this.player = new Player({
-      game: this.game,
       x: 0,
       y: 0,
-      z: 0,
-      sprite: 'people',
-      delimiter: 0,
+      game: this.game,
       group: this.charGroup,
-      map: MAP,
+      map: this.map,
     });
 
     this.npc = new Npc({
       game: this.game,
       group: this.charGroup,
-      map: MAP,
+      map: this.map,
     });
     this.npc.moveTrack(this.player);
 
@@ -79,7 +77,7 @@ class Play extends Phaser.State {
 
       // ignore out of bounds clicks
       if (cursor.x >= 0 && cursor.y >= 0 && cursor.x < GRID.length && cursor.y < GRID.length) {
-        this.player.move({
+        this.player.moveTo({
           x: cursor.x,
           y: cursor.y,
           onStart: (paths) => {

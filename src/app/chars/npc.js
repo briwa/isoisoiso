@@ -1,9 +1,6 @@
-import Player from './player';
+import Person from './person';
 
-// todo: find a way to extract this out of the class component
-import { TILESIZE } from '../maps/default';
-
-class Npc extends Player {
+class Npc extends Person {
   constructor({ game, group, map }) {
     const track = [
       [7, 3],
@@ -16,8 +13,8 @@ class Npc extends Player {
 
     super({
       game,
-      x: track[1][0] * TILESIZE,
-      y: track[1][1] * TILESIZE,
+      x: track[1][0] * map.tilesize,
+      y: track[1][1] * map.tilesize,
       z,
       sprite,
       delimiter,
@@ -46,7 +43,7 @@ class Npc extends Player {
         }
       }
 
-      this.move({
+      this.moveTo({
         x: nextPosX,
         y: nextPosY,
         onFinished: () => {

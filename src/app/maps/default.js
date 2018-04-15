@@ -36,14 +36,20 @@ export const TILE = [
   },
 ];
 
-export const MAP = {
+export class DefaultMap {
+  constructor() {
+    this.grid = [...GRID];
+    this.tilesize = TILESIZE;
+  }
+
   findPath(x, y, x1, y1) {
-    const matrix = new PF.Grid(GRID);
+    const matrix = new PF.Grid(this.grid);
     const finder = new PF.AStarFinder();
 
     return finder.findPath(x, y, x1, y1, matrix);
-  },
+  }
+
   setWalkable(x, y, walkable) {
-    GRID[y][x] = walkable ? 0 : 9;
-  },
-};
+    this.grid[y][x] = walkable ? 0 : 9;
+  }
+}
