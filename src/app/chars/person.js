@@ -50,7 +50,15 @@ class Player {
     const finalPaths = moving ? [[this.currentPos().x, this.currentPos().y]].concat(paths) : paths;
 
     // no need to proceed when there's no paths
-    if (finalPaths.length === 0) {
+    // or when trying to move to the same position as the curret one
+    if (
+      finalPaths.length === 0 ||
+      (
+        finalPaths.length === 1 &&
+        finalPaths[0][0] === startPos.x &&
+        finalPaths[0][1] === startPos.y
+      )
+    ) {
       if (onFinished) onFinished();
       return false;
     }

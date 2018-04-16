@@ -11,6 +11,7 @@ let map;
 describe('Person test', () => {
   beforeEach(() => {
     map = new DefaultMap();
+    // this is just to test the no-path case
     map.setWalkable(4, 4, false);
 
     // spy on the walkable of the map
@@ -54,6 +55,7 @@ describe('Person test', () => {
       const onFinished = () => {};
       person.startTween = jest.fn();
 
+      // mock the current position
       person.currentPos = () => ({
         x: 0,
         y: 0,
@@ -197,6 +199,26 @@ describe('Person test', () => {
 
       expect(onFinished).toHaveBeenCalled();
     });
+
+    test('should not move when going to the same position as the current one', () => {
+      person.currentPos = () => ({
+        x: 0,
+        y: 0,
+      });
+
+      const onFinished = jest.fn();
+      const output = person.moveTo({
+        x: 0,
+        y: 0,
+        onFinished,
+      });
+
+      expect(output).toBe(false);
+
+      expect(person.tweens).toEqual([]);
+
+      expect(onFinished).toHaveBeenCalled();
+    });
   });
 
   describe('#startTween', () => {
@@ -248,6 +270,9 @@ describe('Person test', () => {
         x: 0,
         y: 0,
       });
+
+      // right after the initialization, it will set walkable to false to current position
+      expect(map.setWalkable.mock.calls[0]).toEqual([0, 0, false]);
 
       const onFinished = jest.fn();
       person.tweens = initialTween;
