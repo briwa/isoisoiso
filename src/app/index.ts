@@ -1,4 +1,4 @@
-import Phaser from 'phaser-ce';
+import * as Phaser from 'phaser-ce';
 import Play from './states/play';
 
 class Game extends Phaser.Game {

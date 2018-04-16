@@ -19,8 +19,6 @@ export function shapePaths(paths) {
         speed: Math.abs(next.x - prev.x),
       };
     }
-
-    return false;
   };
 
   return paths.slice(1).reduce((newPath, next) => {

@@ -1,6 +1,10 @@
 import Person from './person';
 
 class Npc extends Person {
+  private index;
+  private forward;
+  private track;
+
   constructor({ game, group, map }) {
     const track = [
       [7, 3],

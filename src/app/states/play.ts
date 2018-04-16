@@ -1,10 +1,20 @@
-import Phaser from 'phaser-ce';
+import * as Phaser from 'phaser-ce';
 
 import Player from '../chars/player';
 import Npc from '../chars/npc';
 import { TILESIZE, GRID, TILE, DefaultMap } from '../maps/default';
 
 class Play extends Phaser.State {
+  private mapGroup;
+  private charGroup;
+
+  private player;
+  private npc;
+
+  private gridCursor;
+  private activePaths;
+  private map;
+
   constructor() {
     super();
 
@@ -27,7 +37,7 @@ class Play extends Phaser.State {
     this.game.time.advancedTiming = true;
 
     // Add and enable the plug-in.
-    this.game.plugins.add(new Phaser.Plugin.Isometric(this.game));
+    this.game.plugins.add(Phaser.Plugin.Isometric);
 
     // This is used to set a game canvas-based offset
     // for the 0, 0, 0 isometric coordinate - by default

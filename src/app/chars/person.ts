@@ -1,4 +1,4 @@
-import Phaser from 'phaser-ce';
+import * as Phaser from 'phaser-ce';
 
 import { shapePaths } from './helper';
 
@@ -6,6 +6,14 @@ import { shapePaths } from './helper';
 const DURATION = 500;
 
 class Player {
+  private speed;
+  private tweens;
+  private currentTween;
+  private bounds;
+  private map;
+  private game;
+  private sprite;
+
   constructor(config) {
     this.speed = 1; // by default the speed is 100%, not slowed down or doubled up
 
@@ -27,7 +35,7 @@ class Player {
     if (config.game) this.setupSprite(config);
   }
 
-  moveTo({ x, y, onStart, onFinished }) {
+  moveTo({ x, y, onStart, onFinished }: {x: number, y: number, onStart?: any, onFinished: any}) {
     // in normal case, we use the current position as the start of position
     // to be used for pathfinding
     const startPos = {
@@ -139,7 +147,7 @@ class Player {
     this.sprite.animations.add('walk-down', [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => i + delimiter), 30, true);
   }
 
-  currentPos(floor) {
+  currentPos(floor = false) {
     const x = this.sprite.isoPosition.x / this.map.tilesize;
     const y = this.sprite.isoPosition.y / this.map.tilesize;
     return {

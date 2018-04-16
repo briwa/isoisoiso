@@ -1,4 +1,4 @@
-import PF from 'pathfinding';
+import * as PF from 'pathfinding';
 
 export const TILESIZE = 36;
 
@@ -37,6 +37,9 @@ export const TILE = [
 ];
 
 export class DefaultMap {
+  private grid;
+  private tilesize;
+
   constructor() {
     this.grid = [...GRID];
     this.tilesize = TILESIZE;

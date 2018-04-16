@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "sourceMap": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "removeComments": true,
+    "strict": false,
+    "experimentalDecorators": true
+  },
+  "include": [
+    "./src/app/**/*.ts",
+    "./test/**/*.ts",
+    "./src/types/*.ts",
+  ]
+}

@@ -6,20 +6,30 @@ module.exports = {
     '<rootDir>',
   ],
   testMatch: [
-    '<rootDir>/test/**/*.test.(js|ts)',
+    '<rootDir>/test/**/*.test.ts',
   ],
   moduleFileExtensions: [
     'js',
     'ts',
   ],
   collectCoverageFrom: [
-    'src/app/**.(js|ts)',
+    'src/app/**.ts',
   ],
   coverageReporters: ['html'],
   watchPathIgnorePatterns: ['<rootDir>/node_modules/'],
   coveragePathIgnorePatterns: ['<rootDir>/node_modules/'],
   transform: {
-    '^.+\\.js[x]?$': '<rootDir>/node_modules/babel-jest',
+    '^.+\\.tsx?$' : 'ts-jest',
   },
-
+  globals : {
+    'ENV' : 'test',
+    'ts-jest' : {
+      extends : './tsconfig',
+      babelConfig : {
+        plugins : [
+          'dynamic-import-node'
+        ]
+      }
+    }
+  }
 };

@@ -4,6 +4,7 @@
 const path = require('path');
 const webpack = require('webpack');
 
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 // we can optimize this by only extracting to file in production
@@ -34,7 +35,7 @@ const vendorEntries = [
 module.exports = {
   entry: {
     app: [
-      path.resolve(__dirname, 'src/app/index.js'),
+      path.resolve(__dirname, 'src/app/index.ts'),
       path.resolve(__dirname, 'src/styles/main.scss'),
     ],
     vendor: vendorEntries,
@@ -54,32 +55,32 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        use: ['babel-loader'],
+        test: /\.ts$/,
+        loader: 'ts-loader',
         exclude: /node_modules/,
         include: path.join(__dirname, 'src/app'),
       },
       {
         test: /pixi\.js/,
-        use: ['expose-loader?PIXI'],
+        loader: 'expose-loader?PIXI',
       },
       {
         test: /phaser-split\.js$/,
-        use: ['expose-loader?Phaser'],
+        loader: 'expose-loader?Phaser',
       },
       {
         test: /p2\.js/,
-        use: ['expose-loader?p2'],
+        loader: 'expose-loader?p2',
       },
       {
         test: /phaser-plugin-isometric\.js/,
-        use: ['imports-loader?Phaser=phaser-ce'],
+        loader: 'imports-loader?Phaser=phaser-ce',
       },
       {
         test: /\.scss$/,
         exclude: /node_modules/,
         include: path.join(__dirname, 'src/styles'),
-        use: extractSass.extract({
+        loader: extractSass.extract({
           use: [
             'css-loader',
             {
@@ -96,6 +97,8 @@ module.exports = {
   },
 
   plugins: [
+    new ForkTsCheckerWebpackPlugin(),
+
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       filename: 'vendor.bundle.js',
@@ -105,6 +108,7 @@ module.exports = {
   ],
 
   resolve: {
+    extensions: ['.js', '.ts'],
     alias: {
       pixi,
       p2,
