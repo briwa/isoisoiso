@@ -38,7 +38,8 @@ class Human extends HumanSprite {
     const moving = this.paths.length > 0;
 
     if (moving) {
-      this.stopAnimation();
+      // do not stop animation when interrupting
+      this.stopTween();
 
       // when moving, the start of the new paths is no longer the current position,
       // it's the end of the animation's position

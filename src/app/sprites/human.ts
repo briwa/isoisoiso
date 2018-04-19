@@ -49,10 +49,11 @@ class HumanSprite {
   }
 
   stopAnimation() {
-    // only stop tween when there's a tween running, do not do stop redundantly
-    if (this.currentTween && this.currentTween.isRunning) this.currentTween.stop();
-
     this.sprite.animations.stop(this.sprite.animations.currentAnim.name, true);
+  }
+
+  stopTween() {
+    if (this.currentTween) this.currentTween.stop();
   }
 
   tweenTo({ x, y, speed, onStart, onComplete }) {

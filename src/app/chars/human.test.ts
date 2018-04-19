@@ -28,6 +28,7 @@ describe('Human test', () => {
     human.currentPos = jest.fn();
     human.playAnimation = jest.fn();
     human.stopAnimation = jest.fn();
+    human.stopTween = jest.fn();
     human.tweenTo = jest.fn().mockImplementation(({ onStart, onComplete }) => ({
       onStart,
       onComplete,
@@ -137,7 +138,7 @@ describe('Human test', () => {
         },
       ]);
 
-      expect(human.stopAnimation).toHaveBeenCalled();
+      expect(human.stopTween).toHaveBeenCalled();
     });
 
     test('should call onStart and onFinished properly', () => {
