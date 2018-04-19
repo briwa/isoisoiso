@@ -1,6 +1,6 @@
-import Person from './person';
+import Human from './human';
 
-class Npc extends Person {
+class Npc extends Human {
   private index;
   private forward;
   private track;

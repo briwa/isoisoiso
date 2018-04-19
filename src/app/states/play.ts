@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser-ce';
 
-import Player from '../chars/player';
+import Hero from '../chars/hero';
 import Npc from '../chars/npc';
 import { TILESIZE, GRID, TILE, DefaultMap } from '../maps/default';
 
@@ -8,7 +8,7 @@ class Play extends Phaser.State {
   private mapGroup;
   private charGroup;
 
-  private player;
+  private hero;
   private npc;
 
   private gridCursor;
@@ -23,7 +23,7 @@ class Play extends Phaser.State {
 
     this.gridCursor = new Phaser.Plugin.Isometric.Point3();
 
-    this.player = null;
+    this.hero = null;
     this.activePaths = [];
   }
 
@@ -63,7 +63,7 @@ class Play extends Phaser.State {
       }
     }
 
-    this.player = new Player({
+    this.hero = new Hero({
       x: 0,
       y: 0,
       game: this.game,
@@ -76,7 +76,7 @@ class Play extends Phaser.State {
       group: this.charGroup,
       map: this.map,
     });
-    this.npc.moveTrack(this.player);
+    this.npc.moveTrack(this.hero);
 
     this.game.input.onDown.add(() => {
       // todo: find out why cursor.x / cursor.y sometimes returns negative value
@@ -87,7 +87,7 @@ class Play extends Phaser.State {
 
       // ignore out of bounds clicks
       if (cursor.x >= 0 && cursor.y >= 0 && cursor.x < GRID.length && cursor.y < GRID.length) {
-        this.player.moveTo({
+        this.hero.moveTo({
           x: cursor.x,
           y: cursor.y,
           onStart: (paths) => {

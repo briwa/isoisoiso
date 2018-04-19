@@ -24,17 +24,16 @@ export function shapePaths(paths) {
   return paths.slice(1).reduce((newPath, next) => {
     // always take the last position as the reference
     // if there's none, use the first position as the current one
-    const current = newPath[newPath.length - 1] || { position: initialPos };
+    const current = newPath[newPath.length - 1] || initialPos;
 
     // assign direction for the next one
-    const nextPosition = {
-      x: next[0],
-      y: next[1],
-    };
+    const newX = next[0];
+    const newY = next[1];
 
-    const { direction, speed } = getDirection(current.position, nextPosition);
+    const { direction, speed } = getDirection(current, { x: newX, y: newY });
     newPath.push({
-      position: nextPosition,
+      x: newX,
+      y: newY,
       speed,
       direction,
     });

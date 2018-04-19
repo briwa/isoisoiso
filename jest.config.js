@@ -6,7 +6,7 @@ module.exports = {
     '<rootDir>',
   ],
   testMatch: [
-    '<rootDir>/test/**/*.test.ts',
+    '<rootDir>/src/app/**/*.test.ts',
   ],
   moduleFileExtensions: [
     'js',

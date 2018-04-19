@@ -1,6 +1,6 @@
-import Person from './person';
+import Human from './human';
 
-class Player extends Person {
+class Hero extends Human {
   constructor({ x, y, game, group, map }) {
     const z = 0;
     const sprite = 'people';
@@ -19,4 +19,4 @@ class Player extends Person {
   }
 }
 
-export default Player;
+export default Hero;

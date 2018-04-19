@@ -1,14 +1,14 @@
-import Person from 'src/app/chars/person';
+import Human from './human';
 
 // test using the default map
 import { DefaultMap } from 'src/app/maps/default';
 
 jest.mock('phaser-ce', () => ({}));
 
-let person;
+let human;
 let map;
 
-describe('Person test', () => {
+describe('Human test', () => {
   beforeEach(() => {
     map = new DefaultMap();
     // this is just to test the no-path case
@@ -17,7 +17,7 @@ describe('Person test', () => {
     // spy on the walkable of the map
     map.setWalkable = jest.fn().mockImplementation(map.setWalkable);
 
-    person = new Person({
+    human = new Human({
       x: 0,
       y: 0,
       z: 0,
@@ -25,11 +25,10 @@ describe('Person test', () => {
     });
 
     // mock all side effect functions
-    person.setupSprite = jest.fn();
-    person.currentPos = jest.fn();
-    person.playAnimation = jest.fn();
-    person.stopAnimation = jest.fn();
-    person.tweenTo = jest.fn().mockImplementation(({ onStart, onComplete }) => ({
+    human.currentPos = jest.fn();
+    human.playAnimation = jest.fn();
+    human.stopAnimation = jest.fn();
+    human.tweenTo = jest.fn().mockImplementation(({ onStart, onComplete }) => ({
       onStart,
       onComplete,
     }));
@@ -37,9 +36,8 @@ describe('Person test', () => {
 
   describe('initialization', () => {
     test('all the default values', () => {
-      expect(person.tweens).toEqual([]);
-      expect(person.currentTween).toEqual(null);
-      expect(person.bounds).toEqual({
+      expect(human.paths).toEqual([]);
+      expect(human.bounds).toEqual({
         down: [],
         right: [],
         up: [],
@@ -53,120 +51,104 @@ describe('Person test', () => {
   describe('#moveTo', () => {
     test('should return positions, directions, and speed', () => {
       const onFinished = () => {};
-      person.startTween = jest.fn();
+      human.startPaths = jest.fn();
 
       // mock the current position
-      person.currentPos = () => ({
+      human.currentPos = () => ({
         x: 0,
         y: 0,
       });
 
-      person.moveTo({
+      human.moveTo({
         x: 3,
         y: 0,
         onFinished,
       });
 
-      expect(person.tweens).toEqual([
+      expect(human.paths).toEqual([
         {
           direction: 'right',
-          position: {
-            x: 1,
-            y: 0,
-          },
+          x: 1,
+          y: 0,
           speed: 1,
         },
         {
           direction: 'right',
-          position: {
-            x: 2,
-            y: 0,
-          },
+          x: 2,
+          y: 0,
           speed: 1,
         },
         {
           direction: 'right',
-          position: {
-            x: 3,
-            y: 0,
-          },
+          x: 3,
+          y: 0,
           speed: 1,
         },
       ]);
 
-      expect(person.stopAnimation).not.toHaveBeenCalled();
-      expect(person.startTween).toHaveBeenCalledWith(onFinished);
+      expect(human.stopAnimation).not.toHaveBeenCalled();
+      expect(human.startPaths).toHaveBeenCalledWith(onFinished);
     });
 
     test('should be able to continue paths properly', () => {
-      person.tweens = [{
+      human.paths = [{
         direction: 'right',
-        position: {
-          x: 1,
-          y: 0,
-        },
+        x: 1,
+        y: 0,
         speed: 1,
       }];
 
-      person.currentPos = () => ({
+      human.currentPos = () => ({
         x: 0.3,
         y: 0,
       });
 
-      const output = person.moveTo({
+      const output = human.moveTo({
         x: 0,
         y: 2,
       });
 
       expect(output).not.toBe(false);
 
-      expect(person.tweens).toEqual([
+      expect(human.paths).toEqual([
         {
           direction: 'right',
-          position: {
-            x: 1,
-            y: 0,
-          },
+          x: 1,
+          y: 0,
           speed: 0.7,
         },
         {
           direction: 'down',
-          position: {
-            x: 1,
-            y: 1,
-          },
+          x: 1,
+          y: 1,
           speed: 1,
         },
         {
           direction: 'down',
-          position: {
-            x: 1,
-            y: 2,
-          },
+          x: 1,
+          y: 2,
           speed: 1,
         },
         {
           direction: 'left',
-          position: {
-            x: 0,
-            y: 2,
-          },
+          x: 0,
+          y: 2,
           speed: 1,
         },
       ]);
 
-      expect(person.stopAnimation).toHaveBeenCalled();
+      expect(human.stopAnimation).toHaveBeenCalled();
     });
 
     test('should call onStart and onFinished properly', () => {
-      person.currentPos = () => ({
+      human.currentPos = () => ({
         x: 0,
         y: 0,
       });
 
       const onStart = jest.fn();
       const onFinished = jest.fn();
-      const output = person.moveTo({
+      const output = human.moveTo({
         x: 0,
         y: 1,
         onStart,
@@ -181,33 +163,29 @@ describe('Person test', () => {
     });
 
     test('should not continue when there\'s no paths', () => {
-      person.currentPos = () => ({
+      human.currentPos = () => ({
         x: 0,
         y: 0,
       });
 
-      const onFinished = jest.fn();
-      const output = person.moveTo({
+      const output = human.moveTo({
         x: 4,
         y: 4,
-        onFinished,
       });
 
       expect(output).toBe(false);
 
-      expect(person.tweens).toEqual([]);
-
-      expect(onFinished).toHaveBeenCalled();
+      expect(human.paths).toEqual([]);
     });
 
     test('should not move when going to the same position as the current one', () => {
-      person.currentPos = () => ({
+      human.currentPos = () => ({
         x: 0,
         y: 0,
       });
 
       const onFinished = jest.fn();
-      const output = person.moveTo({
+      const output = human.moveTo({
         x: 0,
         y: 0,
         onFinished,
@@ -215,58 +193,52 @@ describe('Person test', () => {
 
       expect(output).toBe(false);
 
-      expect(person.tweens).toEqual([]);
+      expect(human.paths).toEqual([]);
 
       expect(onFinished).toHaveBeenCalled();
     });
   });
 
-  describe('#startTween', () => {
+  describe('#startPaths', () => {
     const initialTween = [
       {
         direction: 'right',
-        position: {
-          x: 1,
-          y: 0,
-        },
+        x: 1,
+        y: 0,
         speed: 1,
       },
       {
         direction: 'right',
-        position: {
-          x: 2,
-          y: 0,
-        },
+        x: 2,
+        y: 0,
         speed: 1,
       },
       {
         direction: 'right',
-        position: {
-          x: 3,
-          y: 0,
-        },
+        x: 3,
+        y: 0,
         speed: 1,
       },
     ];
 
     test('should call tweenTo', () => {
-      person.currentPos = () => ({
+      human.currentPos = () => ({
         x: 0,
         y: 0,
       });
 
-      person.tweens = initialTween;
-      person.startTween();
+      human.paths = initialTween;
+      human.startPaths();
 
       // only test the x, y, and speed. callback no need to be tested
-      const args = person.tweenTo.mock.calls[0][0];
+      const args = human.tweenTo.mock.calls[0][0];
       expect(args.speed).toBe(500);
       expect(args.x).toBe(1);
       expect(args.y).toBe(0);
     });
 
     test('should have all events fired when moving', () => {
-      person.currentPos = () => ({
+      human.currentPos = () => ({
         x: 0,
         y: 0,
       });
@@ -275,44 +247,42 @@ describe('Person test', () => {
       expect(map.setWalkable.mock.calls[0]).toEqual([0, 0, false]);
 
       const onFinished = jest.fn();
-      person.tweens = initialTween;
-      const tween = person.startTween(onFinished);
+      human.paths = initialTween;
+      const tween = human.startPaths(onFinished);
 
       // initially it should set the current position to be walkable
       expect(map.setWalkable.mock.calls[1]).toEqual([0, 0, true]);
 
       // then play the animations on start
       tween.onStart();
-      expect(person.playAnimation).toHaveBeenCalledWith('walk-right');
+      expect(human.playAnimation).toHaveBeenCalledWith('walk-right');
 
       // then at the end, it should set the next position to false
       tween.onComplete();
       expect(map.setWalkable.mock.calls[2]).toEqual([1, 0, false]);
-      expect(person.tweens).toEqual(initialTween.slice(1));
+      expect(human.paths).toEqual(initialTween.slice(1));
 
       // not doing any of these because we're still tweening
-      expect(person.stopAnimation).not.toHaveBeenCalled();
+      expect(human.stopAnimation).not.toHaveBeenCalled();
       expect(onFinished).not.toHaveBeenCalled();
     });
 
     test('should stop and clean up events', () => {
-      person.currentPos = () => ({
+      human.currentPos = () => ({
         x: 0,
         y: 0,
       });
 
-      const onFinished = jest.fn();
-      person.tweens = initialTween.slice(2);
-      const tween = person.startTween(onFinished);
+      human.paths = initialTween.slice(2);
+      const tween = human.startPaths();
 
 
       // since there's only one tween, it's empty on complete
       tween.onComplete();
-      expect(person.tweens).toEqual([]);
+      expect(human.paths).toEqual([]);
 
       // doing all the animation clean up
-      expect(person.stopAnimation).toHaveBeenCalled();
-      expect(onFinished).toHaveBeenCalled();
+      expect(human.stopAnimation).toHaveBeenCalled();
     });
   });
 });
