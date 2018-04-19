@@ -7,6 +7,11 @@ class HumanSprite {
   private currentTween;
   private tilesize;
 
+  static loadAssets(game) {
+    // https://opengameart.org/content/isometric-people
+    game.load.spritesheet('people', 'assets/images/people.png', 32, 49);
+  }
+
   constructor({ game, x, y, z, sprite, delimiter, group, tilesize }) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;
