@@ -20,7 +20,7 @@ class HumanSprite {
     this.sprite = this.game.add.isoSprite(x, y, z, sprite, delimiter, group);
 
     // animation setup
-    this.sprite.anchor.set(0.5);
+    this.sprite.anchor.set(0.5, 0.5);
     this.sprite.animations.add('walk-up', [30, 31, 32, 33, 34, 35, 36, 37, 38].map(i => i + delimiter), 30, true);
     this.sprite.animations.add('walk-left', [20, 21, 22, 23, 24, 25, 26, 27, 28].map(i => i + delimiter), 30, true);
     this.sprite.animations.add('walk-right', [10, 11, 12, 13, 14, 15, 16, 17, 18].map(i => i + delimiter), 30, true);
@@ -30,8 +30,8 @@ class HumanSprite {
   }
 
   currentPos(floor = false) {
-    const x = this.sprite.isoPosition.x / this.tilesize;
-    const y = this.sprite.isoPosition.y / this.tilesize;
+    const x = this.sprite.isoX / this.tilesize;
+    const y = this.sprite.isoY / this.tilesize;
     return {
       x: floor ? Math.floor(x) : x,
       y: floor ? Math.floor(y) : y,

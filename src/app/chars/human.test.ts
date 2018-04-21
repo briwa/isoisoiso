@@ -61,28 +61,28 @@ describe('Human test', () => {
       });
 
       human.moveTo({
-        x: 3,
-        y: 0,
+        x: 0,
+        y: 3,
         onFinished,
       });
 
       expect(human.paths).toEqual([
         {
-          direction: 'right',
-          x: 1,
-          y: 0,
+          direction: 'down',
+          x: 0,
+          y: 1,
           speed: 1,
         },
         {
-          direction: 'right',
-          x: 2,
-          y: 0,
+          direction: 'down',
+          x: 0,
+          y: 2,
           speed: 1,
         },
         {
-          direction: 'right',
-          x: 3,
-          y: 0,
+          direction: 'down',
+          x: 0,
+          y: 3,
           speed: 1,
         },
       ]);

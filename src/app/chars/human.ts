@@ -48,7 +48,7 @@ class Human extends HumanSprite {
     }
 
     const walkablePaths = this.map.findPath(startPos.x, startPos.y, x, y);
-    const finalPaths = moving ?
+    const finalPaths = moving && walkablePaths.length > 0 ?
       // append the paths with the initial paths when moving, to determine direction
       [[this.currentPos().x, this.currentPos().y]].concat(walkablePaths) :
 
@@ -56,15 +56,14 @@ class Human extends HumanSprite {
       walkablePaths;
 
     // no need to proceed when there's no paths
-    // or when trying to move to the same position as the curret one
-    if (
-      finalPaths.length === 0 ||
-      (
-        finalPaths.length === 1 &&
-        finalPaths[0][0] === startPos.x &&
-        finalPaths[0][1] === startPos.y
-      )
-    ) {
+    // or when trying to move to the same position as the current one
+    const samePosition = finalPaths.length === 1 &&
+      finalPaths[0][0] === startPos.x &&
+      finalPaths[0][1] === startPos.y;
+    const noPath = finalPaths.length === 0;
+
+    if ( samePosition || noPath ) {
+      this.stopAnimation();
       if (onFinished) onFinished();
       return false;
     }

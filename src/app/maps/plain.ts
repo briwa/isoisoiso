@@ -3,14 +3,14 @@ import * as PF from 'pathfinding';
 const TILESIZE = 36;
 
 const GRID = [
+  [0, 0, 2, 3, 0, 0, 0, 0],
+  [0, 0, 0, 1, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 1, 1, 1, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 2, 0, 0, 0, 0, 0],
 ];
 
 const TILE = [
@@ -40,8 +40,9 @@ export default class PlainMap {
   private grid;
   private tilesize;
   private tile;
-  private groups;
+  private group;
   private game;
+  private debugMode;
 
   static loadAssets(game) {
     // http://www.pixeljoint.com/pixelart/66809.htm
@@ -52,6 +53,8 @@ export default class PlainMap {
     this.grid = [...GRID];
     this.tilesize = TILESIZE;
     this.tile = TILE;
+
+    this.debugMode = false;
 
     if (game) this.setup(game);
   }
@@ -72,10 +75,7 @@ export default class PlainMap {
   setup(game) {
     this.game = game;
 
-    this.groups = {
-      tile: this.game.add.group(),
-      char: this.game.add.group(),
-    };
+    this.group = this.game.add.group();
 
     // Let's make a load of tiles on a grid.
     for (let i = 0; i < this.grid.length; i += 1) {
@@ -84,7 +84,7 @@ export default class PlainMap {
         // The last parameter is the group you want to add it to (just like game.add.sprite)
         const grid = this.grid[i][j];
         const tile = this.tile[grid];
-        const tileSprite = this.game.add.isoSprite(j * TILESIZE, i * TILESIZE, tile.isoZ, 'tileset', tile.name, this.groups.tile);
+        const tileSprite = this.game.add.isoSprite(j * TILESIZE, i * TILESIZE, tile.isoZ, 'tileset', tile.name, this.group);
         tileSprite.anchor.set(tile.anchor[0], tile.anchor[1]);
         tileSprite.smoothed = false;
       }
@@ -92,8 +92,13 @@ export default class PlainMap {
   }
 
   debug({ cursor, paths }) {
-    this.groups.tile.forEach((t) => {
+    if (!this.debugMode) return;
+
+    this.group.forEach((t) => {
       const tile = t;
+
+      // not debugging people tile!
+      if (tile.key === 'people') return;
 
       if (tile.inPath || tile.walkable) {
         // Clear tint from previous path
@@ -133,6 +138,6 @@ export default class PlainMap {
   }
 
   sortSprites() {
-    this.game.iso.topologicalSort(this.groups.tile);
+    this.game.iso.topologicalSort(this.group);
   }
 }

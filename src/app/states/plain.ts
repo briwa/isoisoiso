@@ -45,13 +45,13 @@ class Plain extends Phaser.State {
       x: 0,
       y: 0,
       game: this.game,
-      group: this.map.groups.char,
+      group: this.map.group,
       map: this.map,
     });
 
     this.npc = new Npc({
       game: this.game,
-      group: this.map.groups.char,
+      group: this.map.group,
       map: this.map,
       hero: this.hero,
     });
