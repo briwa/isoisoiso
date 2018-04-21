@@ -252,7 +252,9 @@ describe('Human test', () => {
       const tween = human.startPaths(onFinished);
 
       // initially it should set the current position to be walkable
-      expect(map.setWalkable.mock.calls[1]).toEqual([0, 0, true]);
+      // and the next one not to be walkable
+      expect(map.setWalkable.mock.calls[1]).toEqual([1, 0, false]);
+      expect(map.setWalkable.mock.calls[2]).toEqual([0, 0, true]);
 
       // then play the animations on start
       tween.onStart();
@@ -260,7 +262,6 @@ describe('Human test', () => {
 
       // then at the end, it should set the next position to false
       tween.onComplete();
-      expect(map.setWalkable.mock.calls[2]).toEqual([1, 0, false]);
       expect(human.paths).toEqual(initialTween.slice(1));
 
       // not doing any of these because we're still tweening

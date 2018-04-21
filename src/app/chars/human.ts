@@ -79,6 +79,7 @@ class Human extends HumanSprite {
     const {x, y, direction, speed} = this.paths[0];
 
     // update walkable tile and bounds
+    this.map.setWalkable(x, y, false);
     this.map.setWalkable(this.currentPos(true).x, this.currentPos(true).y, true);
 
     const nowTweening = this.tweenTo({
@@ -96,8 +97,6 @@ class Human extends HumanSprite {
         // only stop when there's no more paths left
         // we want the animation to run seamlessly
         if (!this.paths.length) this.stopAnimation();
-
-        this.map.setWalkable(x, y, false);
 
         // do not go to the next one when failed, or when there's no tweens left
         if (next) {

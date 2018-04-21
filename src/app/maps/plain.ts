@@ -95,27 +95,35 @@ export default class PlainMap {
     this.groups.tile.forEach((t) => {
       const tile = t;
 
-      if (tile.inPath) {
+      if (tile.inPath || tile.walkable) {
         // Clear tint from previous path
         tile.tint = 0xffffff;
       }
+
       const x = tile.isoX / this.tilesize;
       const y = tile.isoY / this.tilesize;
 
       const inPath = paths.some(point => point[0] === x && point[1] === y);
       if (inPath) {
-        tile.tint = 0xff0000;
+        tile.tint = 0xbbbbbb;
         tile.inPath = true;
       } else {
         tile.inPath = false;
       }
 
-      const inBounds = tile.isoBounds.containsXY(cursor.x, cursor.y);
+      const walkable = this.grid[y][x] !== 0;
+      if (walkable) {
+        tile.walkable = true;
+        tile.tint = 0x444444;
+      } else {
+        tile.walkable = false;
+      }
 
-      if (!tile.selected && inBounds && !tile.inPath) {
+      const inBounds = tile.isoBounds.containsXY(cursor.x, cursor.y);
+      if (!tile.selected && inBounds && !tile.inPath && !tile.walkable) {
         // If it does, do a little animation and tint change.
         tile.selected = true;
-        tile.tint = 0x86bfda;
+        tile.tint = 0xff4400;
       } else if (tile.selected && !inBounds) {
         // If not, revert back to how it was.
         tile.selected = false;
