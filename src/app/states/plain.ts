@@ -10,7 +10,7 @@ class Plain extends Phaser.State {
   private mapGroup;
   private charGroup;
 
-  private hero;
+  private hero: Hero;
   private npc;
 
   private cursor;
@@ -33,12 +33,16 @@ class Plain extends Phaser.State {
     this.game.plugins.add(Phaser.Plugin.Isometric);
     this.game.time.advancedTiming = true; // for physics, i'm still not sure what is the use yet
 
+    this.game.physics.startSystem(Phaser.Plugin.Isometric.ISOARCADE);
+
     // adjust the anchors of the sprites
     // these numbers are really from trial and error, could be improved
-    this.game.iso.anchor.setTo(0.5, 0.2);
+    this.game.iso.anchor.setTo(0.5, 0.25);
   }
 
   create() {
+    ( this.game.physics as any ).isoArcade.gravity.setTo(0, 0, -500);
+
     this.map = new PlainMap(this.game);
 
     this.hero = new Hero({
@@ -49,12 +53,12 @@ class Plain extends Phaser.State {
       map: this.map,
     });
 
-    this.npc = new Npc({
-      game: this.game,
-      group: this.map.group,
-      map: this.map,
-      hero: this.hero,
-    });
+    // this.npc = new Npc({
+    //   game: this.game,
+    //   group: this.map.group,
+    //   map: this.map,
+    //   hero: this.hero,
+    // });
 
     // register mouse down input here
     this.game.input.onDown.add(() => {
@@ -69,12 +73,6 @@ class Plain extends Phaser.State {
         this.hero.moveTo({
           x: cursor.x,
           y: cursor.y,
-          onStart: (paths) => {
-            this.paths = paths;
-          },
-          onFinished: () => {
-            this.paths = [];
-          },
         });
       }
     });
@@ -84,14 +82,22 @@ class Plain extends Phaser.State {
     // project the current mouse from x/y position to x/y/z position of the isometric map, into this.cursor
     this.game.iso.unproject(this.game.input.activePointer.position, this.cursor);
 
+    this.hero.movePaths();
+
     // show cursor position and current player paths
     this.map.debug({
       cursor: this.cursor,
-      paths: this.paths,
+      paths: this.hero.paths,
     });
 
     // sort sprites so it would look nice when other sprites are moving
     this.map.sortSprites();
+  }
+
+  render() {
+    this.game.debug.body(this.hero.sprite);
+    if (this.hero.paths.length) this.game.debug.text(`path x: ${( this.hero.paths[0].x ).toFixed(2)}, y: ${( this.hero.paths[0].y ).toFixed(2)}`, 0, 16);
+    this.game.debug.text(`current x: ${this.hero.currentPos().x.toFixed(2)}, y: ${this.hero.currentPos().y.toFixed(2)}`, 0, 32);
   }
 }
 

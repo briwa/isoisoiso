@@ -54,7 +54,7 @@ export default class PlainMap {
     this.tilesize = TILESIZE;
     this.tile = TILE;
 
-    this.debugMode = false;
+    this.debugMode = true;
 
     if (game) this.setup(game);
   }

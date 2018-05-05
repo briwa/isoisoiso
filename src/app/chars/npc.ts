@@ -54,10 +54,6 @@ class Npc extends Human {
       this.moveTo({
         x: nextPosX,
         y: nextPosY,
-        onFinished: () => {
-          this.setNextIndex();
-          this.moveTrack();
-        },
       });
     }, 2000);
   }

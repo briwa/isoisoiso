@@ -6,9 +6,10 @@ const DURATION = 500;
 
 class Human extends HumanSprite {
   private speed;
-  private paths;
   private bounds;
   private map;
+
+  public paths;
 
   constructor(config) {
     super({ ...config, tilesize: config.map.tilesize });
@@ -24,10 +25,9 @@ class Human extends HumanSprite {
 
     // setup map
     this.map = config.map;
-    this.map.setWalkable(config.x / this.map.tilesize, config.y / this.map.tilesize, false);
   }
 
-  moveTo({ x, y, onStart, onFinished }: {x: number, y: number, onStart?: any, onFinished: any}) {
+  moveTo({ x, y }: {x: number, y: number }) {
     // in normal case, we use the current position as the start of position
     // to be used for pathfinding
     const startPos = {
@@ -38,9 +38,6 @@ class Human extends HumanSprite {
     const moving = this.paths.length > 0;
 
     if (moving) {
-      // do not stop animation when interrupting
-      this.stopTween();
-
       // when moving, the start of the new paths is no longer the current position,
       // it's the end of the animation's position
       startPos.x = this.paths[0].x;
@@ -64,49 +61,54 @@ class Human extends HumanSprite {
 
     if ( samePosition || noPath ) {
       this.stopAnimation();
-      if (onFinished) onFinished();
       return false;
     }
 
     this.paths = shapePaths(finalPaths);
-
-    if (onStart) onStart(walkablePaths);
-    return this.startPaths(onFinished);
   }
 
-  startPaths(onFinished) {
+  movePaths() {
+    // only stop when there's no more paths left
+    // we want the animation to run seamlessly
+    if (!this.paths.length) {
+      this.stopAnimation();
+      this.sprite.body.velocity.y = 0;
+      this.sprite.body.velocity.x = 0;
+
+      return;
+    }
+
     const {x, y, direction, speed} = this.paths[0];
 
-    // update walkable tile and bounds
-    this.map.setWalkable(x, y, false);
-    this.map.setWalkable(this.currentPos(true).x, this.currentPos(true).y, true);
+    const curr = this.currentPos(true);
 
-    const nowTweening = this.tweenTo({
-      x,
-      y,
-      speed: speed * DURATION,
-      onStart: () => {
-        this.playAnimation(`walk-${direction}`);
-      },
-      onComplete: () => {
-        // remove the tween that is already done
-        this.paths = this.paths.slice(1);
-        const next = this.paths[0];
+    // one path done
+    if (curr.x === x && curr.y === y ) {
+      // remove the tween that is already done
+      this.paths = this.paths.slice(1);
+    } else {
+      // start moving
+      this.playAnimation(`walk-${direction}`);
 
-        // only stop when there's no more paths left
-        // we want the animation to run seamlessly
-        if (!this.paths.length) this.stopAnimation();
-
-        // do not go to the next one when failed, or when there's no tweens left
-        if (next) {
-          this.startPaths(onFinished);
-        } else if (onFinished) {
-          onFinished(this.paths);
-        }
-      },
-    });
-
-    return nowTweening;
+      switch (direction) {
+        case 'up':
+          this.sprite.body.velocity.y = -speed * 50;
+          this.sprite.body.velocity.x = 0;
+          break;
+        case 'down':
+          this.sprite.body.velocity.y = speed * 50;
+          this.sprite.body.velocity.x = 0;
+          break;
+        case 'left':
+          this.sprite.body.velocity.x = -speed * 50;
+          this.sprite.body.velocity.y = 0;
+          break;
+        case 'right':
+          this.sprite.body.velocity.x = speed * 50;
+          this.sprite.body.velocity.y = 0;
+          break;
+      }
+    }
   }
 }
 
