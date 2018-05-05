@@ -6,6 +6,8 @@ class Npc extends Human {
   private track;
   private hero;
 
+  private moving;
+
   constructor({ game, group, map, hero }) {
     const track = [
       [7, 3],

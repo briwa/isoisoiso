@@ -70,50 +70,26 @@ class Human extends HumanSprite {
     // only stop when there's no more paths left
     // we want the animation to run seamlessly
     if (!this.paths.length) {
-      this.stopAnimation();
-
-      // stop moving by turning off velocity
-      this.sprite.body.velocity.y = 0;
-      this.sprite.body.velocity.x = 0;
-
+      this.goTo(null);
       return;
     }
 
     const {x, y, direction, speed} = this.paths[0];
-
-    const curr = this.currentPos();
-
-    // find the best operator to check if a path has been done
-    let operator;
+    const velocity = speed * this.duration;
 
     // start moving
-    this.playAnimation(`walk-${direction}`);
+    this.goTo(direction, velocity);
 
-    switch (direction) {
-      case 'up':
-        this.sprite.body.velocity.y = -speed * this.duration;
-        this.sprite.body.velocity.x = 0;
-        operator = Math.round;
-        break;
-      case 'down':
-        this.sprite.body.velocity.y = speed * this.duration;
-        this.sprite.body.velocity.x = 0;
-        operator = Math.floor;
-        break;
-      case 'left':
-        this.sprite.body.velocity.x = -speed * this.duration;
-        this.sprite.body.velocity.y = 0;
-        operator = Math.round;
-        break;
-      case 'right':
-        this.sprite.body.velocity.x = speed * this.duration;
-        this.sprite.body.velocity.y = 0;
-        operator = Math.floor;
-        break;
-    }
+    // once the diff gets smaller than treshold, means we're at the end of the path
+    const curr = this.currentPos();
+    const treshold = 10 / this.duration;
+    const diffX = curr.x - x;
+    const diffY = curr.y - y;
 
-    // one path done
-    if (operator(curr.x) === x && operator(curr.y) === y ) {
+    if (
+      diffX >= 0 && diffX <= treshold && (direction === 'left' || direction === 'right') ||
+      diffY >= 0 && diffY <= treshold && (direction === 'up' || direction === 'down')
+    ) {
       // remove the tween that is already done
       this.paths = this.paths.slice(1);
     }

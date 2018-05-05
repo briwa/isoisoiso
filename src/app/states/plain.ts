@@ -17,11 +17,15 @@ class Plain extends Phaser.State {
   private paths;
   private map;
 
+  private debugging;
+
   constructor() {
     super();
 
     this.cursor = new Phaser.Plugin.Isometric.Point3();
     this.paths = [];
+
+    this.debugging = true;
   }
 
   preload() {
@@ -95,12 +99,14 @@ class Plain extends Phaser.State {
   }
 
   render() {
-    this.game.debug.body(this.hero.sprite);
-    this.game.debug.text(`current x: ${this.hero.currentPos().x.toFixed(2)}, y: ${this.hero.currentPos().y.toFixed(2)}`, 0, 16);
-    if (this.hero.paths.length) {
-      this.hero.paths.forEach((path, idx) => {
-        this.game.debug.text(`x: ${path.x}, y: ${path.y}, dir: ${path.direction}`, 0, 32 + (idx * 16));
-      });
+    if (this.debugging) {
+      this.game.debug.body(this.hero.sprite);
+      this.game.debug.text(`current x: ${this.hero.currentPos().x.toFixed(2)}, y: ${this.hero.currentPos().y.toFixed(2)}`, 0, 32);
+      if (this.hero.paths.length) {
+        this.hero.paths.forEach((path, idx) => {
+          this.game.debug.text(`x: ${path.x}, y: ${path.y}, dir: ${path.direction}`, 0, 48 + (idx * 16));
+        });
+      }
     }
   }
 }
