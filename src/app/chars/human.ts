@@ -2,12 +2,11 @@ import HumanSprite from '../sprites/human';
 
 import { shapePaths } from './helper';
 
-const DURATION = 500;
-
 class Human extends HumanSprite {
   private speed;
   private bounds;
   private map;
+  private duration = 100; // max speed, don't go higher than this
 
   public paths;
 
@@ -72,6 +71,8 @@ class Human extends HumanSprite {
     // we want the animation to run seamlessly
     if (!this.paths.length) {
       this.stopAnimation();
+
+      // stop moving by turning off velocity
       this.sprite.body.velocity.y = 0;
       this.sprite.body.velocity.x = 0;
 
@@ -80,34 +81,41 @@ class Human extends HumanSprite {
 
     const {x, y, direction, speed} = this.paths[0];
 
-    const curr = this.currentPos(true);
+    const curr = this.currentPos();
+
+    // find the best operator to check if a path has been done
+    let operator;
+
+    // start moving
+    this.playAnimation(`walk-${direction}`);
+
+    switch (direction) {
+      case 'up':
+        this.sprite.body.velocity.y = -speed * this.duration;
+        this.sprite.body.velocity.x = 0;
+        operator = Math.round;
+        break;
+      case 'down':
+        this.sprite.body.velocity.y = speed * this.duration;
+        this.sprite.body.velocity.x = 0;
+        operator = Math.floor;
+        break;
+      case 'left':
+        this.sprite.body.velocity.x = -speed * this.duration;
+        this.sprite.body.velocity.y = 0;
+        operator = Math.round;
+        break;
+      case 'right':
+        this.sprite.body.velocity.x = speed * this.duration;
+        this.sprite.body.velocity.y = 0;
+        operator = Math.floor;
+        break;
+    }
 
     // one path done
-    if (curr.x === x && curr.y === y ) {
+    if (operator(curr.x) === x && operator(curr.y) === y ) {
       // remove the tween that is already done
       this.paths = this.paths.slice(1);
-    } else {
-      // start moving
-      this.playAnimation(`walk-${direction}`);
-
-      switch (direction) {
-        case 'up':
-          this.sprite.body.velocity.y = -speed * 50;
-          this.sprite.body.velocity.x = 0;
-          break;
-        case 'down':
-          this.sprite.body.velocity.y = speed * 50;
-          this.sprite.body.velocity.x = 0;
-          break;
-        case 'left':
-          this.sprite.body.velocity.x = -speed * 50;
-          this.sprite.body.velocity.y = 0;
-          break;
-        case 'right':
-          this.sprite.body.velocity.x = speed * 50;
-          this.sprite.body.velocity.y = 0;
-          break;
-      }
     }
   }
 }

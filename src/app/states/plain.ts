@@ -96,8 +96,12 @@ class Plain extends Phaser.State {
 
   render() {
     this.game.debug.body(this.hero.sprite);
-    if (this.hero.paths.length) this.game.debug.text(`path x: ${( this.hero.paths[0].x ).toFixed(2)}, y: ${( this.hero.paths[0].y ).toFixed(2)}`, 0, 16);
-    this.game.debug.text(`current x: ${this.hero.currentPos().x.toFixed(2)}, y: ${this.hero.currentPos().y.toFixed(2)}`, 0, 32);
+    this.game.debug.text(`current x: ${this.hero.currentPos().x.toFixed(2)}, y: ${this.hero.currentPos().y.toFixed(2)}`, 0, 16);
+    if (this.hero.paths.length) {
+      this.hero.paths.forEach((path, idx) => {
+        this.game.debug.text(`x: ${path.x}, y: ${path.y}, dir: ${path.direction}`, 0, 32 + (idx * 16));
+      });
+    }
   }
 }
 
