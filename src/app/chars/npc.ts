@@ -8,7 +8,7 @@ class Npc extends Human {
 
   private moving;
 
-  constructor({ game, group, map, hero }) {
+  constructor({ game, group, map }) {
     const track = [
       [7, 3],
       [1, 3],
@@ -33,29 +33,14 @@ class Npc extends Human {
     this.forward = true;
     this.track = track;
 
-    this.hero = hero;
     this.moveTrack();
   }
 
   moveTrack() {
     setTimeout(() => {
-      let nextPosX = this.track[this.index][0];
-      let nextPosY = this.track[this.index][1];
-
-      const playerX = Math.ceil(this.hero.currentPos().x);
-      const playerY = Math.ceil(this.hero.currentPos().y);
-
-      if (nextPosX === playerX && nextPosY === playerY) {
-        if (nextPosX === playerX) {
-          nextPosX -= 1;
-        } else if (nextPosY === playerY) {
-          nextPosY -= 1;
-        }
-      }
-
       this.moveTo({
-        x: nextPosX,
-        y: nextPosY,
+        x: this.track[this.index][0],
+        y: this.track[this.index][1],
       });
     }, 2000);
   }

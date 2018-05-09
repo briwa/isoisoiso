@@ -44,13 +44,9 @@ class Human extends HumanSprite {
     const walkablePaths = this.map.findPath(startPos.x, startPos.y, x, y);
 
     // no need to proceed when there's no paths
-    // or when trying to move to the same position as the current one
-    const samePosition = walkablePaths.length === 1 &&
-      walkablePaths[0][0] === startPos.x &&
-      walkablePaths[0][1] === startPos.y;
     const noPath = walkablePaths.length === 0;
 
-    if ( samePosition || noPath ) {
+    if (noPath) {
       this.stopAnimation();
       return false;
     }

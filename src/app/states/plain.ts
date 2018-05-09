@@ -57,12 +57,11 @@ class Plain extends Phaser.State {
       map: this.map,
     });
 
-    // this.npc = new Npc({
-    //   game: this.game,
-    //   group: this.map.group,
-    //   map: this.map,
-    //   hero: this.hero,
-    // });
+    this.npc = new Npc({
+      game: this.game,
+      group: this.map.group,
+      map: this.map,
+    });
 
     // register mouse down input here
     this.game.input.onDown.add(() => {
@@ -87,6 +86,7 @@ class Plain extends Phaser.State {
     this.game.iso.unproject(this.game.input.activePointer.position, this.cursor);
 
     this.hero.movePaths();
+    this.npc.movePaths();
 
     // sort sprites so it would look nice when other sprites are moving
     this.map.sortSprites();
