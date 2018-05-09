@@ -1,27 +1,31 @@
+import Phaser from 'phaser-ce';
 import Human from './human';
 
+type Track = [number, number][];
+
+interface Config {
+  game: Phaser.Game;
+  group: Phaser.Group;
+  map: any;
+  x?: number;
+  y?: number;
+  track?: Track;
+  follow?: Human;
+};
+
 class Npc extends Human {
-  private index;
-  private forward;
-  private track;
-  private hero;
+  private index: number;
+  private forward: boolean;
 
-  private moving;
-
-  constructor({ game, group, map }) {
-    const track = [
-      [7, 3],
-      [1, 3],
-    ];
-
+  constructor({ x, y, game, group, map, track, follow }: Config) {
     const z = 0;
     const sprite = 'people';
     const delimiter = 129;
 
     super({
       game,
-      x: track[1][0] * map.tilesize,
-      y: track[1][1] * map.tilesize,
+      x: (track ? track[1][0] : x) * map.tilesize,
+      y: (track ? track[1][1] : y) * map.tilesize,
       z,
       sprite,
       delimiter,
@@ -31,28 +35,43 @@ class Npc extends Human {
 
     this.index = 0;
     this.forward = true;
-    this.track = track;
 
-    if (this.track) this.moveTrack();
+    if (follow) {
+      const onFollow = () => {
+        this.generatePaths({
+          x: follow.position(true).x,
+          y: follow.position(true).y,
+        });
+
+        // also follow the char on every movement
+        follow.listen('endPath', () => {
+          onFollow();
+        });
+      };
+
+      onFollow();
+    } else if (track) {
+      this.moveTrack(track);
+    }
   }
 
-  moveTrack() {
+  moveTrack(track: Track) {
     setTimeout(() => {
       this.generatePaths({
-        x: this.track[this.index][0],
-        y: this.track[this.index][1],
+        x: track[this.index][0],
+        y: track[this.index][1],
         onFinished: function() {
           this.setNextIndex();
-          this.moveTrack();
+          this.moveTrack(track);
         },
       });
     }, 2000);
   }
 
-  setNextIndex() {
+  setNextIndex(track: Config['track']) {
     this.forward =
-      (this.forward && !!this.track[this.index + 1]) ||
-      (!this.forward && !this.track[this.index - 1]);
+      (this.forward && !!track[this.index + 1]) ||
+      (!this.forward && !track[this.index - 1]);
 
     if (this.forward) {
       this.index += 1;

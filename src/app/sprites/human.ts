@@ -2,15 +2,15 @@
 // people sprite every 43 frames
 import Phaser from 'phaser-ce';
 
-interface Config {
-  game: Phaser.Game;
+export interface Config {
   x: number;
   y: number;
   z: number;
-  sprite: string; // sprite name on the spritesheet
-  delimiter: number;
-  group: Phaser.Group;
-  tilesize: number;
+  map: any;
+  game?: Phaser.Game;
+  sprite?: string; // sprite name on the spritesheet
+  delimiter?: number;
+  group?: Phaser.Group;
 };
 
 class HumanSprite {
@@ -25,12 +25,12 @@ class HumanSprite {
     game.load.spritesheet('people', 'assets/images/people.png', 32, 49);
   }
 
-  constructor({ game, x, y, z, sprite, delimiter, group, tilesize }: Config) {
+  constructor({ game, x, y, z, sprite, delimiter, group, map }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;
 
     this.game = game;
-    this.tilesize = tilesize;
+    this.tilesize = map.tilesize;
 
     this.sprite = this.game.add.isoSprite(x, y, z, sprite, delimiter, group);
 
@@ -47,6 +47,7 @@ class HumanSprite {
 
     // events
     this.signals.stopping = new Phaser.Signal();
+    this.signals.endPath = new Phaser.Signal();
 
     // circular reference!!!
     // needed for side effect things

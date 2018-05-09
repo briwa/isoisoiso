@@ -1,4 +1,4 @@
-import HumanSprite from '../sprites/human';
+import HumanSprite, { Config } from '../sprites/human';
 import { shapePaths } from './helper';
 
 interface Path {
@@ -15,8 +15,8 @@ class Human extends HumanSprite {
 
   public paths: Path[] = [];
 
-  constructor(config) {
-    super({ ...config, tilesize: config.map.tilesize });
+  constructor(config: Config) {
+    super(config);
 
     // setup map
     this.map = config.map;
@@ -57,10 +57,9 @@ class Human extends HumanSprite {
     }
 
     const {x, y, direction, speed} = this.paths[0];
-    const velocity = speed * this.duration;
 
     // start moving
-    this.goTo(direction, velocity);
+    this.goTo(direction, speed * this.duration);
 
     // once the diff gets smaller than treshold, means we're at the end of the path
     const curr = this.position();
@@ -72,6 +71,7 @@ class Human extends HumanSprite {
       diffX >= 0 && diffX <= treshold && (direction === 'left' || direction === 'right') ||
       diffY >= 0 && diffY <= treshold && (direction === 'up' || direction === 'down')
     ) {
+      this.dispatch('endPath');
       // remove the tween that is already done
       this.paths = this.paths.slice(1);
     }

@@ -55,9 +55,12 @@ class Plain extends Phaser.State {
     });
 
     this.npc = new Npc({
+      x: 7,
+      y: 3,
       game: this.game,
       group: this.map.group,
       map: this.map,
+      follow: this.hero,
     });
 
     // register mouse down input here
