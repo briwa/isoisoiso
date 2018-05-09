@@ -33,7 +33,7 @@ class Npc extends Human {
     this.forward = true;
     this.track = track;
 
-    this.moveTrack();
+    if (this.track) this.moveTrack();
   }
 
   moveTrack() {
@@ -41,6 +41,10 @@ class Npc extends Human {
       this.moveTo({
         x: this.track[this.index][0],
         y: this.track[this.index][1],
+        onFinished: function() {
+          this.setNextIndex();
+          this.moveTrack();
+        },
       });
     }, 2000);
   }

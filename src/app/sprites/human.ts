@@ -5,6 +5,7 @@ class HumanSprite {
   private game;
   private currentTween;
   private tilesize;
+  private signals;
 
   public sprite;
 
@@ -31,6 +32,10 @@ class HumanSprite {
 
     this.game.physics.isoArcade.enable(this.sprite);
     this.sprite.body.collideWorldBounds = true;
+
+    this.signals = {
+      stopping: new Phaser.Signal(),
+    };
   }
 
   currentPos(floor = false) {
@@ -87,6 +92,14 @@ class HumanSprite {
         this.sprite.body.velocity.y = 0;
         break;
     }
+  }
+
+  addCallback(name, callback) {
+    this.signals[name].addOnce(callback, this);
+  }
+
+  dispatch(name) {
+    this.signals[name].dispatch();
   }
 }
 

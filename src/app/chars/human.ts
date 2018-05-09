@@ -26,7 +26,7 @@ class Human extends HumanSprite {
     this.map = config.map;
   }
 
-  moveTo({ x, y }: {x: number, y: number }) {
+  moveTo({ x, y, onFinished }: {x: number, y: number, onFinished?: any }) {
     // in normal case, we use the current position as the start of position
     // to be used for pathfinding
     const startPos = {
@@ -51,6 +51,10 @@ class Human extends HumanSprite {
       return false;
     }
 
+    if (onFinished) {
+      this.addCallback('stopping', onFinished);
+    }
+
     this.paths = shapePaths(walkablePaths);
   }
 
@@ -59,6 +63,7 @@ class Human extends HumanSprite {
     // we want the animation to run seamlessly
     if (!this.paths.length) {
       this.goTo(null);
+      this.dispatch('stopping');
       return;
     }
 
