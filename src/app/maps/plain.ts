@@ -42,7 +42,6 @@ export default class PlainMap {
   private tile;
   private group;
   private game;
-  private debugging;
 
   static loadAssets(game) {
     // http://www.pixeljoint.com/pixelart/66809.htm
@@ -53,8 +52,6 @@ export default class PlainMap {
     this.grid = [...GRID];
     this.tilesize = TILESIZE;
     this.tile = TILE;
-
-    this.debugging = true;
 
     if (game) this.setup(game);
   }
@@ -92,8 +89,6 @@ export default class PlainMap {
   }
 
   debug({ cursor, paths }) {
-    if (!this.debugging) return;
-
     this.group.forEach((t) => {
       const tile = t;
 
@@ -108,7 +103,7 @@ export default class PlainMap {
       const x = tile.isoX / this.tilesize;
       const y = tile.isoY / this.tilesize;
 
-      const inPath = paths.some(point => point[0] === x && point[1] === y);
+      const inPath = paths.some(path => path.x === x && path.y === y);
       if (inPath) {
         tile.tint = 0xbbbbbb;
         tile.inPath = true;

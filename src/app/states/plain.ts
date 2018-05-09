@@ -88,18 +88,18 @@ class Plain extends Phaser.State {
 
     this.hero.movePaths();
 
-    // show cursor position and current player paths
-    this.map.debug({
-      cursor: this.cursor,
-      paths: this.hero.paths,
-    });
-
     // sort sprites so it would look nice when other sprites are moving
     this.map.sortSprites();
   }
 
   render() {
     if (this.debugging) {
+      // show cursor position and current player paths
+      this.map.debug({
+        cursor: this.cursor,
+        paths: this.hero.paths,
+      });
+
       this.game.debug.body(this.hero.sprite);
       this.game.debug.text(`current x: ${this.hero.currentPos().x.toFixed(2)}, y: ${this.hero.currentPos().y.toFixed(2)}`, 0, 32);
       if (this.hero.paths.length) {

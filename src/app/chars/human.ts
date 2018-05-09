@@ -34,36 +34,28 @@ class Human extends HumanSprite {
       y: this.currentPos(true).y,
     };
 
-    const moving = this.paths.length > 0;
-
-    if (moving) {
-      // when moving, the start of the new paths is no longer the current position,
-      // it's the end of the animation's position
+    // when moving, the start of the new paths is no longer the current position,
+    // it's the end of the animation's position
+    if (this.paths.length > 0) {
       startPos.x = this.paths[0].x;
       startPos.y = this.paths[0].y;
     }
 
     const walkablePaths = this.map.findPath(startPos.x, startPos.y, x, y);
-    const finalPaths = moving && walkablePaths.length > 0 ?
-      // append the paths with the initial paths when moving, to determine direction
-      [[this.currentPos().x, this.currentPos().y]].concat(walkablePaths) :
-
-      // otherwise just use the original paths
-      walkablePaths;
 
     // no need to proceed when there's no paths
     // or when trying to move to the same position as the current one
-    const samePosition = finalPaths.length === 1 &&
-      finalPaths[0][0] === startPos.x &&
-      finalPaths[0][1] === startPos.y;
-    const noPath = finalPaths.length === 0;
+    const samePosition = walkablePaths.length === 1 &&
+      walkablePaths[0][0] === startPos.x &&
+      walkablePaths[0][1] === startPos.y;
+    const noPath = walkablePaths.length === 0;
 
     if ( samePosition || noPath ) {
       this.stopAnimation();
       return false;
     }
 
-    this.paths = shapePaths(finalPaths);
+    this.paths = shapePaths(walkablePaths);
   }
 
   movePaths() {
