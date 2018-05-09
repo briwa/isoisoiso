@@ -139,7 +139,7 @@ export default class PlainMap {
   }
 
   collisionCheck() {
-    ( this.game.physics as any ).isoArcade.collide(this.group, null, function() {
+    this.game.physics.isoArcade.collide(this.group, null, function() {
       onColliding([].slice.call(arguments));
     });
   }

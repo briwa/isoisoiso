@@ -1,45 +1,34 @@
 import HumanSprite from '../sprites/human';
-
 import { shapePaths } from './helper';
 
-class Human extends HumanSprite {
-  private speed;
-  private bounds;
-  private map;
-  private duration = 100; // max speed, don't go higher than this
+interface Path {
+  x: number;
+  y: number;
+  direction: string;
+  speed: number;
+};
 
-  public paths;
+class Human extends HumanSprite {
+  private map;
+  private speed: number = 1;
+  private duration: number = 100; // max speed, don't go higher than this
+
+  public paths: Path[] = [];
 
   constructor(config) {
     super({ ...config, tilesize: config.map.tilesize });
-
-    this.speed = 1; // by default the speed is 100%, not slowed down or doubled up
-    this.paths = [];
-    this.bounds = {
-      up: [],
-      down: [],
-      left: [],
-      right: [],
-    };
 
     // setup map
     this.map = config.map;
   }
 
-  moveTo({ x, y, onFinished }: {x: number, y: number, onFinished?: any }) {
+  generatePaths({ x, y, onFinished }: {x: number, y: number, onFinished?: Function }): Path[] {
     // in normal case, we use the current position as the start of position
     // to be used for pathfinding
     const startPos = {
-      x: this.currentPos(true).x,
-      y: this.currentPos(true).y,
+      x: this.position(true).x,
+      y: this.position(true).y,
     };
-
-    // when moving, the start of the new paths is no longer the current position,
-    // it's the end of the animation's position
-    if (this.paths.length > 0) {
-      startPos.x = this.paths[0].x;
-      startPos.y = this.paths[0].y;
-    }
 
     const walkablePaths = this.map.findPath(startPos.x, startPos.y, x, y);
 
@@ -48,14 +37,15 @@ class Human extends HumanSprite {
 
     if (noPath) {
       this.stopAnimation();
-      return false;
+      return [];
     }
 
     if (onFinished) {
-      this.addCallback('stopping', onFinished);
+      this.listen('stopping', onFinished);
     }
 
     this.paths = shapePaths(walkablePaths);
+    return this.paths;
   }
 
   movePaths() {
@@ -73,7 +63,7 @@ class Human extends HumanSprite {
     this.goTo(direction, velocity);
 
     // once the diff gets smaller than treshold, means we're at the end of the path
-    const curr = this.currentPos();
+    const curr = this.position();
     const treshold = 10 / this.duration;
     const diffX = curr.x - x;
     const diffY = curr.y - y;

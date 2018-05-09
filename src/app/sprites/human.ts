@@ -1,20 +1,31 @@
 // This class is to separate human side effects (phaserjs-related) from the logics (chars/human)
 // people sprite every 43 frames
+import Phaser from 'phaser-ce';
+
+interface Config {
+  game: Phaser.Game;
+  x: number;
+  y: number;
+  z: number;
+  sprite: string; // sprite name on the spritesheet
+  delimiter: number;
+  group: Phaser.Group;
+  tilesize: number;
+};
 
 class HumanSprite {
-  private game;
-  private tilesize;
-  private signals;
-  private char;
+  private game: Phaser.Game;
+  private tilesize: number;
+  private signals: { [key:string]: Phaser.Signal } = {};
 
-  public sprite;
+  public sprite: Phaser.Plugin.Isometric.IsoSprite;
 
-  static loadAssets(game) {
+  static loadAssets(game: Phaser.Game) {
     // https://opengameart.org/content/isometric-people
     game.load.spritesheet('people', 'assets/images/people.png', 32, 49);
   }
 
-  constructor({ game, x, y, z, sprite, delimiter, group, tilesize }) {
+  constructor({ game, x, y, z, sprite, delimiter, group, tilesize }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;
 
@@ -22,7 +33,6 @@ class HumanSprite {
     this.tilesize = tilesize;
 
     this.sprite = this.game.add.isoSprite(x, y, z, sprite, delimiter, group);
-    this.sprite.char = this; // circular reference!!!
 
     // animation setup
     this.sprite.anchor.set(0.5);
@@ -36,12 +46,15 @@ class HumanSprite {
     this.sprite.body.collideWorldBounds = true;
 
     // events
-    this.signals = {
-      stopping: new Phaser.Signal(),
-    };
+    this.signals.stopping = new Phaser.Signal();
+
+    // circular reference!!!
+    // needed for side effect things
+    // TODO: just do this for now to escape the typings
+    this.sprite['char'] = this;
   }
 
-  currentPos(floor = false) {
+  position(floor = false) {
     const x = this.sprite.isoX / this.tilesize;
     const y = this.sprite.isoY / this.tilesize;
     return {
@@ -50,7 +63,7 @@ class HumanSprite {
     };
   }
 
-  playAnimation(name) {
+  playAnimation(name: string) {
     // do not play the same animation twice
     // if this is the first movement (from static to moving),
     // always play the animation regardless
@@ -64,7 +77,7 @@ class HumanSprite {
     this.sprite.animations.stop(this.sprite.animations.currentAnim.name, true);
   }
 
-  goTo(direction, velocity = 0) {
+  goTo(direction: string, velocity = 0) {
     if (!direction) {
       this.stopAnimation();
 
@@ -97,12 +110,12 @@ class HumanSprite {
     }
   }
 
-  addCallback(name, callback) {
-    this.signals[name].addOnce(callback, this);
+  listen(name: string, callback: Function) {
+    if (this.signals[name]) this.signals[name].addOnce(callback, this);
   }
 
-  dispatch(name) {
-    this.signals[name].dispatch();
+  dispatch(name: string) {
+    if (this.signals[name]) this.signals[name].dispatch();
   }
 }
 

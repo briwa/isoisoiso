@@ -38,7 +38,7 @@ class Npc extends Human {
 
   moveTrack() {
     setTimeout(() => {
-      this.moveTo({
+      this.generatePaths({
         x: this.track[this.index][0],
         y: this.track[this.index][1],
         onFinished: function() {

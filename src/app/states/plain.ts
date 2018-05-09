@@ -42,7 +42,7 @@ class Plain extends Phaser.State {
   }
 
   create() {
-    ( this.game.physics as any ).isoArcade.gravity.setTo(0, 0, -500);
+    this.game.physics.isoArcade.gravity.setTo(0, 0, -500);
 
     this.map = new PlainMap(this.game);
 
@@ -70,7 +70,7 @@ class Plain extends Phaser.State {
 
       // ignore out of bounds clicks
       if (cursor.x >= 0 && cursor.y >= 0 && cursor.x < this.map.grid.length && cursor.y < this.map.grid.length) {
-        this.hero.moveTo({
+        this.hero.generatePaths({
           x: cursor.x,
           y: cursor.y,
         });
@@ -100,7 +100,7 @@ class Plain extends Phaser.State {
 
       this.game.debug.body(this.hero.sprite);
       this.game.debug.body(this.npc.sprite);
-      this.game.debug.text(`current x: ${this.hero.currentPos().x.toFixed(2)}, y: ${this.hero.currentPos().y.toFixed(2)}`, 0, 32);
+      this.game.debug.text(`current x: ${this.hero.position().x.toFixed(2)}, y: ${this.hero.position().y.toFixed(2)}`, 0, 32);
       if (this.hero.paths.length) {
         this.hero.paths.forEach((path, idx) => {
           this.game.debug.text(`x: ${path.x}, y: ${path.y}, dir: ${path.direction}`, 0, 48 + (idx * 16));
