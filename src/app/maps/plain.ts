@@ -1,5 +1,7 @@
 import * as PF from 'pathfinding';
 
+import { onColliding } from '../chars/helper';
+
 const TILESIZE = 36;
 
 const GRID = [
@@ -134,5 +136,11 @@ export default class PlainMap {
 
   sortSprites() {
     this.game.iso.topologicalSort(this.group);
+  }
+
+  collisionCheck() {
+    ( this.game.physics as any ).isoArcade.collide(this.group, null, function() {
+      onColliding([].slice.call(arguments));
+    });
   }
 }

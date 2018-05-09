@@ -1,4 +1,5 @@
-/* eslint-disable import/prefer-default-export */
+import Human from './human';
+
 export function shapePaths(paths) {
   const initialPos = {
     x: paths[0][0],
@@ -40,4 +41,15 @@ export function shapePaths(paths) {
 
     return newPath;
   }, []);
+}
+
+export function onColliding(sprites) {
+  sprites.forEach((sprite) => {
+    // when humans collide
+    if (sprite.char instanceof Human) {
+      // stop them from moving
+      sprite.char.paths = [];
+      sprite.char.onStopMoving();
+    }
+  });
 }

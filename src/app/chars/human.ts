@@ -62,8 +62,7 @@ class Human extends HumanSprite {
     // only stop when there's no more paths left
     // we want the animation to run seamlessly
     if (!this.paths.length) {
-      this.goTo(null);
-      this.dispatch('stopping');
+      this.onStopMoving();
       return;
     }
 
@@ -86,6 +85,11 @@ class Human extends HumanSprite {
       // remove the tween that is already done
       this.paths = this.paths.slice(1);
     }
+  }
+
+  onStopMoving() {
+    this.goTo(null);
+    this.dispatch('stopping');
   }
 }
 

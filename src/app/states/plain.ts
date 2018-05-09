@@ -7,9 +7,6 @@ import HumanSprite from '../sprites/human';
 import PlainMap from '../maps/plain';
 
 class Plain extends Phaser.State {
-  private mapGroup;
-  private charGroup;
-
   private hero: Hero;
   private npc;
 
@@ -90,6 +87,7 @@ class Plain extends Phaser.State {
 
     // sort sprites so it would look nice when other sprites are moving
     this.map.sortSprites();
+    this.map.collisionCheck();
   }
 
   render() {
@@ -101,6 +99,7 @@ class Plain extends Phaser.State {
       });
 
       this.game.debug.body(this.hero.sprite);
+      this.game.debug.body(this.npc.sprite);
       this.game.debug.text(`current x: ${this.hero.currentPos().x.toFixed(2)}, y: ${this.hero.currentPos().y.toFixed(2)}`, 0, 32);
       if (this.hero.paths.length) {
         this.hero.paths.forEach((path, idx) => {

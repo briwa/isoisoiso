@@ -3,9 +3,9 @@
 
 class HumanSprite {
   private game;
-  private currentTween;
   private tilesize;
   private signals;
+  private char;
 
   public sprite;
 
@@ -22,6 +22,7 @@ class HumanSprite {
     this.tilesize = tilesize;
 
     this.sprite = this.game.add.isoSprite(x, y, z, sprite, delimiter, group);
+    this.sprite.char = this; // circular reference!!!
 
     // animation setup
     this.sprite.anchor.set(0.5);
@@ -30,9 +31,11 @@ class HumanSprite {
     this.sprite.animations.add('walk-right', [10, 11, 12, 13, 14, 15, 16, 17, 18].map(i => i + delimiter), 30, true);
     this.sprite.animations.add('walk-down', [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => i + delimiter), 30, true);
 
+    // arcade
     this.game.physics.isoArcade.enable(this.sprite);
     this.sprite.body.collideWorldBounds = true;
 
+    // events
     this.signals = {
       stopping: new Phaser.Signal(),
     };
@@ -47,13 +50,13 @@ class HumanSprite {
     };
   }
 
-  playAnimation(animationName) {
+  playAnimation(name) {
     // do not play the same animation twice
     // if this is the first movement (from static to moving),
     // always play the animation regardless
     const currentAnim = this.sprite.animations.currentAnim;
-    if (!currentAnim.isPlaying || currentAnim.name !== animationName) {
-      this.sprite.animations.play(animationName);
+    if (!currentAnim.isPlaying || currentAnim.name !== name) {
+      this.sprite.animations.play(name);
     }
   }
 
