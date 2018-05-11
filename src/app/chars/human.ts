@@ -64,9 +64,9 @@ class Human extends HumanSprite {
 
     // once the diff gets smaller than treshold, means we're at the end of the path
     const curr = this.position();
-    const treshold = 10 / this.duration;
-    const diffX = curr.x - x;
-    const diffY = curr.y - y;
+    const treshold = 5 / this.duration;
+    const diffX = Math.abs((curr.x - this.anchorX) - x);
+    const diffY = Math.abs((curr.y - this.anchorY) - y);
 
     if (
       diffX >= 0 && diffX <= treshold && (direction === 'left' || direction === 'right') ||

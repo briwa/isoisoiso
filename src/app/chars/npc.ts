@@ -61,14 +61,14 @@ class Npc extends Human {
         x: track[this.index][0],
         y: track[this.index][1],
         onFinished: function() {
-          this.setNextIndex();
+          this.setNextIndex(track);
           this.moveTrack(track);
         },
       });
     }, 2000);
   }
 
-  setNextIndex(track: Config['track']) {
+  setNextIndex(track: Track) {
     this.forward =
       (this.forward && !!track[this.index + 1]) ||
       (!this.forward && !track[this.index - 1]);

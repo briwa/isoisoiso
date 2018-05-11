@@ -57,7 +57,7 @@ class Plain extends Phaser.State {
       game: this.game,
       group: this.map.group,
       map: this.map,
-      follow: this.hero,
+      track: [[7,3], [3,3]],
     });
 
     // register mouse down input here

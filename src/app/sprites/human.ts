@@ -19,6 +19,8 @@ class HumanSprite {
   private tilesize: number;
   private signals: { [key:string]: Phaser.Signal } = {};
 
+  public anchorX: number = 1 / 4;
+  public anchorY: number = 1 / 4;
   public sprite: Phaser.Plugin.Isometric.IsoSprite;
 
   static loadAssets(game: Phaser.Game) {
@@ -33,7 +35,7 @@ class HumanSprite {
     this.game = game;
     this.tilesize = map.tilesize;
 
-    this.sprite = this.game.add.isoSprite(x, y, z, sprite, delimiter, group);
+    this.sprite = this.game.add.isoSprite(x + (this.anchorX * this.tilesize), y + (this.anchorY * this.tilesize), z, sprite, delimiter, group);
 
     // animation setup
     this.sprite.anchor.set(0.5);
