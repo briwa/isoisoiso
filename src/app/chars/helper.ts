@@ -1,25 +1,19 @@
 import Human from './human';
 
+const getDirection = (prev, next) => {
+  if (prev.x === next.x) {
+    return prev.y > next.y ? 'up' : 'down';
+  }
+
+  if (prev.y === next.y) {
+    return prev.x > next.x ? 'left' : 'right';
+  }
+};
+
 export function shapePaths(paths) {
   const initialPos = {
     x: paths[0][0],
     y: paths[0][1],
-  };
-
-  const getDirection = (prev, next) => {
-    if (prev.x === next.x) {
-      return {
-        direction: prev.y > next.y ? 'up' : 'down',
-        speed: Math.abs(next.y - prev.y),
-      };
-    }
-
-    if (prev.y === next.y) {
-      return {
-        direction: prev.x > next.x ? 'left' : 'right',
-        speed: Math.abs(next.x - prev.x),
-      };
-    }
   };
 
   return paths.slice(1).reduce((newPath, next) => {
@@ -31,11 +25,10 @@ export function shapePaths(paths) {
     const newX = next[0];
     const newY = next[1];
 
-    const { direction, speed } = getDirection(current, { x: newX, y: newY });
+    const direction = getDirection(current, { x: newX, y: newY });
     newPath.push({
       x: newX,
       y: newY,
-      speed,
       direction,
     });
 

@@ -1,6 +1,30 @@
 // This class is to separate human side effects (phaserjs-related) from the logics (chars/human)
 import Phaser from 'phaser-ce';
+
+import Human from '../chars/human';
 import PlainMap from '../maps/plain';
+
+export interface MovementTrack {
+  type: 'track';
+  input: [number, number][];
+};
+
+export interface MovementFollow {
+  type: 'follow';
+  input: Human;
+};
+
+export interface MovementMouse {
+  type: 'mouse';
+  input?: Phaser.Plugin.Isometric.Point3;
+};
+
+export interface MovementKeys {
+  type: 'keys';
+  input: { [key:string]: Phaser.Key };
+};
+
+export type Direction = 'up' | 'down' | 'left' | 'right';
 
 // people sprite every 43 frames
 export interface Config {
@@ -12,6 +36,7 @@ export interface Config {
   sprite?: string; // sprite name on the spritesheet
   delimiter?: number;
   group?: Phaser.Group;
+  movement: MovementTrack | MovementFollow | MovementKeys | MovementMouse;
 };
 
 class HumanSprite {
@@ -19,16 +44,17 @@ class HumanSprite {
   private tilesize: number;
   private signals: { [key:string]: Phaser.Signal } = {};
 
-  public anchorX: number = 1 / 4;
-  public anchorY: number = 1 / 4;
+  public anchorX: number = 1/4;
+  public anchorY: number = 1/4;
   public sprite: Phaser.Plugin.Isometric.IsoSprite;
+  public movement: MovementTrack | MovementFollow | MovementKeys | MovementMouse;
 
   static loadAssets(game: Phaser.Game) {
     // https://opengameart.org/content/isometric-people
     game.load.spritesheet('people', 'assets/images/people.png', 32, 49);
   }
 
-  constructor({ game, x, y, z, sprite, delimiter, group, map }: Config) {
+  constructor({ game, x, y, z, sprite, delimiter, group, map, movement }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;
 
@@ -49,8 +75,10 @@ class HumanSprite {
     this.sprite.body.collideWorldBounds = true;
 
     // events
-    this.signals.stopping = new Phaser.Signal();
-    this.signals.endPath = new Phaser.Signal();
+    this.signals.pathsFinished = new Phaser.Signal();
+    this.signals.pathEnd = new Phaser.Signal();
+
+    this.movement = movement;
 
     // circular reference!!!
     // needed for side effect things
@@ -81,7 +109,7 @@ class HumanSprite {
     this.sprite.animations.stop(this.sprite.animations.currentAnim.name, true);
   }
 
-  goTo(direction: string, velocity = 0) {
+  goTo(direction: Direction, velocity = 0) {
     if (!direction) {
       this.stopAnimation();
 
@@ -115,6 +143,10 @@ class HumanSprite {
   }
 
   listen(name: string, callback: Function) {
+    if (this.signals[name]) this.signals[name].add(callback, this);
+  }
+
+  listenOnce(name: string, callback: Function) {
     if (this.signals[name]) this.signals[name].addOnce(callback, this);
   }
 

@@ -1,7 +1,7 @@
 import Phaser from 'phaser-ce';
-import Human from './human';
 
-type Track = [number, number][];
+import Human from './human';
+import { MovementTrack, MovementFollow } from '../sprites/human';
 
 interface Config {
   game: Phaser.Game;
@@ -9,66 +9,70 @@ interface Config {
   map: any;
   x?: number;
   y?: number;
-  track?: Track;
-  follow?: Human;
+  movement: MovementTrack | MovementFollow;
 };
 
 class Npc extends Human {
   private index: number;
   private forward: boolean;
 
-  constructor({ x, y, game, group, map, track, follow }: Config) {
+  constructor({ x, y, game, group, map, movement }: Config) {
     const z = 0;
     const sprite = 'people';
     const delimiter = 129;
 
     super({
       game,
-      x: (track ? track[1][0] : x) * map.tilesize,
-      y: (track ? track[1][1] : y) * map.tilesize,
+      x: x * map.tilesize,
+      y: y * map.tilesize,
       z,
       sprite,
       delimiter,
       group,
       map,
+      movement,
     });
 
     this.index = 0;
     this.forward = true;
 
-    if (follow) {
+    if (this.movement.type === 'follow') {
+      const follow = this.movement.input;
       const onFollow = () => {
         this.generatePaths({
           x: follow.position(true).x,
           y: follow.position(true).y,
         });
 
-        // also follow the char on every movement
-        follow.listen('endPath', () => {
+        // also follow the char on every path
+        follow.listenOnce('pathEnd', () => {
           onFollow();
         });
       };
 
       onFollow();
-    } else if (track) {
-      this.moveTrack(track);
+    } else if (this.movement.type === 'track') {
+      this.moveTrack();
     }
   }
 
-  moveTrack(track: Track) {
+  moveTrack() {
+    const track = this.movement.input;
     setTimeout(() => {
       this.generatePaths({
         x: track[this.index][0],
         y: track[this.index][1],
-        onFinished: function() {
-          this.setNextIndex(track);
-          this.moveTrack(track);
+        onFinished: () => {
+          this.setNextIndex();
+          this.moveTrack();
         },
       });
     }, 2000);
   }
 
-  setNextIndex(track: Track) {
+  setNextIndex() {
+    const track = this.movement.input;
+
     this.forward =
       (this.forward && !!track[this.index + 1]) ||
       (!this.forward && !track[this.index - 1]);

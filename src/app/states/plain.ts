@@ -11,6 +11,7 @@ class Plain extends Phaser.State {
   private npc: Npc;
 
   private cursor: Phaser.Plugin.Isometric.Point3;
+  private keys: { [key:string]: Phaser.Key };
   private map: PlainMap;
 
   private debug: boolean;
@@ -41,6 +42,13 @@ class Plain extends Phaser.State {
   create() {
     this.game.physics.isoArcade.gravity.setTo(0, 0, -500);
 
+    this.keys = {
+      w: this.game.input.keyboard.addKey(Phaser.Keyboard.W),
+      a: this.game.input.keyboard.addKey(Phaser.Keyboard.A),
+      s: this.game.input.keyboard.addKey(Phaser.Keyboard.S),
+      d: this.game.input.keyboard.addKey(Phaser.Keyboard.D),
+    };
+
     this.map = new PlainMap(this.game);
 
     this.hero = new Hero({
@@ -49,6 +57,10 @@ class Plain extends Phaser.State {
       game: this.game,
       group: this.map.group,
       map: this.map,
+      movement: {
+        type: 'keys',
+        input: this.keys,
+      },
     });
 
     this.npc = new Npc({
@@ -57,24 +69,10 @@ class Plain extends Phaser.State {
       game: this.game,
       group: this.map.group,
       map: this.map,
-      track: [[7,3], [3,3]],
-    });
-
-    // register mouse down input here
-    this.game.input.onDown.add(() => {
-      // for hero movement
-      const cursor = {
-        x: Math.floor(this.cursor.x / this.map.tilesize),
-        y: Math.floor(this.cursor.y / this.map.tilesize),
-      };
-
-      // ignore out of bounds clicks
-      if (cursor.x >= 0 && cursor.y >= 0 && cursor.x < this.map.grid.length && cursor.y < this.map.grid.length) {
-        this.hero.generatePaths({
-          x: cursor.x,
-          y: cursor.y,
-        });
-      }
+      movement: {
+        type: 'track',
+        input: [[7,3], [3,3]],
+      },
     });
   }
 
@@ -82,8 +80,8 @@ class Plain extends Phaser.State {
     // project the current mouse from x/y position to x/y/z position of the isometric map, into this.cursor
     this.game.iso.unproject(this.game.input.activePointer.position, this.cursor);
 
-    this.hero.movePaths();
-    this.npc.movePaths();
+    this.hero.registerMovement();
+    this.npc.registerMovement();
 
     // sort sprites so it would look nice when other sprites are moving
     this.map.sortSprites();

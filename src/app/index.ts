@@ -1,4 +1,4 @@
-import * as Phaser from 'phaser-ce';
+import Phaser from 'phaser-ce';
 import Plain from './states/plain';
 
 const states = {

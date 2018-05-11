@@ -22,6 +22,9 @@ describe('Human test', () => {
       y: 0,
       z: 0,
       map,
+      movement: {
+        type: 'mouse',
+      },
     });
 
     // mock all side effect functions
