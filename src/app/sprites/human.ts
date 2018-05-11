@@ -1,12 +1,13 @@
 // This class is to separate human side effects (phaserjs-related) from the logics (chars/human)
-// people sprite every 43 frames
 import Phaser from 'phaser-ce';
+import PlainMap from '../maps/plain';
 
+// people sprite every 43 frames
 export interface Config {
   x: number;
   y: number;
   z: number;
-  map: any;
+  map: PlainMap;
   game?: Phaser.Game;
   sprite?: string; // sprite name on the spritesheet
   delimiter?: number;

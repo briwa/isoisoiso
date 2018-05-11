@@ -1,6 +1,14 @@
-import * as PF from 'pathfinding';
+import Phaser from 'phaser-ce';
+import PF from 'pathfinding';
 
+import { Path } from '../chars/human';
 import { onColliding } from '../chars/helper';
+
+interface Tile {
+  name: string;
+  isoZ: number;
+  anchor: number[];
+};
 
 const TILESIZE = 36;
 
@@ -39,18 +47,19 @@ const TILE = [
 ];
 
 export default class PlainMap {
-  private grid;
-  private tilesize;
-  private tile;
-  private group;
-  private game;
+  private game: Phaser.Game;
 
-  static loadAssets(game) {
+  public grid: number[][];
+  public tile: Tile[];
+  public group: Phaser.Group;
+  public tilesize: number;
+
+  static loadAssets(game: Phaser.Game) {
     // http://www.pixeljoint.com/pixelart/66809.htm
     game.load.atlasJSONHash('tileset', 'assets/images/tileset.png', 'assets/images/tileset.json');
   }
 
-  constructor(game) {
+  constructor(game: Phaser.Game) {
     this.grid = [...GRID];
     this.tilesize = TILESIZE;
     this.tile = TILE;
@@ -58,20 +67,20 @@ export default class PlainMap {
     if (game) this.setup(game);
   }
 
-  findPath(x, y, x1, y1) {
+  findPath(x: number, y: number, x1: number, y1: number) {
     const matrix = new PF.Grid(this.grid);
     const finder = new PF.AStarFinder();
 
     return finder.findPath(x, y, x1, y1, matrix);
   }
 
-  setWalkable(x, y, walkable) {
+  setWalkable(x: number, y: number, walkable: boolean) {
     this.grid[y][x] = walkable ? 0 : 9;
   }
 
   // also side effects
   // mainly to append all grids into phaserjs canvas. in isometric fashion
-  setup(game) {
+  setup(game: Phaser.Game) {
     this.game = game;
 
     this.group = this.game.add.group();
@@ -90,7 +99,7 @@ export default class PlainMap {
     }
   }
 
-  debug({ cursor, paths }) {
+  debug({ cursor, paths }: { cursor: Phaser.Plugin.Isometric.Point3, paths: Path[] }) {
     this.group.forEach((t) => {
       const tile = t;
 
@@ -131,7 +140,7 @@ export default class PlainMap {
         tile.selected = false;
         tile.tint = 0xffffff;
       }
-    });
+    }, this);
   }
 
   sortSprites() {

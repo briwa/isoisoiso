@@ -1,4 +1,4 @@
-import * as Phaser from 'phaser-ce';
+import Phaser from 'phaser-ce';
 
 import Hero from '../chars/hero';
 import Npc from '../chars/npc';
@@ -8,21 +8,18 @@ import PlainMap from '../maps/plain';
 
 class Plain extends Phaser.State {
   private hero: Hero;
-  private npc;
+  private npc: Npc;
 
-  private cursor;
-  private paths;
-  private map;
+  private cursor: Phaser.Plugin.Isometric.Point3;
+  private map: PlainMap;
 
-  private debugging;
+  private debug: boolean;
 
   constructor() {
     super();
 
     this.cursor = new Phaser.Plugin.Isometric.Point3();
-    this.paths = [];
-
-    this.debugging = true;
+    this.debug = true;
   }
 
   preload() {
@@ -94,15 +91,18 @@ class Plain extends Phaser.State {
   }
 
   render() {
-    if (this.debugging) {
+    if (this.debug) {
       // show cursor position and current player paths
       this.map.debug({
         cursor: this.cursor,
         paths: this.hero.paths,
       });
 
+      // body debug
       this.game.debug.body(this.hero.sprite);
       this.game.debug.body(this.npc.sprite);
+
+      // just some text for debugging paths
       this.game.debug.text(`current x: ${this.hero.position().x.toFixed(2)}, y: ${this.hero.position().y.toFixed(2)}`, 0, 32);
       if (this.hero.paths.length) {
         this.hero.paths.forEach((path, idx) => {

@@ -1,7 +1,8 @@
+import PlainMap from '../maps/plain';
 import HumanSprite, { Config } from '../sprites/human';
 import { shapePaths } from './helper';
 
-interface Path {
+export interface Path {
   x: number;
   y: number;
   direction: string;
@@ -9,7 +10,7 @@ interface Path {
 };
 
 class Human extends HumanSprite {
-  private map;
+  private map: PlainMap;
   private speed: number = 1;
   private duration: number = 100; // max speed, don't go higher than this
 
