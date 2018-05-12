@@ -1,7 +1,7 @@
 import Phaser from 'phaser-ce';
 
 import Hero from 'src/app/chars/hero';
-import Npc from 'src/app/chars/base/npc';
+import SomeDude from 'src/app/chars/villagers/some-dude';
 
 import HumanSprite from 'src/app/sprites/human';
 import DialogSprite from 'src/app/sprites/dialog';
@@ -9,7 +9,8 @@ import PlainMap from 'src/app/maps/plain';
 
 class Plain extends Phaser.State {
   private hero: Hero;
-  private npc: Npc;
+
+  private someDude: SomeDude;
 
   private cursor: Phaser.Plugin.Isometric.Point3;
   private keys: { [key:string]: Phaser.Key };
@@ -66,53 +67,10 @@ class Plain extends Phaser.State {
       controls: this.keys,
     });
 
-    this.npc = new Npc({
-      x: 7,
-      y: 3,
+    this.someDude = new SomeDude({
       game: this.game,
       group: this.map.group,
       map: this.map,
-      movement: {
-        type: 'track',
-        input: [[7,3], [3,3]],
-      },
-      name: 'Some Dude',
-      conversations: [{
-        id: 1,
-        type: 'dialog',
-        text: 'Long time no see, chap. How are you?',
-      }, {
-        id: 2,
-        type: 'dialog',
-        text: 'Was wondering if you could help me with something?',
-      }, {
-        id: 3,
-        type: 'menu',
-        text: '',
-        options: [{
-          text: 'Sure, what is it?',
-          nextId: 5,
-        }, {
-          text: 'Aw maybe next time...',
-          nextId: 4,
-        }],
-      }, {
-        id: 4,
-        type: 'conversation',
-        conversations: [{
-          id: 6,
-          type: 'dialog',
-          text: 'Fine, next time it is!'
-        }],
-      }, {
-        id: 5,
-        type: 'conversation',
-        conversations: [{
-          id: 7,
-          type: 'dialog',
-          text: 'Ok so can you get lost? Thanks.'
-        }],
-      }],
       hero: this.hero,
     });
   }
@@ -122,7 +80,7 @@ class Plain extends Phaser.State {
     this.game.iso.unproject(this.game.input.activePointer.position, this.cursor);
 
     this.hero.registerMovement();
-    this.npc.registerMovement();
+    this.someDude.registerMovement();
 
     // sort sprites so it would look nice when other sprites are moving
     this.map.sortSprites();
@@ -139,10 +97,10 @@ class Plain extends Phaser.State {
 
       // body debug
       this.game.debug.body(this.hero.sprite);
-      this.game.debug.body(this.npc.sprite);
+      this.game.debug.body(this.someDude.sprite);
 
       // just some text for debugging paths
-      this.game.debug.text(`contact x: ${this.npc.contact}`, 0, 16);
+      this.game.debug.text(`someDude contact? ${this.someDude.contact}`, 0, 16);
       this.game.debug.text(`current x: ${this.hero.position().x.toFixed(2)}, y: ${this.hero.position().y.toFixed(2)}`, 0, 32);
       if (this.hero.paths.length) {
         this.hero.paths.forEach((path, idx) => {
