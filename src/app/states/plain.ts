@@ -1,11 +1,11 @@
 import Phaser from 'phaser-ce';
 
-import Hero from '../chars/hero';
-import Npc from '../chars/npc';
+import Hero from 'src/app/chars/hero';
+import Npc from 'src/app/chars/base/npc';
 
-import HumanSprite from '../sprites/human';
-import DialogSprite from '../sprites/dialog';
-import PlainMap from '../maps/plain';
+import HumanSprite from 'src/app/sprites/human';
+import DialogSprite from 'src/app/sprites/dialog';
+import PlainMap from 'src/app/maps/plain';
 
 class Plain extends Phaser.State {
   private hero: Hero;

@@ -1,8 +1,8 @@
 import Phaser from 'phaser-ce';
 
-import Human from './human';
-import Hero from './hero';
-import { MovementTrack, MovementFollow } from '../sprites/human';
+import Human from 'src/app/chars/base/human';
+import Hero from 'src/app/chars/hero';
+import { MovementTrack, MovementFollow } from 'src/app/sprites/human';
 
 interface Option {
   text: string;

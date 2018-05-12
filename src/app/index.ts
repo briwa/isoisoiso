@@ -1,5 +1,5 @@
 import Phaser from 'phaser-ce';
-import Plain from './states/plain';
+import Plain from 'src/app/states/plain';
 
 const states = {
   plain : Plain,

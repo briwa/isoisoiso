@@ -1,7 +1,7 @@
 import Phaser from 'phaser-ce';
 
-import Human from './human';
-import { MovementMouse, MovementKeys } from '../sprites/human';
+import Human from 'src/app/chars/base/human';
+import { MovementMouse, MovementKeys } from 'src/app/sprites/human';
 
 interface Config {
   game: Phaser.Game;

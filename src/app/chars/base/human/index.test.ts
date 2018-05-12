@@ -1,4 +1,4 @@
-import Human from './human';
+import Human from './index';
 
 // test using the default map
 import PlainMap from 'src/app/maps/plain';

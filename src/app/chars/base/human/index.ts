@@ -1,6 +1,6 @@
-import { shapePaths } from './helper';
-import PlainMap from '../maps/plain';
-import HumanSprite, { Config, Direction, MovementKeys } from '../sprites/human';
+import { shapePaths } from 'src/app/chars/helper';
+import PlainMap from 'src/app/maps/plain';
+import HumanSprite, { Config, Direction, MovementKeys } from 'src/app/sprites/human';
 
 export interface Path {
   x: number;

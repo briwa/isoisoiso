@@ -108,6 +108,10 @@ module.exports = {
   ],
 
   resolve: {
+    modules: [
+      path.resolve(__dirname, './'),
+      path.resolve(__dirname, 'node_modules'),
+    ],
     extensions: ['.js', '.ts'],
     alias: {
       pixi,

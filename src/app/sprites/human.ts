@@ -1,9 +1,9 @@
 // This class is to separate human side effects (phaserjs-related) from the logics (chars/human)
 import Phaser from 'phaser-ce';
 
-import Human from '../chars/human';
-import DialogSprite from './dialog';
-import PlainMap from '../maps/plain';
+import Human from 'src/app/chars/base/human';
+import DialogSprite from 'src/app/sprites/dialog';
+import PlainMap from 'src/app/maps/plain';
 
 export interface MovementTrack {
   type: 'track';

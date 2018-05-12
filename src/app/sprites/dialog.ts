@@ -2,8 +2,8 @@ import Phaser from 'phaser-ce';
 
 import MenuSprite from './menu';
 
-import Npc from '../chars/npc';
-import Hero from '../chars/hero';
+import Npc from 'src/app/chars/base/npc';
+import Hero from 'src/app/chars/hero';
 
 interface Config {
   game: Phaser.Game;

@@ -1,8 +1,8 @@
 import Phaser from 'phaser-ce';
 import PF from 'pathfinding';
 
-import { Path } from '../chars/human';
-import { onColliding } from '../chars/helper';
+import { Path } from 'src/app/chars/base/human';
+import { onColliding } from 'src/app/chars/helper';
 
 interface Tile {
   name: string;

@@ -1,4 +1,4 @@
-import Human from './human';
+import Human from 'src/app/chars/base/human';
 
 const getDirection = (prev, next) => {
   if (prev.x === next.x) {
