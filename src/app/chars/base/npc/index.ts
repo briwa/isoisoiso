@@ -5,13 +5,13 @@ import Hero from 'src/app/chars/hero';
 import { MovementTrack, MovementFollow } from 'src/app/sprites/human';
 
 interface Option {
-  text: string;
+  name: string;
   nextId: number;
 };
 
 interface Conversation {
   id: number;
-  type: 'dialog' | 'menu' | 'conversation';
+  type: string;
   text?: string;
   conversations?: Conversation[];
   options?: Option[];
@@ -24,7 +24,7 @@ interface Config {
   x?: number;
   y?: number;
   delimiter: number;
-  movement: MovementTrack | MovementFollow;
+  movement?: MovementTrack | MovementFollow;
   conversations: Conversation[];
   name: string;
   hero: Hero;
@@ -59,23 +59,25 @@ class Npc extends Human {
 
     // movement setup
     // ---------------
-    if (this.movement.type === 'follow') {
-      const follow = this.movement.input;
-      const onFollow = () => {
-        this.generatePaths({
-          x: follow.position(true).x,
-          y: follow.position(true).y,
-        });
+    if (this.movement) {
+      if (this.movement.type === 'follow') {
+        const follow = this.movement.input;
+        const onFollow = () => {
+          this.generatePaths({
+            x: follow.position(true).x,
+            y: follow.position(true).y,
+          });
 
-        // also follow the char on every path
-        follow.listenOnce('pathEnd', () => {
-          onFollow();
-        });
-      };
+          // also follow the char on every path
+          follow.listenOnce('pathEnd', () => {
+            onFollow();
+          });
+        };
 
-      onFollow();
-    } else if (this.movement.type === 'track') {
-      this.moveTrack(this.pause);
+        onFollow();
+      } else if (this.movement.type === 'track') {
+        this.moveTrack(this.pause);
+      }
     }
 
     // event setup

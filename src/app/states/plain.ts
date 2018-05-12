@@ -2,6 +2,7 @@ import Phaser from 'phaser-ce';
 
 import Hero from 'src/app/chars/hero';
 import SomeDude from 'src/app/chars/villagers/some-dude';
+import Merchant from 'src/app/chars/merchants/basic';
 
 import SpriteHuman from 'src/app/sprites/human';
 import SpriteDialog from 'src/app/sprites/dialog';
@@ -11,6 +12,7 @@ class Plain extends Phaser.State {
   private hero: Hero;
 
   private someDude: SomeDude;
+  private merchant: Merchant;
 
   private cursor: Phaser.Plugin.Isometric.Point3;
   private keys: { [key:string]: Phaser.Key };
@@ -68,6 +70,13 @@ class Plain extends Phaser.State {
     });
 
     this.someDude = new SomeDude({
+      game: this.game,
+      group: this.map.group,
+      map: this.map,
+      hero: this.hero,
+    });
+
+    this.merchant = new Merchant({
       game: this.game,
       group: this.map.group,
       map: this.map,

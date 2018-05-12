@@ -6,7 +6,7 @@ interface Config {
   id: number;
   game: Phaser.Game;
   label?: string;
-  options: { nextId: number, text: string, label?: boolean }[];
+  options: { nextId: number, name: string, label?: boolean }[];
   controls: { [key:string]: Phaser.Key };
   parent: Phaser.Sprite;
 };
@@ -21,7 +21,7 @@ class MenuSprite {
   private game: Phaser.Game;
   private parent: Phaser.Sprite;
   private controls: { [key:string]: Phaser.Key };
-  private options: { nextId: number, text: string, label?: boolean }[];
+  private options: { nextId: number, name: string, label?: boolean }[];
   private selectedIndex = 0;
   private group: Phaser.Sprite;
   private cursor: Phaser.Text;
@@ -51,11 +51,11 @@ class MenuSprite {
     this.options = options;
     this.sprite = this.game.add.sprite();
 
-    const allText = label ? [{text: label, label: true}, ...this.options] : this.options;
+    const allText = label ? [{name: label, label: true}, ...this.options] : this.options;
     const allTextSprite = allText.map((option, idx) => {
       return this.game.make.text(
         marginLeft, (idx * lineHeight) + marginTop,
-        option.text,
+        option.name,
         option.label ? labelStyle : optionStyle,
       );
     });

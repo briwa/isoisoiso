@@ -121,6 +121,12 @@ class SpriteHuman {
     this.sprite.animations.stop(name || this.currentAnimation().name, true);
   }
 
+  setAnimation(name: string) {
+    // TODO: find out why we can't just simply set an animation frame
+    this.playAnimation(name);
+    this.stopAnimation();
+  }
+
   stopOppositeAnimation(name: string) {
     const oppositeDirection = (name) => {
       if (name === 'walk-up') {
@@ -140,9 +146,7 @@ class SpriteHuman {
       }
     };
 
-    // TODO: find out why we can't just simply set an animation frame
-    this.playAnimation(oppositeDirection(name));
-    this.stopAnimation();
+    this.setAnimation(oppositeDirection(name));
   }
 
   goTo(direction: Direction, velocity = 0) {
