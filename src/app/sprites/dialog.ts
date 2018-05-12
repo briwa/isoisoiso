@@ -68,7 +68,7 @@ class SpriteDialog {
       this.hero.paused = false;
       if (this.npc) {
         this.npc.paused = false;
-        this.npc.contact = false; // some npc stays in contact, so force no contact
+        this.npc.contact = false; // some npc stays in contact (like stationary ones), so force no contact
       }
 
       this.hero.controls.p.onDown.remove(this.nextConvo, this);

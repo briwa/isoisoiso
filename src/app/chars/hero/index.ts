@@ -3,6 +3,8 @@ import Phaser from 'phaser-ce';
 import Human from 'src/app/chars/base/human';
 import { MovementMouse, MovementKeys } from 'src/app/sprites/human';
 
+import { get as getItem } from 'src/app/chars/items';
+
 interface Config {
   game: Phaser.Game;
   group: Phaser.Group;
@@ -92,8 +94,9 @@ class Hero extends Human {
     });
   }
 
-  purchase(item: { id: number, price: number, name: string }) {
+  purchase(id: string) {
     // I should've done lookup for the item id, but i don't have them
+    const item = getItem(id);
     this.gold -= item.price;
     this.inventory.push(item);
   }

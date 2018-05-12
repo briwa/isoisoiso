@@ -130,7 +130,7 @@ class SpriteHuman {
     this.stopAnimation();
   }
 
-  stopOppositeAnimation(name: string) {
+  stopOppositeAnimation(name?: string) {
     const oppositeDirection = (name) => {
       if (name === 'walk-up') {
         return 'walk-down';
@@ -149,7 +149,7 @@ class SpriteHuman {
       }
     };
 
-    this.setAnimation(oppositeDirection(name));
+    this.setAnimation(oppositeDirection(name || this.currentAnimation().name));
   }
 
   goTo(direction: Direction, velocity = 0) {

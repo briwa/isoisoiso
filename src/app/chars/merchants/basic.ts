@@ -5,6 +5,8 @@ import Phaser from 'phaser-ce';
 import Hero from 'src/app/chars/hero';
 import Npc from 'src/app/chars/base/npc';
 
+import { getAll as getAllItems } from 'src/app/chars/items';
+
 interface Config {
   game: Phaser.Game;
   group: Phaser.Group;
@@ -12,39 +14,7 @@ interface Config {
   map: any;
 };
 
-const items = [{
-  id: 1,
-  name: 'Small Potion',
-  type: 'consumable',
-  description: 'Heals a small amount of health.',
-  price: 100,
-  effects: [{
-    property: 'hp',
-    value: 100
-  }]
-}, {
-  id: 2,
-  name: 'Wooden Sword',
-  type: 'weapon',
-  description: 'Some toy sword.',
-  price: 400,
-  effects: [{
-    property: 'atk',
-    value: 100
-  }]
-}, {
-  id: 2,
-  name: 'Wooden Armor',
-  type: 'armor',
-  description: 'Some toy armor.',
-  price: 350,
-  effects: [{
-    property: 'def',
-    value: 100
-  }]
-}];
-
-const shapedOptions = items.map(item => ({
+const shapedOptions = getAllItems().map(item => ({
   id: item.id,
   price: item.price,
   name: `${item.name} - ${item.price} G`,
@@ -59,6 +29,8 @@ const conversations = [{
   id: 2,
   type: 'menu',
   onSelect: (subject, item) => {
+    subject.stopOppositeAnimation();
+
     if (!item.confirm) return 3;
 
     // check if can purchase
@@ -71,7 +43,7 @@ const conversations = [{
     return 5;
   },
   options: shapedOptions.concat([{
-    id: -1,
+    id: '-1',
     name: 'Cancel',
     price: null,
     confirm: false,
