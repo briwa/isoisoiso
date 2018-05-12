@@ -1,6 +1,7 @@
 import Phaser from 'phaser-ce';
 
 import Human from './human';
+import Hero from './hero';
 import { MovementTrack, MovementFollow } from '../sprites/human';
 
 interface Config {
@@ -10,31 +11,33 @@ interface Config {
   x?: number;
   y?: number;
   movement: MovementTrack | MovementFollow;
+  messages: string[];
+  hero: Hero;
 };
 
 class Npc extends Human {
-  private index: number;
-  private forward: boolean;
+  private index: number = 0;
+  private forward: boolean = true;
+  private pause: number = 2000;
+  private messages: string[];
 
-  constructor({ x, y, game, group, map, movement }: Config) {
-    const z = 0;
-    const sprite = 'people';
-    const delimiter = 129;
+  public contact: boolean = false;
 
+  constructor({ x, y, game, group, map, movement, messages, hero }: Config) {
     super({
       game,
       x: x * map.tilesize,
       y: y * map.tilesize,
-      z,
-      sprite,
-      delimiter,
+      z: 0,
+      sprite: 'people',
+      delimiter: 129,
       group,
       map,
       movement,
     });
 
-    this.index = 0;
-    this.forward = true;
+    this.name = 'npc';
+    this.messages = messages;
 
     if (this.movement.type === 'follow') {
       const follow = this.movement.input;
@@ -52,22 +55,41 @@ class Npc extends Human {
 
       onFollow();
     } else if (this.movement.type === 'track') {
-      this.moveTrack();
+      this.moveTrack(this.pause);
     }
+
+    hero.listen('action', () => {
+      // check if any npc is in contact
+      if (this.contact) {
+        this.toggleMessage(!this.message, this.messages);
+        this.paused = !! this.message;
+        hero.paused = !! this.message;
+
+        if (this.paused) {
+          this.stopOppositeAnimation(hero.currentAnimation().name);
+        }
+      }
+    });
   }
 
-  moveTrack() {
+  moveTrack(timeout: number) {
     const track = this.movement.input;
     setTimeout(() => {
+      // do not move when it's paused
+      if (this.paused) {
+        this.moveTrack(this.pause);
+        return false;
+      }
+
       this.generatePaths({
         x: track[this.index][0],
         y: track[this.index][1],
         onFinished: () => {
           this.setNextIndex();
-          this.moveTrack();
+          this.moveTrack(this.contact ? this.pause / 2 : this.pause);
         },
       });
-    }, 2000);
+    }, timeout);
   }
 
   setNextIndex() {

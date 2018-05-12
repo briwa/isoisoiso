@@ -10,9 +10,12 @@ export interface Path {
 
 class Human extends HumanSprite {
   private map: PlainMap;
-  private speed: number = 100; // max speed, don't go higher than this
 
+  public name: string; // max speed, don't go higher than this
+  public speed: number = 100; // max speed, don't go higher than this
   public paths: Path[] = [];
+
+  public paused: boolean = false;
 
   constructor(config: Config) {
     super(config);
@@ -58,11 +61,18 @@ class Human extends HumanSprite {
       this.listenOnce('pathsFinished', onFinished);
     }
 
+    this.dispatch('pathsStart');
+
     this.paths = shapePaths(walkablePaths);
     return this.paths;
   }
 
   movePaths() {
+    // do not move when it's paused
+    if (this.paused) {
+      return false;
+    }
+
     // only stop when there's no more paths left
     // we want the animation to run seamlessly
     if (!this.paths.length) {
@@ -92,6 +102,11 @@ class Human extends HumanSprite {
   }
 
   moveKeys() {
+    // do not move when it's paused
+    if (this.paused) {
+      return false;
+    }
+
     const movement = <MovementKeys> this.movement;
 
     let direction = null;

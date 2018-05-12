@@ -4,6 +4,7 @@ import Hero from '../chars/hero';
 import Npc from '../chars/npc';
 
 import HumanSprite from '../sprites/human';
+import MessageSprite from '../sprites/message';
 import PlainMap from '../maps/plain';
 
 class Plain extends Phaser.State {
@@ -27,11 +28,11 @@ class Plain extends Phaser.State {
     // load all the sprites assets
     HumanSprite.loadAssets(this.game);
     PlainMap.loadAssets(this.game);
+    MessageSprite.loadAssets(this.game);
 
     // Add and enable the plug-in.
     this.game.plugins.add(Phaser.Plugin.Isometric);
     this.game.time.advancedTiming = true; // for physics, i'm still not sure what is the use yet
-
     this.game.physics.startSystem(Phaser.Plugin.Isometric.ISOARCADE);
 
     // adjust the anchors of the sprites
@@ -47,6 +48,7 @@ class Plain extends Phaser.State {
       a: this.game.input.keyboard.addKey(Phaser.Keyboard.A),
       s: this.game.input.keyboard.addKey(Phaser.Keyboard.S),
       d: this.game.input.keyboard.addKey(Phaser.Keyboard.D),
+      p: this.game.input.keyboard.addKey(Phaser.Keyboard.P),
     };
 
     this.map = new PlainMap(this.game);
@@ -61,6 +63,7 @@ class Plain extends Phaser.State {
         type: 'keys',
         input: this.keys,
       },
+      controls: this.keys,
     });
 
     this.npc = new Npc({
@@ -73,6 +76,8 @@ class Plain extends Phaser.State {
         type: 'track',
         input: [[7,3], [3,3]],
       },
+      messages: ['Long time no see, chap.'],
+      hero: this.hero,
     });
   }
 
@@ -101,6 +106,7 @@ class Plain extends Phaser.State {
       this.game.debug.body(this.npc.sprite);
 
       // just some text for debugging paths
+      this.game.debug.text(`contact x: ${this.npc.contact}`, 0, 16);
       this.game.debug.text(`current x: ${this.hero.position().x.toFixed(2)}, y: ${this.hero.position().y.toFixed(2)}`, 0, 32);
       if (this.hero.paths.length) {
         this.hero.paths.forEach((path, idx) => {

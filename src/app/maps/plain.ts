@@ -26,22 +26,22 @@ const GRID = [
 const TILE = [
   {
     name: 'grass',
-    isoZ: 0,
+    isoZ: 5,
     anchor: [0.5, 0],
   },
   {
     name: 'wall',
-    isoZ: 4,
+    isoZ: 0,
     anchor: [0.5, 0.5],
   },
   {
     name: 'bush1',
-    isoZ: 13,
+    isoZ: 0,
     anchor: [0.5, 0],
   },
   {
     name: 'bush2',
-    isoZ: 13,
+    isoZ: 0,
     anchor: [0.5, 0],
   },
 ];

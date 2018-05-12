@@ -2,6 +2,7 @@
 import Phaser from 'phaser-ce';
 
 import Human from '../chars/human';
+import MessageSprite from './message';
 import PlainMap from '../maps/plain';
 
 export interface MovementTrack {
@@ -48,6 +49,7 @@ class HumanSprite {
   public anchorY: number = 1/4;
   public sprite: Phaser.Plugin.Isometric.IsoSprite;
   public movement: MovementTrack | MovementFollow | MovementKeys | MovementMouse;
+  public message: MessageSprite;
 
   static loadAssets(game: Phaser.Game) {
     // https://opengameart.org/content/isometric-people
@@ -75,8 +77,10 @@ class HumanSprite {
     this.sprite.body.collideWorldBounds = true;
 
     // events
+    this.signals.pathsStart = new Phaser.Signal();
     this.signals.pathsFinished = new Phaser.Signal();
     this.signals.pathEnd = new Phaser.Signal();
+    this.signals.action = new Phaser.Signal();
 
     this.movement = movement;
 
@@ -95,18 +99,45 @@ class HumanSprite {
     };
   }
 
+  currentAnimation() {
+    return this.sprite.animations.currentAnim;
+  }
+
   playAnimation(name: string) {
     // do not play the same animation twice
     // if this is the first movement (from static to moving),
     // always play the animation regardless
-    const currentAnim = this.sprite.animations.currentAnim;
-    if (!currentAnim.isPlaying || currentAnim.name !== name) {
+    if (!this.currentAnimation().isPlaying || this.currentAnimation().name !== name) {
       this.sprite.animations.play(name);
     }
   }
 
-  stopAnimation() {
-    this.sprite.animations.stop(this.sprite.animations.currentAnim.name, true);
+  stopAnimation(name?: string) {
+    this.sprite.animations.stop(name || this.currentAnimation().name, true);
+  }
+
+  stopOppositeAnimation(name: string) {
+    const oppositeDirection = (name) => {
+      if (name === 'walk-up') {
+        return 'walk-down';
+      }
+
+      if (name === 'walk-down') {
+        return 'walk-up';
+      }
+
+      if (name === 'walk-left') {
+        return 'walk-right';
+      }
+
+      if (name === 'walk-right') {
+        return 'walk-left';
+      }
+    };
+
+    // TODO: find out why we can't just simply set an animation frame
+    this.playAnimation(oppositeDirection(name));
+    this.stopAnimation();
   }
 
   goTo(direction: Direction, velocity = 0) {
@@ -142,16 +173,37 @@ class HumanSprite {
     }
   }
 
+  toggleMessage(toggle: boolean, message?: string[]) {
+    if (toggle) {
+      this.message = new MessageSprite({ game: this.game, message });
+    } else {
+      this.message.sprite.destroy();
+      this.message = null;
+    }
+  }
+
   listen(name: string, callback: Function) {
-    if (this.signals[name]) this.signals[name].add(callback, this);
+    if (this.signals[name]) {
+      this.signals[name].add(callback, this);
+    } else {
+      throw new Error(`Cannot listen to signal '${name}'.`)
+    }
   }
 
   listenOnce(name: string, callback: Function) {
-    if (this.signals[name]) this.signals[name].addOnce(callback, this);
+    if (this.signals[name]) {
+      this.signals[name].addOnce(callback, this);
+    } else {
+      throw new Error(`Cannot listen once to signal '${name}'.`)
+    }
   }
 
-  dispatch(name: string) {
-    if (this.signals[name]) this.signals[name].dispatch();
+  dispatch(name: string, params?: any) {
+    if (this.signals[name]) {
+      this.signals[name].dispatch(params);
+    } else {
+      throw new Error(`Cannot dispatch signal '${name}'.`)
+    }
   }
 }
 

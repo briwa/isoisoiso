@@ -40,6 +40,14 @@ export function onColliding(sprites) {
   sprites.forEach((sprite) => {
     // when humans collide
     if (sprite.char instanceof Human) {
+      if (sprite.char.name === 'npc') {
+        sprite.char.contact = true;
+
+        sprite.char.listenOnce('pathsStart', () => {
+          sprite.char.contact = false;
+        });
+      }
+
       // stop them from moving
       sprite.char.paths = [];
       sprite.char.onStopMoving();

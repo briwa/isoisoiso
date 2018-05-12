@@ -10,21 +10,18 @@ interface Config {
   x?: number;
   y?: number;
   movement: MovementMouse | MovementKeys;
+  controls: { [key:string]: Phaser.Key };
 };
 
 class Hero extends Human {
-  constructor({ x, y, game, group, map, movement }: Config) {
-    const z = 0;
-    const sprite = 'people';
-    const delimiter = 0;
-
+  constructor({ x, y, game, group, map, movement, controls }: Config) {
     super({
       game,
-      x,
-      y,
-      z,
-      sprite,
-      delimiter,
+      x: x * map.tilesize,
+      y: y * map.tilesize,
+      z: 0,
+      sprite: 'people',
+      delimiter: 0,
       group,
       map,
       movement,
@@ -49,6 +46,11 @@ class Hero extends Human {
         }
       });
     }
+
+    // register keyboard controls
+    controls.p.onDown.add(() => {
+      this.dispatch('action');
+    });
   }
 }
 
