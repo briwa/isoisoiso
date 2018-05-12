@@ -22,12 +22,15 @@ const conversations = [{
     id: 3,
     type: 'menu',
     text: 'Choose an option...',
+    onSelect: (subject, item) => {
+      return item.confirm ? 5 : 4;
+    },
     options: [{
       name: 'Sure, what is it?',
-      nextId: 5,
+      confirm: true,
     }, {
       name: 'Aw maybe next time...',
-      nextId: 4,
+      confirm: false,
     }],
   }, {
     id: 4,

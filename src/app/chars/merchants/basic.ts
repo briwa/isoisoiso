@@ -1,3 +1,5 @@
+// TODO
+// - Most of the time merchants will sit behind a desk. So the hit area should be in front of the desk. Find a way to make that happen
 import Phaser from 'phaser-ce';
 
 import Hero from 'src/app/chars/hero';
@@ -44,8 +46,9 @@ const items = [{
 
 const shapedOptions = items.map(item => ({
   id: item.id,
-  name: item.name,
-  nextId: 4,
+  price: item.price,
+  name: `${item.name} - ${item.price} G`,
+  confirm: true,
 }));
 
 const conversations = [{
@@ -55,10 +58,23 @@ const conversations = [{
 }, {
   id: 2,
   type: 'menu',
+  onSelect: (subject, item) => {
+    if (!item.confirm) return 3;
+
+    // check if can purchase
+    if (subject.gold >= item.price) {
+      subject.purchase(item);
+      return 4;
+    }
+
+    // not enough gold
+    return 5;
+  },
   options: shapedOptions.concat([{
     id: -1,
     name: 'Cancel',
-    nextId: 3,
+    price: null,
+    confirm: false,
   }]),
 }, {
   id: 3,
@@ -75,6 +91,14 @@ const conversations = [{
     id: 6,
     type: 'dialog',
     text: 'Thanks! Come again!'
+  }],
+}, {
+  id: 5,
+  type: 'conversations',
+  conversations: [{
+    id: 11,
+    type: 'dialog',
+    text: 'Not enough money, son...'
   }],
 }];
 

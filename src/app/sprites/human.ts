@@ -3,6 +3,9 @@
 import Phaser from 'phaser-ce';
 
 import Human from 'src/app/chars/base/human';
+import Npc from 'src/app/chars/base/npc';
+import Hero from 'src/app/chars/hero';
+
 import SpriteDialog from 'src/app/sprites/dialog';
 import MapPlain from 'src/app/maps/plain';
 
@@ -182,8 +185,13 @@ class SpriteHuman {
     }
   }
 
-  showDialog(npc, hero) {
-    this.dialog = new SpriteDialog({ game: this.game, npc, hero });
+  showDialog({ hero, npc, conversations }: { hero: Hero, npc?: Npc, conversations?: any[] }) {
+    this.dialog = new SpriteDialog({
+      game: this.game,
+      hero,
+      npc,
+      conversations,
+    });
   }
 
   listen(name: string, callback: Function) {

@@ -14,7 +14,11 @@ interface Config {
 };
 
 class Hero extends Human {
+  private inventory: any[] = [];
+  private debug: boolean = false;
+
   public controls: { [key:string]: Phaser.Key };
+  public gold: number = 100;
 
   constructor({ x, y, game, group, map, movement, controls }: Config) {
     super({
@@ -29,6 +33,7 @@ class Hero extends Human {
       movement,
     });
 
+    this.name = 'Hero';
     this.controls = controls;
 
     // register mouse down input upon `create` bc we only need to do it once
@@ -55,6 +60,42 @@ class Hero extends Human {
     this.controls.p.onDown.add(() => {
       this.dispatch('action');
     });
+
+    // temporary UI for inventory
+    this.controls.o.onDown.add(() => {
+      if (this.dialog && this.dialog.sprite.alive) {
+        this.dialog.sprite.destroy();
+      } else {
+        const inventory = this.inventory.map(item => item.name).join('\n');
+        const conversations = [{
+          id: 1,
+          type: 'dialog',
+          text: `Gold: ${this.gold}\n${inventory}`,
+        }];
+
+        this.showDialog({
+          hero: this,
+          conversations: conversations,
+        });
+      }
+    });
+
+    // DEBUGGING
+    this.controls[','].onDown.add(() => {
+      if (this.debug) {
+        this.gold += 1000;
+      }
+    });
+
+    this.controls['.'].onDown.add(() => {
+      this.debug = !this.debug;
+    });
+  }
+
+  purchase(item: { id: number, price: number, name: string }) {
+    // I should've done lookup for the item id, but i don't have them
+    this.gold -= item.price;
+    this.inventory.push(item);
   }
 }
 

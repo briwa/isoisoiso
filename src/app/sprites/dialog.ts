@@ -7,8 +7,9 @@ import Hero from 'src/app/chars/hero';
 
 interface Config {
   game: Phaser.Game;
-  npc: Npc;
   hero: Hero;
+  npc: Npc;
+  conversations: any[];
 };
 
 const width = 319;
@@ -16,6 +17,7 @@ const height = 78;
 const marginLeft = 12;
 const nameTop = 9;
 const convoTop = 24;
+const lineSpacing = -8;
 
 class SpriteDialog {
   private game: Phaser.Game;
@@ -33,33 +35,45 @@ class SpriteDialog {
     game.load.spritesheet('dialog', 'assets/images/dialog-black.png', width, height);
   }
 
-  constructor({ game, npc, hero }: Config) {
+  constructor({ game, hero, npc, conversations }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;
 
     // setup
     this.game = game;
-    this.npc = npc;
     this.hero = hero;
+    this.npc = npc;
 
     this.sprite = game.world.create((game.world.bounds.width / 2) - (width / 2), game.world.bounds.height / 2, 'dialog', 0);
-    this.conversations = this.npc.conversations;
+    this.conversations = conversations;
 
     // styles
     const nameStyle = { font: '12px Arial', fill: '#CCCCCC' };
     const convoStyle = { font: '12px Arial', fill: '#FFFFFF', wordWrap: true, wordWrapWidth: this.sprite.width };
 
-    this.nameText = this.game.make.text(marginLeft, nameTop, npc.name, nameStyle);
+    this.nameText = this.game.make.text(marginLeft, nameTop, (npc ? npc.name : hero.name), nameStyle);
     this.convoText = this.game.make.text(marginLeft, convoTop, '', convoStyle);
+    this.convoText.lineSpacing = lineSpacing; // the default line spacing was way too big for this font size
 
     this.sprite.addChild(this.nameText);
     this.sprite.addChild(this.convoText);
 
-    this.npc.paused = true;
     this.hero.paused = true;
+    if (this.npc) this.npc.paused = true;
 
     // listen to keys
     this.hero.controls.p.onDown.add(this.nextConvo, this);
+
+    this.sprite.events.onDestroy.add(() => {
+      this.hero.paused = false;
+      if (this.npc) {
+        this.npc.paused = false;
+        this.npc.contact = false; // some npc stays in contact, so force no contact
+      }
+
+      this.hero.controls.p.onDown.remove(this.nextConvo, this);
+    }, this);
+
     this.nextConvo();
   }
 
@@ -70,9 +84,6 @@ class SpriteDialog {
   nextConvo() {
     const current = this.conversations[0];
     if (!current) {
-      this.npc.paused = false;
-      this.hero.paused = false;
-      this.hero.controls.p.onDown.remove(this.nextConvo, this);
       this.sprite.destroy();
       return null;
     }
@@ -84,7 +95,7 @@ class SpriteDialog {
       // coming from pressing 'action', so it's a selection of the same menu
       if (this.menu && this.menu.id === current.id) {
         // get the next convo id
-        const nextId = this.menu.selection.nextId;
+        const nextId = this.menu.select();
 
         // i can't simply use .find here because tslint is targetting es5
         // if i changed it to es6, uglifier will break since it takes in es5 as input
@@ -98,7 +109,8 @@ class SpriteDialog {
         this.menu = new MenuSprite({
           game: this.game,
           parent: this.sprite,
-          controls: this.hero.controls,
+          subject: this.hero,
+          onSelect: current.onSelect,
           options: current.options,
           label: current.text,
           id: current.id,

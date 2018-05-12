@@ -6,7 +6,7 @@ import { MovementTrack, MovementFollow } from 'src/app/sprites/human';
 
 interface Option {
   name: string;
-  nextId: number;
+  confirm: boolean;
 };
 
 interface Conversation {
@@ -15,6 +15,7 @@ interface Conversation {
   text?: string;
   conversations?: Conversation[];
   options?: Option[];
+  onSelect?: (subject: Hero, option: Option) => number;
 };
 
 interface Config {
@@ -85,7 +86,11 @@ class Npc extends Human {
     hero.listen('action', () => {
       // check if any npc is in contact
       if (this.contact && !this.paused) {
-        this.showDialog(this, hero);
+        this.showDialog({
+          hero,
+          npc: this,
+          conversations: this.conversations,
+        });
         this.stopOppositeAnimation(hero.currentAnimation().name);
       }
     });
