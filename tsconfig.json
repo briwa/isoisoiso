@@ -2,12 +2,12 @@
   "compilerOptions": {
     "baseUrl": "./",
     "sourceMap": true,
-    "module": "esnext",
+    "module": "es2015",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "removeComments": true,
     "strict": false,
-    "target": "es6",
+    "target": "es5",
     "experimentalDecorators": true
   },
   "include": [

@@ -84,9 +84,13 @@ class DialogSprite {
       // coming from pressing 'action', so it's a selection of the same menu
       if (this.menu && this.menu.id === current.id) {
         // get the next convo id
-        const menu = this.menu;
-        this.conversations = this.conversations.find(convo => convo.id === menu.selection.nextId).conversations;
-        menu.sprite.destroy();
+        const nextId = this.menu.selection.nextId;
+
+        // i can't simply use .find here because tslint is targetting es5
+        // if i changed it to es6, uglifier will break since it takes in es5 as input
+        // so we'll stick with .filter[0] for now
+        this.conversations = this.conversations.filter(convo => convo.id === nextId)[0].conversations;
+        this.menu.sprite.destroy();
 
         this.nextConvo();
       } else {
