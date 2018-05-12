@@ -4,7 +4,7 @@ import Hero from '../chars/hero';
 import Npc from '../chars/npc';
 
 import HumanSprite from '../sprites/human';
-import MessageSprite from '../sprites/message';
+import DialogSprite from '../sprites/dialog';
 import PlainMap from '../maps/plain';
 
 class Plain extends Phaser.State {
@@ -27,7 +27,7 @@ class Plain extends Phaser.State {
     // load all the sprites assets
     HumanSprite.loadAssets(this.game);
     PlainMap.loadAssets(this.game);
-    MessageSprite.loadAssets(this.game);
+    DialogSprite.loadAssets(this.game);
 
     // Add and enable the plug-in.
     this.game.plugins.add(Phaser.Plugin.Isometric);

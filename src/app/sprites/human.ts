@@ -2,7 +2,7 @@
 import Phaser from 'phaser-ce';
 
 import Human from '../chars/human';
-import MessageSprite from './message';
+import DialogSprite from './dialog';
 import PlainMap from '../maps/plain';
 
 export interface MovementTrack {
@@ -49,7 +49,7 @@ class HumanSprite {
   public anchorY: number = 1/4;
   public sprite: Phaser.Plugin.Isometric.IsoSprite;
   public movement: MovementTrack | MovementFollow | MovementKeys | MovementMouse;
-  public message: MessageSprite;
+  public dialog: DialogSprite;
 
   static loadAssets(game: Phaser.Game) {
     // https://opengameart.org/content/isometric-people
@@ -177,8 +177,8 @@ class HumanSprite {
     }
   }
 
-  showMessage(npc, hero) {
-    this.message = new MessageSprite({ game: this.game, npc, hero });
+  showDialog(npc, hero) {
+    this.dialog = new DialogSprite({ game: this.game, npc, hero });
   }
 
   listen(name: string, callback: Function) {

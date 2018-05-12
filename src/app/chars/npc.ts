@@ -69,7 +69,7 @@ class Npc extends Human {
     hero.listen('action', () => {
       // check if any npc is in contact
       if (this.contact && !this.paused) {
-        this.showMessage(this, hero);
+        this.showDialog(this, hero);
         this.stopOppositeAnimation(hero.currentAnimation().name);
       }
     });

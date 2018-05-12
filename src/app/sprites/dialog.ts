@@ -9,7 +9,7 @@ interface Config {
   hero: Hero;
 };
 
-class MessageSprite {
+class DialogSprite {
   private game: Phaser.Game;
   private nameText: Phaser.Text;
   private convoText: Phaser.Text;
@@ -21,7 +21,7 @@ class MessageSprite {
 
   static loadAssets(game: Phaser.Game) {
     // https://opengameart.org/content/isometric-people
-    game.load.spritesheet('messages', 'assets/images/message-black.png', 319, 78);
+    game.load.spritesheet('dialog', 'assets/images/dialog-black.png', 319, 78);
   }
 
   constructor({ game, npc, hero }: Config) {
@@ -32,7 +32,7 @@ class MessageSprite {
     this.npc = npc;
     this.hero = hero;
 
-    this.sprite = game.world.create((game.world.bounds.width / 2) - (319/2), game.world.bounds.height / 2, 'messages', 0);
+    this.sprite = game.world.create((game.world.bounds.width / 2) - (319/2), game.world.bounds.height / 2, 'dialog', 0);
     this.conversations = this.npc.conversations;
 
     this.nameText = this.game.make.text(12, 9, npc.name, { font: '12px Arial', fill: '#CCCCCC' });
@@ -45,10 +45,10 @@ class MessageSprite {
     this.hero.paused = true;
 
     // listen to keys
-    this.hero.controls.p.onDown.add(this.nextMessage, this);
+    this.hero.controls.p.onDown.add(this.nextConvo, this);
   }
 
-  nextMessage() {
+  nextConvo() {
     this.conversations = this.conversations.slice(1);
     if (this.conversations.length > 0) {
       this.convoText.text = this.conversations[0];
@@ -57,10 +57,10 @@ class MessageSprite {
 
     this.npc.paused = false;
     this.hero.paused = false;
-    this.hero.controls.p.onDown.remove(this.nextMessage, this);
+    this.hero.controls.p.onDown.remove(this.nextConvo, this);
     this.sprite.destroy();
     return null;
   }
 }
 
-export default MessageSprite;
+export default DialogSprite;
