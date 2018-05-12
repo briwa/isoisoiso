@@ -93,17 +93,23 @@ class Human extends HumanSprite {
 
   moveKeys() {
     const movement = <MovementKeys> this.movement;
+
+    let direction = null;
     if (movement.input.w.isDown) {
-      this.goTo('up', this.speed);
+      direction = 'up';
     } else if (movement.input.s.isDown) {
-      this.goTo('down', this.speed);
+      direction = 'down';
     } else if (movement.input.a.isDown) {
-      this.goTo('left', this.speed);
+      direction = 'left';
     } else if (movement.input.d.isDown) {
-      this.goTo('right', this.speed);
-    } else {
-      this.goTo(null);
+      direction = 'right';
     }
+
+    this.goTo(direction, this.speed);
+
+    // TODO: needs to be debounced,
+    // only emits when the position has changed
+    this.dispatch('pathEnd');
   }
 
   onStopMoving() {
