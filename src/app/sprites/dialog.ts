@@ -11,6 +11,12 @@ interface Config {
   hero: Hero;
 };
 
+const width = 319;
+const height = 78;
+const marginLeft = 12;
+const nameTop = 9;
+const convoTop = 24;
+
 class DialogSprite {
   private game: Phaser.Game;
   private nameText: Phaser.Text;
@@ -24,35 +30,30 @@ class DialogSprite {
 
   static loadAssets(game: Phaser.Game) {
     // https://opengameart.org/content/isometric-people
-    game.load.spritesheet('dialog', 'assets/images/dialog-black.png', 319, 78);
+    game.load.spritesheet('dialog', 'assets/images/dialog-black.png', width, height);
   }
 
   constructor({ game, npc, hero }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;
 
+    // setup
     this.game = game;
     this.npc = npc;
     this.hero = hero;
 
-    this.sprite = game.world.create((game.world.bounds.width / 2) - (319/2), game.world.bounds.height / 2, 'dialog', 0);
+    this.sprite = game.world.create((game.world.bounds.width / 2) - (width / 2), game.world.bounds.height / 2, 'dialog', 0);
     this.conversations = this.npc.conversations;
 
-    this.nameText = this.game.make.text(12, 9, npc.name, { font: '12px Arial', fill: '#CCCCCC' });
-    this.convoText = this.game.make.text(12, 24, '', { font: '12px Arial', fill: '#FFFFFF', wordWrap: true, wordWrapWidth: this.sprite.width });
+    // styles
+    const nameStyle = { font: '12px Arial', fill: '#CCCCCC' };
+    const convoStyle = { font: '12px Arial', fill: '#FFFFFF', wordWrap: true, wordWrapWidth: this.sprite.width };
+
+    this.nameText = this.game.make.text(marginLeft, nameTop, npc.name, nameStyle);
+    this.convoText = this.game.make.text(marginLeft, convoTop, '', convoStyle);
 
     this.sprite.addChild(this.nameText);
     this.sprite.addChild(this.convoText);
-
-    // this.nameText.visible = false;
-    // this.convoText.visible = false;
-
-    // const menu = new MenuSprite({
-    //   game,
-    //   parent: this.sprite,
-    //   controls: this.hero.controls,
-    //   options: ['Yes', 'No'],
-    // });
 
     this.npc.paused = true;
     this.hero.paused = true;
@@ -95,6 +96,7 @@ class DialogSprite {
           parent: this.sprite,
           controls: this.hero.controls,
           options: current.options,
+          label: current.text,
           id: current.id,
         });
       }

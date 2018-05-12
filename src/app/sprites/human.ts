@@ -1,3 +1,4 @@
+// NOTE:
 // This class is to separate human side effects (phaserjs-related) from the logics (chars/human)
 import Phaser from 'phaser-ce';
 

@@ -13,7 +13,7 @@ interface Config {
 class SomeDude extends Npc {
   constructor({ game, group, map, hero }: Config) {
     super({
-      x: 7,
+      x: 3,
       y: 3,
       game,
       group,
@@ -34,7 +34,7 @@ class SomeDude extends Npc {
       }, {
         id: 3,
         type: 'menu',
-        text: '',
+        text: 'Choose an option...',
         options: [{
           text: 'Sure, what is it?',
           nextId: 5,
