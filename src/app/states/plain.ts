@@ -20,7 +20,6 @@ class Plain extends Phaser.State {
   constructor() {
     super();
 
-    this.cursor = new Phaser.Plugin.Isometric.Point3();
     this.debug = true;
   }
 
@@ -41,6 +40,7 @@ class Plain extends Phaser.State {
   }
 
   create() {
+    this.cursor = new Phaser.Plugin.Isometric.Point3();
     this.game.physics.isoArcade.gravity.setTo(0, 0, -500);
 
     this.keys = {
@@ -76,7 +76,8 @@ class Plain extends Phaser.State {
         type: 'track',
         input: [[7,3], [3,3]],
       },
-      messages: ['Long time no see, chap.'],
+      name: 'Some Dude',
+      conversations: ['Long time no see, chap. How are you?', 'Oh, don\'t mind me, I\'m just some random NPC.'],
       hero: this.hero,
     });
   }

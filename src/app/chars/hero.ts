@@ -14,6 +14,8 @@ interface Config {
 };
 
 class Hero extends Human {
+  public controls: { [key:string]: Phaser.Key };
+
   constructor({ x, y, game, group, map, movement, controls }: Config) {
     super({
       game,
@@ -26,6 +28,8 @@ class Hero extends Human {
       map,
       movement,
     });
+
+    this.controls = controls;
 
     // register mouse down input upon `create` bc we only need to do it once
     if (this.movement.type === 'mouse') {
@@ -48,7 +52,7 @@ class Hero extends Human {
     }
 
     // register keyboard controls
-    controls.p.onDown.add(() => {
+    this.controls.p.onDown.add(() => {
       this.dispatch('action');
     });
   }

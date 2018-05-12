@@ -90,6 +90,10 @@ class HumanSprite {
     this.sprite['char'] = this;
   }
 
+  setImmovable(toggle: boolean) {
+    this.sprite.body.immovable = toggle;
+  }
+
   position(floor = false) {
     const x = this.sprite.isoX / this.tilesize;
     const y = this.sprite.isoY / this.tilesize;
@@ -173,13 +177,8 @@ class HumanSprite {
     }
   }
 
-  toggleMessage(toggle: boolean, message?: string[]) {
-    if (toggle) {
-      this.message = new MessageSprite({ game: this.game, message });
-    } else {
-      this.message.sprite.destroy();
-      this.message = null;
-    }
+  showMessage(npc, hero) {
+    this.message = new MessageSprite({ game: this.game, npc, hero });
   }
 
   listen(name: string, callback: Function) {

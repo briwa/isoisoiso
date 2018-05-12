@@ -40,7 +40,7 @@ export function onColliding(sprites) {
   sprites.forEach((sprite) => {
     // when humans collide
     if (sprite.char instanceof Human) {
-      if (sprite.char.name === 'npc') {
+      if (sprite.char.npc) {
         sprite.char.contact = true;
 
         sprite.char.listenOnce('pathsStart', () => {

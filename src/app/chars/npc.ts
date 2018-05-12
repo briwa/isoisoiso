@@ -11,7 +11,8 @@ interface Config {
   x?: number;
   y?: number;
   movement: MovementTrack | MovementFollow;
-  messages: string[];
+  conversations: string[];
+  name: string;
   hero: Hero;
 };
 
@@ -19,11 +20,12 @@ class Npc extends Human {
   private index: number = 0;
   private forward: boolean = true;
   private pause: number = 2000;
-  private messages: string[];
+  private npc: boolean = true;
 
   public contact: boolean = false;
+  public conversations: string[];
 
-  constructor({ x, y, game, group, map, movement, messages, hero }: Config) {
+  constructor({ x, y, game, group, map, movement, conversations, name, hero }: Config) {
     super({
       game,
       x: x * map.tilesize,
@@ -36,9 +38,13 @@ class Npc extends Human {
       movement,
     });
 
-    this.name = 'npc';
-    this.messages = messages;
+    this.npc = true;
+    this.name = name;
+    this.conversations = conversations;
+    this.setImmovable(true);
 
+    // movement setup
+    // ---------------
     if (this.movement.type === 'follow') {
       const follow = this.movement.input;
       const onFollow = () => {
@@ -58,16 +64,13 @@ class Npc extends Human {
       this.moveTrack(this.pause);
     }
 
+    // event setup
+    // ---------------
     hero.listen('action', () => {
       // check if any npc is in contact
-      if (this.contact) {
-        this.toggleMessage(!this.message, this.messages);
-        this.paused = !! this.message;
-        hero.paused = !! this.message;
-
-        if (this.paused) {
-          this.stopOppositeAnimation(hero.currentAnimation().name);
-        }
+      if (this.contact && !this.paused) {
+        this.showMessage(this, hero);
+        this.stopOppositeAnimation(hero.currentAnimation().name);
       }
     });
   }
