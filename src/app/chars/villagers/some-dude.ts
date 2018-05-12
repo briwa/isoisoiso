@@ -15,6 +15,7 @@ class SomeDude extends Npc {
     super({
       x: 3,
       y: 3,
+      delimiter: 129,
       game,
       group,
       map,

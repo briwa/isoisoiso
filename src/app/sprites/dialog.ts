@@ -17,7 +17,7 @@ const marginLeft = 12;
 const nameTop = 9;
 const convoTop = 24;
 
-class DialogSprite {
+class SpriteDialog {
   private game: Phaser.Game;
   private nameText: Phaser.Text;
   private convoText: Phaser.Text;
@@ -108,4 +108,4 @@ class DialogSprite {
   }
 }
 
-export default DialogSprite;
+export default SpriteDialog;

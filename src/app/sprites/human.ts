@@ -3,8 +3,8 @@
 import Phaser from 'phaser-ce';
 
 import Human from 'src/app/chars/base/human';
-import DialogSprite from 'src/app/sprites/dialog';
-import PlainMap from 'src/app/maps/plain';
+import SpriteDialog from 'src/app/sprites/dialog';
+import MapPlain from 'src/app/maps/plain';
 
 export interface MovementTrack {
   type: 'track';
@@ -33,7 +33,7 @@ export interface Config {
   x: number;
   y: number;
   z: number;
-  map: PlainMap;
+  map: MapPlain;
   game?: Phaser.Game;
   sprite?: string; // sprite name on the spritesheet
   delimiter?: number;
@@ -41,7 +41,7 @@ export interface Config {
   movement: MovementTrack | MovementFollow | MovementKeys | MovementMouse;
 };
 
-class HumanSprite {
+class SpriteHuman {
   private game: Phaser.Game;
   private tilesize: number;
   private signals: { [key:string]: Phaser.Signal } = {};
@@ -50,7 +50,7 @@ class HumanSprite {
   public anchorY: number = 1/4;
   public sprite: Phaser.Plugin.Isometric.IsoSprite;
   public movement: MovementTrack | MovementFollow | MovementKeys | MovementMouse;
-  public dialog: DialogSprite;
+  public dialog: SpriteDialog;
 
   static loadAssets(game: Phaser.Game) {
     // https://opengameart.org/content/isometric-people
@@ -179,7 +179,7 @@ class HumanSprite {
   }
 
   showDialog(npc, hero) {
-    this.dialog = new DialogSprite({ game: this.game, npc, hero });
+    this.dialog = new SpriteDialog({ game: this.game, npc, hero });
   }
 
   listen(name: string, callback: Function) {
@@ -207,4 +207,4 @@ class HumanSprite {
   }
 }
 
-export default HumanSprite;
+export default SpriteHuman;

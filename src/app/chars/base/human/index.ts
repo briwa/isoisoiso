@@ -1,6 +1,6 @@
 import { shapePaths } from 'src/app/chars/helper';
-import PlainMap from 'src/app/maps/plain';
-import HumanSprite, { Config, Direction, MovementKeys } from 'src/app/sprites/human';
+import MapPlain from 'src/app/maps/plain';
+import SpriteHuman, { Config, Direction, MovementKeys } from 'src/app/sprites/human';
 
 export interface Path {
   x: number;
@@ -8,8 +8,8 @@ export interface Path {
   direction: Direction;
 };
 
-class Human extends HumanSprite {
-  private map: PlainMap;
+class Human extends SpriteHuman {
+  private map: MapPlain;
 
   public name: string; // max speed, don't go higher than this
   public speed: number = 100; // max speed, don't go higher than this

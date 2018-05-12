@@ -3,9 +3,9 @@ import Phaser from 'phaser-ce';
 import Hero from 'src/app/chars/hero';
 import SomeDude from 'src/app/chars/villagers/some-dude';
 
-import HumanSprite from 'src/app/sprites/human';
-import DialogSprite from 'src/app/sprites/dialog';
-import PlainMap from 'src/app/maps/plain';
+import SpriteHuman from 'src/app/sprites/human';
+import SpriteDialog from 'src/app/sprites/dialog';
+import MapPlain from 'src/app/maps/plain';
 
 class Plain extends Phaser.State {
   private hero: Hero;
@@ -14,7 +14,7 @@ class Plain extends Phaser.State {
 
   private cursor: Phaser.Plugin.Isometric.Point3;
   private keys: { [key:string]: Phaser.Key };
-  private map: PlainMap;
+  private map: MapPlain;
 
   private debug: boolean;
 
@@ -26,9 +26,9 @@ class Plain extends Phaser.State {
 
   preload() {
     // load all the sprites assets
-    HumanSprite.loadAssets(this.game);
-    PlainMap.loadAssets(this.game);
-    DialogSprite.loadAssets(this.game);
+    SpriteHuman.loadAssets(this.game);
+    MapPlain.loadAssets(this.game);
+    SpriteDialog.loadAssets(this.game);
 
     // Add and enable the plug-in.
     this.game.plugins.add(Phaser.Plugin.Isometric);
@@ -52,7 +52,7 @@ class Plain extends Phaser.State {
       p: this.game.input.keyboard.addKey(Phaser.Keyboard.P),
     };
 
-    this.map = new PlainMap(this.game);
+    this.map = new MapPlain(this.game);
 
     this.hero = new Hero({
       x: 6,

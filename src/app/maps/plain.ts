@@ -46,7 +46,7 @@ const TILE = [
   },
 ];
 
-export default class PlainMap {
+export default class MapPlain {
   private game: Phaser.Game;
 
   public grid: number[][];

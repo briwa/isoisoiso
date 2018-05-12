@@ -1,7 +1,7 @@
 import Human from './index';
 
 // test using the default map
-import PlainMap from 'src/app/maps/plain';
+import MapPlain from 'src/app/maps/plain';
 
 jest.mock('phaser-ce', () => ({}));
 
@@ -10,7 +10,7 @@ let map;
 
 describe('Human test', () => {
   beforeEach(() => {
-    map = new PlainMap(null);
+    map = new MapPlain(null);
     // this is just to test the no-path case
     map.setWalkable(4, 4, false);
 

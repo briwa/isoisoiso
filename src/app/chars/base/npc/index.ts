@@ -23,6 +23,7 @@ interface Config {
   map: any;
   x?: number;
   y?: number;
+  delimiter: number;
   movement: MovementTrack | MovementFollow;
   conversations: Conversation[];
   name: string;
@@ -38,14 +39,14 @@ class Npc extends Human {
   public contact: boolean = false;
   public conversations: Conversation[];
 
-  constructor({ x, y, game, group, map, movement, conversations, name, hero }: Config) {
+  constructor({ x, y, game, group, map, movement, delimiter, conversations, name, hero }: Config) {
     super({
       game,
       x: x * map.tilesize,
       y: y * map.tilesize,
       z: 0,
       sprite: 'people',
-      delimiter: 129,
+      delimiter,
       group,
       map,
       movement,
