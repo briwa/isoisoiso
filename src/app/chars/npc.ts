@@ -4,6 +4,19 @@ import Human from './human';
 import Hero from './hero';
 import { MovementTrack, MovementFollow } from '../sprites/human';
 
+interface Option {
+  text: string;
+  nextId: number;
+};
+
+interface Conversation {
+  id: number;
+  type: 'dialog' | 'menu' | 'conversation';
+  text?: string;
+  conversations?: Conversation[];
+  options?: Option[];
+};
+
 interface Config {
   game: Phaser.Game;
   group: Phaser.Group;
@@ -11,7 +24,7 @@ interface Config {
   x?: number;
   y?: number;
   movement: MovementTrack | MovementFollow;
-  conversations: string[];
+  conversations: Conversation[];
   name: string;
   hero: Hero;
 };
@@ -23,7 +36,7 @@ class Npc extends Human {
   private npc: boolean = true;
 
   public contact: boolean = false;
-  public conversations: string[];
+  public conversations: Conversation[];
 
   constructor({ x, y, game, group, map, movement, conversations, name, hero }: Config) {
     super({
