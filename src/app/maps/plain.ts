@@ -95,6 +95,13 @@ export default class PlainMap {
         const tileSprite = this.game.add.isoSprite(j * TILESIZE, i * TILESIZE, tile.isoZ, 'tileset', tile.name, this.group);
         tileSprite.anchor.set(tile.anchor[0], tile.anchor[1]);
         tileSprite.smoothed = false;
+
+        // apply immovable for non-walkable tiles
+        if (this.grid[i][j] !== 0) {
+          this.game.physics.isoArcade.enable(tileSprite);
+          tileSprite.body.collideWorldBounds = true;
+          tileSprite.body.immovable = true;
+        }
       }
     }
   }
