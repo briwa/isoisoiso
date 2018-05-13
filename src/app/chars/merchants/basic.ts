@@ -35,7 +35,7 @@ const conversations = [{
 
       // check if can purchase
       if (subject.gold >= item.price) {
-        subject.purchase(item);
+        subject.purchase(item.id);
         return 'yes';
       }
 

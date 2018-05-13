@@ -34,7 +34,7 @@ const items = [{
 }];
 
 export const get = (id: string) => {
-  return items.filter(item => item.id)[0];
+  return items.filter(item => id === item.id)[0];
 };
 
 export const getAll = () => {

@@ -95,7 +95,6 @@ class Hero extends Human {
   }
 
   purchase(id: string) {
-    // I should've done lookup for the item id, but i don't have them
     const item = getItem(id);
     this.gold -= item.price;
     this.inventory.push(item);
