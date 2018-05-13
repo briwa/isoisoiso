@@ -2,21 +2,9 @@ import Phaser from 'phaser-ce';
 
 import Human from 'src/app/chars/base/human';
 import Hero from 'src/app/chars/hero';
+
 import { MovementTrack, MovementFollow } from 'src/app/sprites/human';
-
-interface Option {
-  name: string;
-  confirm: boolean;
-};
-
-interface Conversation {
-  id: number;
-  type: string;
-  text?: string;
-  conversations?: Conversation[];
-  options?: Option[];
-  onSelect?: (subject: Hero, option: Option) => number;
-};
+import { Conversation } from 'src/app/sprites/dialog';
 
 interface Config {
   game: Phaser.Game;

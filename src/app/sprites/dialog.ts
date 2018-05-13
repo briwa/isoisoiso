@@ -1,15 +1,24 @@
 import Phaser from 'phaser-ce';
 
-import MenuSprite from './menu';
+import MenuSprite, { Option } from './menu';
 
 import Npc from 'src/app/chars/base/npc';
 import Hero from 'src/app/chars/hero';
+
+export interface Conversation {
+  id: string;
+  type: string;
+  text?: string;
+  options?: Option[];
+  onSelect?: (subject: Hero, option: Option) => string;
+  answers?: { [key: string]: Conversation[] };
+};
 
 interface Config {
   game: Phaser.Game;
   hero: Hero;
   npc: Npc;
-  conversations: any[];
+  conversations: Conversation[];
 };
 
 const width = 319;
@@ -24,7 +33,7 @@ class SpriteDialog {
   private nameText: Phaser.Text;
   private convoText: Phaser.Text;
   private menu: MenuSprite;
-  private conversations: any[];
+  private conversations: Conversation[];
   private npc: Npc;
   private hero: Hero;
 
@@ -77,10 +86,6 @@ class SpriteDialog {
     this.nextConvo();
   }
 
-  showConvo(text) {
-    this.convoText.text = text;
-  }
-
   nextConvo() {
     const current = this.conversations[0];
     if (!current) {
@@ -95,12 +100,8 @@ class SpriteDialog {
       // coming from pressing 'action', so it's a selection of the same menu
       if (this.menu && this.menu.id === current.id) {
         // get the next convo id
-        const nextId = this.menu.select();
-
-        // i can't simply use .find here because tslint is targetting es5
-        // if i changed it to es6, uglifier will break since it takes in es5 as input
-        // so we'll stick with .filter[0] for now
-        this.conversations = this.conversations.filter(convo => convo.id === nextId)[0].conversations;
+        const answerId = this.menu.select();
+        this.conversations = current.answers[answerId];
         this.menu.sprite.destroy();
 
         this.nextConvo();

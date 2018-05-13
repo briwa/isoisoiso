@@ -18,61 +18,53 @@ const shapedOptions = getAllItems().map(item => ({
   id: item.id,
   price: item.price,
   name: `${item.name} - ${item.price} G`,
-  confirm: true,
+  answer: null,
 }));
 
 const conversations = [{
-  id: 1,
-  type: 'dialog',
-  text: 'Get the best of the items here!',
-}, {
-  id: 2,
-  type: 'menu',
-  onSelect: (subject, item) => {
-    subject.stopOppositeAnimation();
-
-    if (!item.confirm) return 3;
-
-    // check if can purchase
-    if (subject.gold >= item.price) {
-      subject.purchase(item);
-      return 4;
-    }
-
-    // not enough gold
-    return 5;
-  },
-  options: shapedOptions.concat([{
-    id: '-1',
-    name: 'Cancel',
-    price: null,
-    confirm: false,
-  }]),
-}, {
-  id: 3,
-  type: 'conversations',
-  conversations: [{
-    id: 5,
+    id: '1',
     type: 'dialog',
-    text: 'Oh well, that\'s fine, my kids don\'t need no food anyway. Bye.'
-  }],
-}, {
-  id: 4,
-  type: 'conversations',
-  conversations: [{
-    id: 6,
-    type: 'dialog',
-    text: 'Thanks! Come again!'
-  }],
-}, {
-  id: 5,
-  type: 'conversations',
-  conversations: [{
-    id: 11,
-    type: 'dialog',
-    text: 'Not enough money, son...'
-  }],
-}];
+    text: 'Get the best of the items here!',
+  }, {
+    id: '2',
+    type: 'menu',
+    onSelect: (subject, item) => {
+      subject.stopOppositeAnimation();
+
+      if (item.answer === 'no') return 'no';
+
+      // check if can purchase
+      if (subject.gold >= item.price) {
+        subject.purchase(item);
+        return 'yes';
+      }
+
+      return 'not-enough-gold';
+    },
+    options: shapedOptions.concat([{
+      id: '-1',
+      name: 'Cancel',
+      price: null,
+      answer: 'no',
+    }]),
+    answers: {
+      yes: [{
+        id: '6',
+        type: 'dialog',
+        text: 'Thanks! Come again!'
+      }],
+      no: [{
+        id: '5',
+        type: 'dialog',
+        text: 'Oh well, that\'s fine, my kids don\'t need no food anyway. Bye.'
+      }],
+      'not-enough-gold': [{
+        id: '11',
+        type: 'dialog',
+        text: 'Not enough money, son...'
+      }],
+    },
+  }];
 
 class MerchantBasic extends Npc {
   constructor({ game, group, map, hero }: Config) {

@@ -11,44 +11,40 @@ interface Config {
 };
 
 const conversations = [{
-    id: 1,
-    type: 'dialog',
-    text: 'Long time no see, chap. How are you?',
+  id: '1',
+  type: 'dialog',
+  text: 'Long time no see, chap. How are you?',
+}, {
+  id: '2',
+  type: 'dialog',
+  text: 'Was wondering if you could help me with something?',
+}, {
+  id: '3',
+  type: 'menu',
+  text: 'Choose an option...',
+  onSelect: (subject, item) => {
+    return item.answer;
+  },
+  options: [{
+    name: 'Sure, what is it?',
+    answer: 'yes',
   }, {
-    id: 2,
-    type: 'dialog',
-    text: 'Was wondering if you could help me with something?',
-  }, {
-    id: 3,
-    type: 'menu',
-    text: 'Choose an option...',
-    onSelect: (subject, item) => {
-      return item.confirm ? 5 : 4;
-    },
-    options: [{
-      name: 'Sure, what is it?',
-      confirm: true,
-    }, {
-      name: 'Aw maybe next time...',
-      confirm: false,
-    }],
-  }, {
-    id: 4,
-    type: 'conversation',
-    conversations: [{
-      id: 6,
+    name: 'Sorry, kinda busy...',
+    answer: 'no',
+  }],
+  answers: {
+    no: [{
+      id: '6',
       type: 'dialog',
-      text: 'Fine, next time it is!'
+      text: 'Fine, next time it is!',
     }],
-  }, {
-    id: 5,
-    type: 'conversation',
-    conversations: [{
-      id: 7,
+    yes: [{
+      id: '7',
       type: 'dialog',
-      text: 'Ok so can you get lost? Thanks.'
+      text: 'You know what, I forgot what I wanted to ask you.',
     }],
-  }];
+  },
+}];
 
 class SomeDude extends Npc {
   constructor({ game, group, map, hero }: Config) {

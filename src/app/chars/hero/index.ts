@@ -70,7 +70,7 @@ class Hero extends Human {
       } else {
         const inventory = this.inventory.map(item => item.name).join('\n');
         const conversations = [{
-          id: 1,
+          id: '1',
           type: 'dialog',
           text: `Gold: ${this.gold}\n${inventory}`,
         }];

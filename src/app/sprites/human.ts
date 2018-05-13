@@ -6,7 +6,7 @@ import Human from 'src/app/chars/base/human';
 import Npc from 'src/app/chars/base/npc';
 import Hero from 'src/app/chars/hero';
 
-import SpriteDialog from 'src/app/sprites/dialog';
+import SpriteDialog, { Conversation } from 'src/app/sprites/dialog';
 import MapPlain from 'src/app/maps/plain';
 
 export interface MovementTrack {
@@ -185,7 +185,7 @@ class SpriteHuman {
     }
   }
 
-  showDialog({ hero, npc, conversations }: { hero: Hero, npc?: Npc, conversations?: any[] }) {
+  showDialog({ hero, npc, conversations }: { hero: Hero, npc?: Npc, conversations?: Conversation[] }) {
     this.dialog = new SpriteDialog({
       game: this.game,
       hero,

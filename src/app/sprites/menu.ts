@@ -2,14 +2,20 @@ import Phaser from 'phaser-ce';
 
 import Hero from 'src/app/chars/hero';
 
+export interface Option {
+  name: string;
+  answer?: string;
+  label?: boolean;
+};
+
 interface Config {
   game: Phaser.Game;
   parent: Phaser.Sprite;
   subject?: Hero;
-  id: number;
+  id: string;
   label?: string;
-  options: { confirm: boolean, name: string, label?: boolean }[];
-  onSelect?: (subject: Hero, option: any) => number;
+  options: Option[];
+  onSelect?: (subject: Hero, option: Option) => string;
 };
 
 const lineHeight = 15;
@@ -21,14 +27,14 @@ const cursorTop = 24;
 class MenuSprite {
   private game: Phaser.Game;
   private parent: Phaser.Sprite;
-  private options: { confirm: boolean, name: string, label?: boolean }[];
-  private onSelect: any;
-  private subject: any;
+  private options: Option[];
+  private onSelect: (subject: Hero, option: Option) => string;
+  private subject: Hero;
   private selectedIndex = 0;
   private group: Phaser.Sprite;
   private cursor: Phaser.Text;
 
-  public id: number;
+  public id: string;
   public selection;
   public sprite: Phaser.Sprite;
 
