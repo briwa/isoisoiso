@@ -1,5 +1,6 @@
-// NOTE:
-// This class is to separate human side effects (phaserjs-related) from the logics (chars/human)
+// NOTE: This class is to separate human side effects (phaserjs-related) from the logics (chars/human)
+// TODO:
+// - consider cleaning up signals on destroy?
 import Phaser from 'phaser-ce';
 
 import Human from 'src/app/chars/base/human';

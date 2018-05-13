@@ -7,6 +7,8 @@ import Npc from 'src/app/chars/base/npc';
 
 import { getAll as getAllItems } from 'src/app/chars/items';
 
+import SpriteShop from 'src/app/sprites/shop';
+
 interface Config {
   game: Phaser.Game;
   group: Phaser.Group;
@@ -81,6 +83,9 @@ class MerchantBasic extends Npc {
     });
 
     this.setAnimation('walk-right');
+
+    const shop = new SpriteShop({ game, hero, npc: this, items: getAllItems() });
+    // shop.sprite.visible = false;
   }
 }
 

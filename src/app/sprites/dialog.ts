@@ -1,6 +1,6 @@
 import Phaser from 'phaser-ce';
 
-import MenuSprite, { Option } from './menu';
+import MenuSprite, { Option } from 'src/app/sprites/menu';
 
 import Npc from 'src/app/chars/base/npc';
 import Hero from 'src/app/chars/hero';
@@ -21,8 +21,8 @@ interface Config {
   conversations: Conversation[];
 };
 
-const width = 319;
-const height = 78;
+const width = 400;
+const height = 100;
 const marginLeft = 12;
 const nameTop = 9;
 const convoTop = 24;
@@ -40,8 +40,7 @@ class SpriteDialog {
   public sprite: Phaser.Sprite;
 
   static loadAssets(game: Phaser.Game) {
-    // https://opengameart.org/content/isometric-people
-    game.load.spritesheet('dialog', 'assets/images/dialog-black.png', width, height);
+    // no need sprite for now
   }
 
   constructor({ game, hero, npc, conversations }: Config) {
@@ -53,7 +52,23 @@ class SpriteDialog {
     this.hero = hero;
     this.npc = npc;
 
-    this.sprite = game.world.create((game.world.bounds.width / 2) - (width / 2), game.world.bounds.height / 2, 'dialog', 0);
+    var graphics = this.game.add.graphics(0, 0);
+
+    // set a fill and line style
+    graphics.beginFill(0x333333);
+    graphics.lineStyle(3, 0xdddddd, 1);
+
+    // draw a shape
+    graphics.moveTo(0,0);
+    graphics.lineTo(width, 0);
+    graphics.lineTo(width, height);
+    graphics.lineTo(0, height);
+    graphics.lineTo(0, 0);
+    graphics.endFill();
+
+    this.sprite = game.world.create((game.world.bounds.width / 2) - (width / 2), game.world.bounds.height / 2, graphics.generateTexture());
+    graphics.destroy();
+
     this.conversations = conversations;
 
     // styles
@@ -116,8 +131,13 @@ class SpriteDialog {
           label: current.text,
           id: current.id,
         });
+        this.menu.sprite.y = 24; // TODO: manual adjustment! maybe handle this in the child instead?
       }
     }
+  }
+
+  onDone(cb) {
+    this.sprite.events.onDestroy.add(cb);
   }
 }
 

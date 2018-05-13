@@ -1,3 +1,5 @@
+// TODO:
+// - review the process on who should be listening to the select event, should we listen to hero 'action', or this should have its own listener?
 import Phaser from 'phaser-ce';
 
 import Hero from 'src/app/chars/hero';
@@ -11,18 +13,18 @@ export interface Option {
 interface Config {
   game: Phaser.Game;
   parent: Phaser.Sprite;
-  subject?: Hero;
-  id: string;
-  label?: string;
   options: Option[];
+  subject: Hero;
+  id?: string;
+  label?: string;
   onSelect?: (subject: Hero, option: Option) => string;
 };
 
 const lineHeight = 15;
+const marginTop = 0;
 const marginLeft = 24;
-const marginTop = 24;
 const cursorLeft = 12;
-const cursorTop = 24;
+const cursorTop = 0;
 
 class MenuSprite {
   private game: Phaser.Game;
@@ -30,16 +32,17 @@ class MenuSprite {
   private options: Option[];
   private onSelect: (subject: Hero, option: Option) => string;
   private subject: Hero;
-  private selectedIndex = 0;
   private group: Phaser.Sprite;
   private cursor: Phaser.Text;
+  private cursorTop = cursorTop;
+  private cursorLeft = cursorLeft;
+  private enabled: boolean = true;
 
   public id: string;
   public selection;
   public sprite: Phaser.Sprite;
-
-  private cursorTop = cursorTop;
-  private cursorLeft = cursorLeft;
+  public signals: { [key: string]: Phaser.Signal } = {};
+  public selectedIndex = 0;
 
   constructor({ game, subject, parent, id, label, options, onSelect }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
@@ -79,28 +82,47 @@ class MenuSprite {
     // make it visible in the parent
     parent.addChild(this.sprite);
 
-    // listen to keys
+    // publish events
+    this.signals.selection = new Phaser.Signal();
+    this.signals.selection.add(this.updateCursor, this);
+
+    // subscribe to events
     this.subject.controls.s.onDown.add(this.next, this);
     this.subject.controls.w.onDown.add(this.prev, this);
 
     this.sprite.events.onDestroy.add(() => {
       this.subject.controls.s.onDown.remove(this.next, this);
       this.subject.controls.w.onDown.remove(this.prev, this);
+      this.signals.selection.removeAll();
     });
   }
 
   prev() {
+    if (!this.enabled) return;
     this.selectedIndex = Math.max(0, this.selectedIndex - 1);
-    this.cursor.y = (this.selectedIndex * lineHeight) + this.cursorTop;
+    this.signals.selection.dispatch();
   }
 
   next() {
+    if (!this.enabled) return;
     this.selectedIndex = Math.min(this.selectedIndex + 1, this.options.length - 1);
+    this.signals.selection.dispatch();
+  }
+
+  updateCursor() {
     this.cursor.y = (this.selectedIndex * lineHeight) + this.cursorTop;
+  }
+
+  toggle(enabled: boolean) {
+    this.enabled = enabled;
   }
 
   select() {
     return this.onSelect(this.subject, this.options[this.selectedIndex]);
+  }
+
+  onChange(cb) {
+    this.signals.selection.add(cb);
   }
 }
 
