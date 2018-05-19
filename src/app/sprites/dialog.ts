@@ -133,7 +133,7 @@ class SpriteDialog {
       });
       this.menu.sprite.y = 24; // TODO: manual adjustment! maybe handle this in the child instead?
 
-      this.menu.onSelected((selected) => {
+      this.menu.onSelecting((selected) => {
         const answerId = current.onSelect(this.hero, selected);
         this.menu.doneSelecting();
 

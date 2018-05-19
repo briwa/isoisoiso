@@ -76,6 +76,7 @@ class SpriteShop {
     this.sprite.addChild(this.description);
 
     this.menu = new MenuSprite({
+      id: 'shop-selection',
       game,
       subject: hero,
       parent: this.sprite,
@@ -87,8 +88,7 @@ class SpriteShop {
     });
     this.updateDescription();
 
-    hero.listen('action', () => {
-      // check if any npc is in contact
+    this.menu.onSelecting(() => {
       this.onSelect();
     });
   }
@@ -112,7 +112,7 @@ class SpriteShop {
       hero: this.hero,
       npc: this.npc,
       conversations: [{
-        id: '1',
+        id: 'shop-confirm-menu',
         type: 'menu',
         text: 'Are you sure you want to buy this item?',
         onSelect: (subject, option) => {

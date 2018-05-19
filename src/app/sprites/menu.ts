@@ -52,7 +52,8 @@ class MenuSprite {
     this.id = id;
     this.subject = subject;
 
-    this.subject.setView(`menu-${id}`);
+    // TODO: standardize this to use either id or name
+    this.subject.setView(id);
 
     // styles
     const optionStyle = { font: '12px Arial', fill: '#FFFFFF' };
@@ -122,9 +123,11 @@ class MenuSprite {
     this.signals.selection.add(callback);
   }
 
-  onSelected(callback) {
+  onSelecting(callback) {
     this.signals.doneSelecting.add(() => {
-      callback(this.options[this.selectedIndex]);
+      if (this.subject.getView() === this.id) {
+        callback(this.options[this.selectedIndex]);
+      }
     });
   }
 
