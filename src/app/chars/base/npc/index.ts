@@ -69,8 +69,8 @@ class Npc extends Human {
   moveTrack(timeout: number) {
     const track = this.movement.input;
     setTimeout(() => {
-      // do not move when it's paused
-      if (this.paused) {
+      // do not move when it's not in the map, e.g. in a conversation
+      if (!this.inMap()) {
         this.moveTrack(this.pause);
         return false;
       }

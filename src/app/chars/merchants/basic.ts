@@ -26,8 +26,17 @@ class MerchantBasic extends Merchant {
       map,
       name: 'Merchant Basic',
       hero,
+      shopId: 'shop-basic',
       items: getAllItems(),
       dialogs: {
+        opening: {
+          id: 'shop-basic-opening',
+          conversations: [{
+            id: '1',
+            type: 'dialog',
+            text: 'Welcome to Basic Shop! Looking for something in particular?'
+          }]
+        },
         confirm: {
           id: 'shop-confirm',
           conversations: [{

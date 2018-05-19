@@ -12,6 +12,7 @@ interface Dialogs {
 };
 
 interface Config {
+  id: string;
   game: Phaser.Game;
   subject: Human;
   merchant: Human;
@@ -28,6 +29,7 @@ const convoTop = 24;
 const lineSpacing = -8;
 
 class SpriteShop {
+  private id: string;
   private game: Phaser.Game;
   private description: Phaser.Text;
   private menu: MenuSprite;
@@ -42,11 +44,12 @@ class SpriteShop {
     // TODO: load items sprite
   }
 
-  constructor({ game, subject, merchant, items, dialogs }: Config) {
+  constructor({ id, game, subject, merchant, items, dialogs }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;
 
     // setup
+    this.id = id;
     this.game = game;
     this.subject = subject;
     this.merchant = merchant;
@@ -95,7 +98,7 @@ class SpriteShop {
     this.updateDescription();
 
     this.menu.onSelecting(() => {
-      this.onSelect(dialogs);
+      this.select(dialogs);
     });
   }
 
@@ -109,13 +112,19 @@ class SpriteShop {
     this.description.text = text.join('\n');
   }
 
-  onSelect(dialogs: Dialogs) {
+  select(dialogs: Dialogs) {
     const item = this.items[this.menu.selectedIndex];
 
     this.dialog = this.merchant.showDialog({
+      label: this.merchant.name,
       subject: this.subject,
       dialog: dialogs.confirm,
     });
+  }
+
+  done() {
+    this.sprite.destroy();
+    return null;
   }
 }
 

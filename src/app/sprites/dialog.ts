@@ -39,8 +39,8 @@ class SpriteDialog {
   private conversations: Conversation[];
   private subject: Human;
 
-  public sprite: Phaser.Sprite;
   public id: string = null;
+  public sprite: Phaser.Sprite;
 
   static loadAssets(game: Phaser.Game) {
     // no need sprite for now
@@ -96,7 +96,7 @@ class SpriteDialog {
       }
     });
 
-    this.sprite.events.onDestroy.add(() => {
+    this.sprite.events.onDestroy.addOnce(() => {
       // done listening to this dialog
       this.subject.doneView();
     }, this);
@@ -135,7 +135,7 @@ class SpriteDialog {
   }
 
   onDone(cb) {
-    this.sprite.events.onDestroy.add(cb);
+    this.sprite.events.onDestroy.addOnce(cb);
   }
 }
 

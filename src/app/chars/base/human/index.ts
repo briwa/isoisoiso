@@ -16,8 +16,6 @@ class Human extends SpriteHuman {
   public speed: number = 100; // max speed, don't go higher than this
   public paths: Path[] = [];
 
-  public paused: boolean = false;
-
   constructor(config: Config) {
     super(config);
 
@@ -69,8 +67,8 @@ class Human extends SpriteHuman {
   }
 
   movePaths() {
-    // do not move when it's paused
-    if (this.paused) {
+    // do not move when it's not in the map
+    if (!this.inMap()) {
       return false;
     }
 
@@ -103,8 +101,8 @@ class Human extends SpriteHuman {
   }
 
   moveKeys() {
-    // do not move when it's paused
-    if (this.paused) {
+    // do not move when it's not in the map
+    if (!this.inMap()) {
       return false;
     }
 
@@ -139,8 +137,6 @@ class Human extends SpriteHuman {
     } else {
       this.overlays.splice(0, 1);
     }
-
-    this.paused = this.getView() !== 'map';
   }
 
   doneView() {
@@ -149,6 +145,10 @@ class Human extends SpriteHuman {
 
   getView(): string {
     return this.overlays[0];
+  }
+
+  inMap() {
+    return this.getView() === 'map';
   }
 }
 

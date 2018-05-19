@@ -52,6 +52,7 @@ class Plain extends Phaser.State {
       s: this.game.input.keyboard.addKey(Phaser.Keyboard.S),
       d: this.game.input.keyboard.addKey(Phaser.Keyboard.D),
       p: this.game.input.keyboard.addKey(Phaser.Keyboard.P),
+      l: this.game.input.keyboard.addKey(Phaser.Keyboard.L),
       o: this.game.input.keyboard.addKey(Phaser.Keyboard.O),
       ',': this.game.input.keyboard.addKey(Phaser.Keyboard.COMMA),
       '.': this.game.input.keyboard.addKey(Phaser.Keyboard.PERIOD),

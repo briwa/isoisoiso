@@ -17,7 +17,7 @@ class Commoner extends Npc {
     // ---------------
     config.hero.listen('action', () => {
       // check if any npc is in contact
-      if (this.contact && !this.paused) {
+      if (this.contact && this.inMap()) {
         const dialog = this.showDialog({
           label: this.name,
           subject: config.hero,

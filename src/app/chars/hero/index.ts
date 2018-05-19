@@ -64,6 +64,9 @@ class Hero extends Human {
     this.controls.p.onDown.add(() => {
       this.dispatch('action');
     });
+    this.controls.l.onDown.add(() => {
+      this.dispatch('cancel');
+    });
     this.controls.w.onDown.add(() => {
       this.dispatch('up');
     });
