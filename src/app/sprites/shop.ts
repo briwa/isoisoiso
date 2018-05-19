@@ -108,33 +108,35 @@ class SpriteShop {
     this.menu.toggle(false);
 
     this.dialog = this.npc.showDialog({
-      id: 'shop-confirm',
       hero: this.hero,
       npc: this.npc,
-      conversations: [{
-        id: 'shop-confirm-menu',
-        type: 'menu',
-        text: 'Are you sure you want to buy this item?',
-        onSelect: (subject, option) => {
-          this.menu.toggle(true);
-          return option.answer;
-        },
-        options: [{
-          name: 'Yes',
-          answer: 'yes',
-        }, {
-          name: 'No',
-          answer: 'no',
-        }],
-        answers: {
-          yes: [{
-            id: '2',
-            type: 'dialog',
-            text: 'Thank you!'
+      dialog: {
+        id: 'shop-confirm',
+        conversations: [{
+          id: 'shop-confirm-menu',
+          type: 'menu',
+          text: 'Are you sure you want to buy this item?',
+          onSelect: (subject, option) => {
+            this.menu.toggle(true);
+            return option.answer;
+          },
+          options: [{
+            name: 'Yes',
+            answer: 'yes',
+          }, {
+            name: 'No',
+            answer: 'no',
           }],
-          no: [],
-        },
-      }],
+          answers: {
+            yes: [{
+              id: '2',
+              type: 'dialog',
+              text: 'Thank you!'
+            }],
+            no: [],
+          },
+        }],
+      }
     });
   }
 }

@@ -60,7 +60,10 @@ class SomeDude extends Npc {
         input: [[7,3], [3,3]],
       },
       name: 'Some Dude',
-      conversations,
+      dialog: {
+        id: 'some-dude-generic',
+        conversations,
+      },
       hero,
     });
   }

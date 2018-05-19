@@ -78,13 +78,16 @@ class MerchantBasic extends Npc {
       group,
       map,
       name: 'Merchant',
-      conversations,
+      dialog: {
+        id: 'merchant-generic',
+        conversations,
+      },
       hero,
     });
 
     this.setAnimation('walk-right');
 
-    const shop = new SpriteShop({ game, hero, npc: this, items: getAllItems() });
+    // const shop = new SpriteShop({ game, hero, npc: this, items: getAllItems() });
     // shop.sprite.visible = false;
   }
 }

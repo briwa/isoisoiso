@@ -5,7 +5,12 @@ import MenuSprite, { Option } from 'src/app/sprites/menu';
 import Npc from 'src/app/chars/base/npc';
 import Hero from 'src/app/chars/hero';
 
-export interface Conversation {
+export interface Dialog {
+  id: string;
+  conversations: Conversation[];
+};
+
+interface Conversation {
   id: string;
   type: string;
   text?: string;
@@ -18,8 +23,7 @@ interface Config {
   game: Phaser.Game;
   hero: Hero;
   npc: Npc;
-  conversations: Conversation[];
-  id: string;
+  dialog: Dialog;
 };
 
 const width = 400;
@@ -45,7 +49,7 @@ class SpriteDialog {
     // no need sprite for now
   }
 
-  constructor({ game, hero, npc, conversations, id }: Config) {
+  constructor({ game, hero, npc, dialog }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;
 
@@ -53,12 +57,12 @@ class SpriteDialog {
     this.game = game;
     this.hero = hero;
     this.npc = npc;
-    this.id = id;
+    this.id = dialog.id;
 
     // let hero know that it's viewing this dialog
-    this.hero.setView(id);
+    this.hero.setView(this.id);
     if (this.npc) {
-      this.npc.setView(id);
+      this.npc.setView(this.id);
     }
 
     var graphics = this.game.add.graphics(0, 0);
@@ -78,7 +82,7 @@ class SpriteDialog {
     this.sprite = game.world.create((game.world.bounds.width / 2) - (width / 2), game.world.bounds.height / 2, graphics.generateTexture());
     graphics.destroy();
 
-    this.conversations = conversations;
+    this.conversations = dialog.conversations;
 
     // styles
     const nameStyle = { font: '12px Arial', fill: '#CCCCCC' };

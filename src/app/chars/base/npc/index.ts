@@ -4,7 +4,7 @@ import Human from 'src/app/chars/base/human';
 import Hero from 'src/app/chars/hero';
 
 import { MovementTrack, MovementFollow } from 'src/app/sprites/human';
-import { Conversation } from 'src/app/sprites/dialog';
+import { Dialog } from 'src/app/sprites/dialog';
 
 interface Config {
   game: Phaser.Game;
@@ -14,7 +14,7 @@ interface Config {
   y?: number;
   delimiter: number;
   movement?: MovementTrack | MovementFollow;
-  conversations: Conversation[];
+  dialog: Dialog;
   name: string;
   hero: Hero;
 };
@@ -26,9 +26,8 @@ class Npc extends Human {
   private npc: boolean = true;
 
   public contact: boolean = false;
-  public conversations: Conversation[];
 
-  constructor({ x, y, game, group, map, movement, delimiter, conversations, name, hero }: Config) {
+  constructor({ x, y, game, group, map, movement, delimiter, dialog, name, hero }: Config) {
     super({
       game,
       x: x * map.tilesize,
@@ -43,7 +42,6 @@ class Npc extends Human {
 
     this.npc = true;
     this.name = name;
-    this.conversations = conversations;
     this.setImmovable(true);
 
     // movement setup
@@ -75,10 +73,9 @@ class Npc extends Human {
       // check if any npc is in contact
       if (this.contact && !this.paused) {
         this.showDialog({
-          id: `${this.name}-dialog`,
           hero,
+          dialog,
           npc: this,
-          conversations: this.conversations,
         });
         this.stopOppositeAnimation(hero.currentAnimation().name);
       }

@@ -82,9 +82,11 @@ class Hero extends Human {
         }];
 
         this.showDialog({
-          id: 'ingame-menu',
           hero: this,
-          conversations: conversations,
+          dialog: {
+            id: 'ingame-menu',
+            conversations: conversations,
+          },
         });
       }
     });
