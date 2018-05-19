@@ -54,7 +54,6 @@ class SpriteHuman {
   public anchorY: number = 1/4;
   public sprite: Phaser.Plugin.Isometric.IsoSprite;
   public movement: MovementTrack | MovementFollow | MovementKeys | MovementMouse;
-  public dialog: SpriteDialog;
 
   static loadAssets(game: Phaser.Game) {
     // https://opengameart.org/content/isometric-people
@@ -185,11 +184,11 @@ class SpriteHuman {
     }
   }
 
-  showDialog({ hero, npc, dialog }: { hero: Hero, npc?: Npc, dialog: Dialog }) {
-    this.dialog = new SpriteDialog({
+  showDialog({ label, subject, dialog }: { label?: string, subject: Human, dialog: Dialog }) {
+    return new SpriteDialog({
       game: this.game,
-      hero,
-      npc,
+      label,
+      subject,
       dialog,
     });
   }

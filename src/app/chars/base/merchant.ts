@@ -20,13 +20,13 @@ class Merchant extends Npc {
   constructor(config: ConfigMerchant) {
     super(config);
 
-    const shop = new SpriteShop({
-      game: config.game,
-      subject: config.hero,
-      items: config.items,
-      dialogs: config.dialogs,
-      merchant: this,
-    });
+    // const shop = new SpriteShop({
+    //   game: config.game,
+    //   subject: config.hero,
+    //   items: config.items,
+    //   dialogs: config.dialogs,
+    //   merchant: this,
+    // });
     // shop.sprite.visible = false;
   }
 }

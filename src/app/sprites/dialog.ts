@@ -2,8 +2,7 @@ import Phaser from 'phaser-ce';
 
 import MenuSprite, { Option } from 'src/app/sprites/menu';
 
-import Npc from 'src/app/chars/base/npc';
-import Hero from 'src/app/chars/hero';
+import Human from 'src/app/chars/base/human';
 
 export interface Dialog {
   id: string;
@@ -20,9 +19,9 @@ interface Conversation {
 
 interface Config {
   game: Phaser.Game;
-  hero: Hero;
-  npc: Npc;
+  subject: Human;
   dialog: Dialog;
+  label?: string;
 };
 
 const width = 400;
@@ -38,8 +37,7 @@ class SpriteDialog {
   private convoText: Phaser.Text;
   private menu: MenuSprite;
   private conversations: Conversation[];
-  private subject: Hero;
-  private npc: Npc;
+  private subject: Human;
 
   public sprite: Phaser.Sprite;
   public id: string = null;
@@ -48,21 +46,17 @@ class SpriteDialog {
     // no need sprite for now
   }
 
-  constructor({ game, hero, npc, dialog }: Config) {
+  constructor({ game, subject, label, dialog }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;
 
     // setup
     this.game = game;
-    this.subject = hero;
-    this.npc = npc;
+    this.subject = subject;
     this.id = dialog.id;
 
     // let hero know that it's viewing this dialog
     this.subject.setView(this.id);
-    if (this.npc) {
-      this.npc.setView(this.id);
-    }
 
     var graphics = this.game.add.graphics(0, 0);
 
@@ -87,7 +81,7 @@ class SpriteDialog {
     const nameStyle = { font: '12px Arial', fill: '#CCCCCC' };
     const convoStyle = { font: '12px Arial', fill: '#FFFFFF', wordWrap: true, wordWrapWidth: this.sprite.width };
 
-    this.nameText = this.game.make.text(marginLeft, nameTop, (npc ? npc.name : hero.name), nameStyle);
+    this.nameText = this.game.make.text(marginLeft, nameTop, label, nameStyle);
     this.convoText = this.game.make.text(marginLeft, convoTop, '', convoStyle);
     this.convoText.lineSpacing = lineSpacing; // the default line spacing was way too big for this font size
 
@@ -103,12 +97,6 @@ class SpriteDialog {
     });
 
     this.sprite.events.onDestroy.add(() => {
-      // TODO: see if this can be taken out and done in npc
-      if (this.npc) {
-        this.npc.doneView();
-        this.npc.contact = false; // some npc stays in contact (like stationary ones), so force no contact
-      }
-
       // done listening to this dialog
       this.subject.doneView();
     }, this);

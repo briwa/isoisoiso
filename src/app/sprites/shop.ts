@@ -113,8 +113,7 @@ class SpriteShop {
     const item = this.items[this.menu.selectedIndex];
 
     this.dialog = this.merchant.showDialog({
-      hero: (this.subject as any),
-      npc: (this.merchant as any),
+      subject: this.subject,
       dialog: dialogs.confirm,
     });
   }

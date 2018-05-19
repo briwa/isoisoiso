@@ -18,12 +18,20 @@ class Commoner extends Npc {
     config.hero.listen('action', () => {
       // check if any npc is in contact
       if (this.contact && !this.paused) {
-        this.showDialog({
-          hero: config.hero,
+        const dialog = this.showDialog({
+          label: this.name,
+          subject: config.hero,
           dialog: config.dialog,
-          npc: this,
         });
+
+        // make sure the commoner is facing whatever hero is facing
         this.stopOppositeAnimation(config.hero.currentAnimation().name);
+        this.setView(dialog.id);
+
+        dialog.onDone(() => {
+          this.doneView();
+          this.contact = false;
+        });
       }
     });
   }

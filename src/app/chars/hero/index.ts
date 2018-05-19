@@ -2,6 +2,7 @@ import Phaser from 'phaser-ce';
 
 import Human from 'src/app/chars/base/human';
 import { MovementMouse, MovementKeys } from 'src/app/sprites/human';
+import Dialog from 'src/app/sprites/dialog';
 
 import { get as getItem } from 'src/app/chars/items';
 
@@ -18,6 +19,7 @@ interface Config {
 class Hero extends Human {
   private inventory: any[] = [];
   private debug: boolean = false;
+  private dialog: Dialog;
 
   public controls: { [key:string]: Phaser.Key };
   public gold: number = 100;
@@ -81,8 +83,8 @@ class Hero extends Human {
           text: `Gold: ${this.gold}\n${inventory}`,
         }];
 
-        this.showDialog({
-          hero: this,
+        this.dialog = this.showDialog({
+          subject: this,
           dialog: {
             id: 'ingame-menu',
             conversations: conversations,
