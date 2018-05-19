@@ -19,7 +19,7 @@ interface Config {
   hero: Hero;
   npc: Npc;
   conversations: Conversation[];
-  name: string;
+  id: string;
 };
 
 const width = 400;
@@ -39,13 +39,13 @@ class SpriteDialog {
   private hero: Hero;
 
   public sprite: Phaser.Sprite;
-  public name: string = null;
+  public id: string = null;
 
   static loadAssets(game: Phaser.Game) {
     // no need sprite for now
   }
 
-  constructor({ game, hero, npc, conversations, name }: Config) {
+  constructor({ game, hero, npc, conversations, id }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;
 
@@ -53,12 +53,12 @@ class SpriteDialog {
     this.game = game;
     this.hero = hero;
     this.npc = npc;
-    this.name = name;
+    this.id = id;
 
     // let hero know that it's viewing this dialog
-    this.hero.setView(name);
+    this.hero.setView(id);
     if (this.npc) {
-      this.npc.setView(name);
+      this.npc.setView(id);
     }
 
     var graphics = this.game.add.graphics(0, 0);
@@ -94,8 +94,9 @@ class SpriteDialog {
     // listen to keys
     this.hero.listen( 'action', () => {
       // do not proceed if it's not viewing this one
-      if (this.name !== this.hero.getView()) return;
-      this.nextConvo();
+      if (this.id === this.hero.getView()) {
+        this.nextConvo();
+      }
     });
 
     this.sprite.events.onDestroy.add(() => {

@@ -185,13 +185,13 @@ class SpriteHuman {
     }
   }
 
-  showDialog({ hero, npc, conversations, name }: { hero: Hero, npc?: Npc, conversations?: Conversation[], name: string }) {
+  showDialog({ hero, npc, conversations, id }: { hero: Hero, npc?: Npc, conversations?: Conversation[], id: string }) {
     this.dialog = new SpriteDialog({
       game: this.game,
       hero,
       npc,
       conversations,
-      name,
+      id,
     });
   }
 

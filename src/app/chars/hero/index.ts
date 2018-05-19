@@ -69,7 +69,7 @@ class Hero extends Human {
       this.dispatch('down');
     });
 
-    // temporary UI for inventory
+    // temporary UI for menu
     this.controls.o.onDown.add(() => {
       if (this.dialog && this.dialog.sprite.alive) {
         this.dialog.sprite.destroy();
@@ -82,9 +82,9 @@ class Hero extends Human {
         }];
 
         this.showDialog({
+          id: 'ingame-menu',
           hero: this,
           conversations: conversations,
-          name: 'ingame-menu',
         });
       }
     });
