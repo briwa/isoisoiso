@@ -1,6 +1,6 @@
 // TODO:
 // - get this from db next time
-interface Item {
+interface ItemBase {
   id: string;
   name: string;
   type: string; // TODO: type this
@@ -9,17 +9,18 @@ interface Item {
   effects: { property: string; value: number }[];
 };
 
-interface Equippable extends Item {
+interface Equippable extends ItemBase {
   type: 'weapon' | 'armor' | 'accessory';
   consumable: false;
 };
 
-interface Consumable extends Item {
+interface Consumable extends ItemBase {
   type: 'consumable';
   consumable: true;
 };
 
 export type Items = Array<Equippable | Consumable>;
+export type Item = Equippable | Consumable;
 
 const items: Items = [{
   id: '1',

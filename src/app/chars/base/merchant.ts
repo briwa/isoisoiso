@@ -14,6 +14,8 @@ interface ConfigMerchant extends Config {
   dialogs?: {
     opening?: Dialog;
     confirm?: Dialog;
+    cancel?: Dialog;
+    thanks?: Dialog;
     ending?: Dialog;
   };
 };

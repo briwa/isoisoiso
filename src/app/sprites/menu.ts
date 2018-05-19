@@ -120,7 +120,7 @@ class MenuSprite {
   }
 
   onSelecting(callback) {
-    this.signals.doneSelecting.addOnce(() => {
+    this.signals.doneSelecting.add(() => {
       if (this.subject.getView() === this.id) {
         callback(this.options[this.selectedIndex]);
       }

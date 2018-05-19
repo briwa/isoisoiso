@@ -50,16 +50,24 @@ class MerchantBasic extends Merchant {
               name: 'No',
               answer: 'no',
             }],
-            answers: {
-              yes: [{
-                id: '2',
-                type: 'dialog',
-                text: 'Thank you!'
-              }],
-              no: [],
-            },
           }],
-        }
+        },
+        thanks: {
+          id: 'shop-basic-thanks',
+          conversations: [{
+            id: '1',
+            type: 'dialog',
+            text: 'Thank you!'
+          }]
+        },
+        ending: {
+          id: 'shop-basic-ending',
+          conversations: [{
+            id: '1',
+            type: 'dialog',
+            text: 'Come again!'
+          }]
+        },
       },
     });
 

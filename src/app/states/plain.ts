@@ -61,8 +61,8 @@ class Plain extends Phaser.State {
     this.map = new MapPlain(this.game);
 
     this.hero = new Hero({
-      x: 0,
-      y: 0,
+      x: 6,
+      y: 3,
       game: this.game,
       group: this.map.group,
       map: this.map,

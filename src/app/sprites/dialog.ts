@@ -38,6 +38,7 @@ class SpriteDialog {
   private menu: MenuSprite;
   private conversations: Conversation[];
   private subject: Human;
+  private response: any = null; // TODO: type this
 
   public id: string = null;
   public sprite: Phaser.Sprite;
@@ -88,18 +89,13 @@ class SpriteDialog {
     this.sprite.addChild(this.nameText);
     this.sprite.addChild(this.convoText);
 
-    // listen to keys
+    // TODO: find a way to unsubscribe when done. that this.sprite.alive is a hack
     this.subject.listen( 'action', () => {
       // do not proceed if it's not viewing this one
-      if (this.subject.getView() === this.id) {
+      if (this.sprite.alive && this.subject.getView() === this.id) {
         this.nextConvo();
       }
     });
-
-    this.sprite.events.onDestroy.addOnce(() => {
-      // done listening to this dialog
-      this.subject.doneView();
-    }, this);
 
     this.nextConvo();
   }
@@ -107,8 +103,8 @@ class SpriteDialog {
   nextConvo() {
     const current = this.conversations[0];
     if (!current) {
-      this.sprite.destroy();
-      return null;
+      this.done();
+      return;
     }
 
     if (current.type === 'dialog') {
@@ -128,14 +124,27 @@ class SpriteDialog {
 
       this.menu.onSelecting((selected) => {
         this.menu.doneSelecting();
-        this.conversations = current.answers[selected.answer];
-        this.nextConvo();
+
+        if (current.answers) {
+          this.conversations = current.answers[selected.answer];
+          this.nextConvo();
+        } else {
+          this.response = selected.answer;
+          this.done();
+        }
       });
     }
   }
 
-  onDone(cb) {
-    this.sprite.events.onDestroy.addOnce(cb);
+  done() {
+    this.subject.doneView();
+    this.sprite.destroy();
+  }
+
+  onDone(callback) {
+    this.sprite.events.onDestroy.addOnce(() => {
+      callback(this.response);
+    });
   }
 }
 

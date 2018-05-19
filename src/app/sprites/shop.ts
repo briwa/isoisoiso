@@ -1,14 +1,17 @@
 import Phaser from 'phaser-ce';
 
 import MenuSprite, { Option } from 'src/app/sprites/menu';
-import { Dialog } from 'src/app/sprites/dialog';
+import SpriteDialog, { Dialog } from 'src/app/sprites/dialog';
 
 import Human from 'src/app/chars/base/human';
-import { Items } from 'src/app/chars/items';
+import { Item, Items } from 'src/app/chars/items';
 
 interface Dialogs {
   opening?: Dialog;
   confirm?: Dialog;
+  cancel?: Dialog;
+  thanks?: Dialog;
+  ending?: Dialog;
 };
 
 interface Config {
@@ -33,8 +36,9 @@ class SpriteShop {
   private game: Phaser.Game;
   private description: Phaser.Text;
   private menu: MenuSprite;
-  private dialog: any;
+  private dialog: SpriteDialog;
   private items: Items;
+  private selectedItem: Item;
   private merchant: Human;
   private subject: Human;
 
@@ -110,6 +114,7 @@ class SpriteShop {
     text.push(`${effects}`); // Effect
     text.push(`Price: ${item.price} G`); // price
     this.description.text = text.join('\n');
+    this.selectedItem = item;
   }
 
   select(dialogs: Dialogs) {
@@ -119,6 +124,29 @@ class SpriteShop {
       label: this.merchant.name,
       subject: this.subject,
       dialog: dialogs.confirm,
+    });
+
+    this.dialog.onDone((response) => {
+      if (response === 'yes') {
+        // check if subject has enough money
+
+        // show a thank you message, if any
+        if (dialogs.thanks) {
+          this.merchant.showDialog({
+            label: this.merchant.name,
+            subject: this.subject,
+            dialog: dialogs.thanks,
+          });
+        }
+      } else if (response === 'no') {
+        if (dialogs.cancel) {
+          this.merchant.showDialog({
+            label: this.merchant.name,
+            subject: this.subject,
+            dialog: dialogs.cancel,
+          });
+        }
+      }
     });
   }
 
