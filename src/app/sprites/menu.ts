@@ -2,7 +2,7 @@
 // - review the process on who should be listening to the select event, should we listen to hero 'action', or this should have its own listener?
 import Phaser from 'phaser-ce';
 
-import Hero from 'src/app/chars/hero';
+import Human from 'src/app/chars/base/human';
 
 export interface Option {
   name: string;
@@ -15,7 +15,7 @@ interface Config {
   game: Phaser.Game;
   parent: Phaser.Sprite;
   options: Option[];
-  subject: Hero;
+  subject: Human;
   label?: string;
 };
 
@@ -29,7 +29,7 @@ class MenuSprite {
   private game: Phaser.Game;
   private parent: Phaser.Sprite;
   private options: Option[];
-  private subject: Hero;
+  private subject: Human;
   private group: Phaser.Sprite;
   private cursor: Phaser.Text;
   private cursorTop = cursorTop;

@@ -103,6 +103,7 @@ class SpriteDialog {
     });
 
     this.sprite.events.onDestroy.add(() => {
+      // TODO: see if this can be taken out and done in npc
       if (this.npc) {
         this.npc.doneView();
         this.npc.contact = false; // some npc stays in contact (like stationary ones), so force no contact

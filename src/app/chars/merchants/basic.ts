@@ -3,8 +3,7 @@
 import Phaser from 'phaser-ce';
 
 import Hero from 'src/app/chars/hero';
-import Npc from 'src/app/chars/base/npc';
-
+import Merchant from 'src/app/chars/base/merchant';
 import { getAll as getAllItems } from 'src/app/chars/items';
 
 import SpriteShop from 'src/app/sprites/shop';
@@ -16,7 +15,7 @@ interface Config {
   map: any;
 };
 
-class MerchantBasic extends Npc {
+class MerchantBasic extends Merchant {
   constructor({ game, group, map, hero }: Config) {
     super({
       x: 0,
@@ -25,18 +24,37 @@ class MerchantBasic extends Npc {
       game,
       group,
       map,
-      name: 'Merchant',
-      dialog: {
-        id: 'merchant-generic',
-        conversations: [],
-      },
+      name: 'Merchant Basic',
       hero,
+      items: getAllItems(),
+      dialogs: {
+        confirm: {
+          id: 'shop-confirm',
+          conversations: [{
+            id: 'shop-confirm-menu',
+            type: 'menu',
+            text: 'Are you sure you want to buy this item?',
+            options: [{
+              name: 'Yes',
+              answer: 'yes',
+            }, {
+              name: 'No',
+              answer: 'no',
+            }],
+            answers: {
+              yes: [{
+                id: '2',
+                type: 'dialog',
+                text: 'Thank you!'
+              }],
+              no: [],
+            },
+          }],
+        }
+      },
     });
 
     this.setAnimation('walk-right');
-
-    const shop = new SpriteShop({ game, hero, npc: this, items: getAllItems() });
-    // shop.sprite.visible = false;
   }
 }
 

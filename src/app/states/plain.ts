@@ -1,7 +1,7 @@
 import Phaser from 'phaser-ce';
 
 import Hero from 'src/app/chars/hero';
-import SomeDude from 'src/app/chars/villagers/some-dude';
+import SomeDude from 'src/app/chars/commoners/some-dude';
 import Merchant from 'src/app/chars/merchants/basic';
 
 import SpriteHuman from 'src/app/sprites/human';

@@ -1,16 +1,22 @@
 import Phaser from 'phaser-ce';
 
 import MenuSprite, { Option } from 'src/app/sprites/menu';
+import { Dialog } from 'src/app/sprites/dialog';
 
-import Npc from 'src/app/chars/base/npc';
-import Hero from 'src/app/chars/hero';
+import Human from 'src/app/chars/base/human';
 import { Items } from 'src/app/chars/items';
+
+interface Dialogs {
+  opening?: Dialog;
+  confirm?: Dialog;
+};
 
 interface Config {
   game: Phaser.Game;
-  hero: Hero;
-  npc: Npc;
+  subject: Human;
+  merchant: Human;
   items: Items;
+  dialogs?: Dialogs;
 };
 
 const width = 480;
@@ -27,8 +33,8 @@ class SpriteShop {
   private menu: MenuSprite;
   private dialog: any;
   private items: Items;
-  private npc: Npc;
-  private hero: Hero;
+  private merchant: Human;
+  private subject: Human;
 
   public sprite: Phaser.Sprite;
 
@@ -36,14 +42,14 @@ class SpriteShop {
     // TODO: load items sprite
   }
 
-  constructor({ game, hero, npc, items }: Config) {
+  constructor({ game, subject, merchant, items, dialogs }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;
 
     // setup
     this.game = game;
-    this.hero = hero;
-    this.npc = npc;
+    this.subject = subject;
+    this.merchant = merchant;
     this.items = items;
 
     var graphics = this.game.add.graphics(0, 0);
@@ -78,7 +84,7 @@ class SpriteShop {
     this.menu = new MenuSprite({
       id: 'shop-selection',
       game,
-      subject: hero,
+      subject: this.subject,
       parent: this.sprite,
       options: items,
     });
@@ -89,7 +95,7 @@ class SpriteShop {
     this.updateDescription();
 
     this.menu.onSelecting(() => {
-      this.onSelect();
+      this.onSelect(dialogs);
     });
   }
 
@@ -103,35 +109,13 @@ class SpriteShop {
     this.description.text = text.join('\n');
   }
 
-  onSelect() {
+  onSelect(dialogs: Dialogs) {
     const item = this.items[this.menu.selectedIndex];
 
-    this.dialog = this.npc.showDialog({
-      hero: this.hero,
-      npc: this.npc,
-      dialog: {
-        id: 'shop-confirm',
-        conversations: [{
-          id: 'shop-confirm-menu',
-          type: 'menu',
-          text: `Are you sure you want to buy \`${item.name}\` for ${item.price} G?`,
-          options: [{
-            name: 'Yes',
-            answer: 'yes',
-          }, {
-            name: 'No',
-            answer: 'no',
-          }],
-          answers: {
-            yes: [{
-              id: '2',
-              type: 'dialog',
-              text: 'Thank you!'
-            }],
-            no: [],
-          },
-        }],
-      }
+    this.dialog = this.merchant.showDialog({
+      hero: (this.subject as any),
+      npc: (this.merchant as any),
+      dialog: dialogs.confirm,
     });
   }
 }

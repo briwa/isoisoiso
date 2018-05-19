@@ -1,7 +1,7 @@
 import Phaser from 'phaser-ce';
 
 import Hero from 'src/app/chars/hero';
-import Npc from 'src/app/chars/base/npc';
+import Commoner from 'src/app/chars/base/commoner';
 
 interface Config {
   game: Phaser.Game;
@@ -43,7 +43,7 @@ const conversations = [{
   },
 }];
 
-class SomeDude extends Npc {
+class SomeDude extends Commoner {
   constructor({ game, group, map, hero }: Config) {
     super({
       x: 3,

@@ -4,9 +4,8 @@ import Human from 'src/app/chars/base/human';
 import Hero from 'src/app/chars/hero';
 
 import { MovementTrack, MovementFollow } from 'src/app/sprites/human';
-import { Dialog } from 'src/app/sprites/dialog';
 
-interface Config {
+export interface Config {
   game: Phaser.Game;
   group: Phaser.Group;
   map: any;
@@ -14,7 +13,6 @@ interface Config {
   y?: number;
   delimiter: number;
   movement?: MovementTrack | MovementFollow;
-  dialog: Dialog;
   name: string;
   hero: Hero;
 };
@@ -27,7 +25,7 @@ class Npc extends Human {
 
   public contact: boolean = false;
 
-  constructor({ x, y, game, group, map, movement, delimiter, dialog, name, hero }: Config) {
+  constructor({ x, y, game, group, map, movement, delimiter, name, hero }: Config) {
     super({
       game,
       x: x * map.tilesize,
@@ -66,20 +64,6 @@ class Npc extends Human {
         this.moveTrack(this.pause);
       }
     }
-
-    // event setup
-    // ---------------
-    hero.listen('action', () => {
-      // check if any npc is in contact
-      if (this.contact && !this.paused) {
-        this.showDialog({
-          hero,
-          dialog,
-          npc: this,
-        });
-        this.stopOppositeAnimation(hero.currentAnimation().name);
-      }
-    });
   }
 
   moveTrack(timeout: number) {
