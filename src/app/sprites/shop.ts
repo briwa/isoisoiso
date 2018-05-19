@@ -105,7 +105,6 @@ class SpriteShop {
 
   onSelect() {
     const item = this.items[this.menu.selectedIndex];
-    this.menu.toggle(false);
 
     this.dialog = this.npc.showDialog({
       hero: this.hero,
@@ -115,11 +114,7 @@ class SpriteShop {
         conversations: [{
           id: 'shop-confirm-menu',
           type: 'menu',
-          text: 'Are you sure you want to buy this item?',
-          onSelect: (subject, option) => {
-            this.menu.toggle(true);
-            return option.answer;
-          },
+          text: `Are you sure you want to buy \`${item.name}\` for ${item.price} G?`,
           options: [{
             name: 'Yes',
             answer: 'yes',

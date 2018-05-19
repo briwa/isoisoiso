@@ -22,9 +22,6 @@ const conversations = [{
   id: '3',
   type: 'menu',
   text: 'Choose an option...',
-  onSelect: (subject, item) => {
-    return item.answer;
-  },
   options: [{
     name: 'Sure, what is it?',
     answer: 'yes',

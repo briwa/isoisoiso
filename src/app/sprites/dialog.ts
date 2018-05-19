@@ -15,7 +15,6 @@ interface Conversation {
   type: string;
   text?: string;
   options?: Option[];
-  onSelect?: (subject: Hero, option: Option) => string;
   answers?: { [key: string]: Conversation[] };
 };
 
@@ -39,8 +38,8 @@ class SpriteDialog {
   private convoText: Phaser.Text;
   private menu: MenuSprite;
   private conversations: Conversation[];
+  private subject: Hero;
   private npc: Npc;
-  private hero: Hero;
 
   public sprite: Phaser.Sprite;
   public id: string = null;
@@ -55,12 +54,12 @@ class SpriteDialog {
 
     // setup
     this.game = game;
-    this.hero = hero;
+    this.subject = hero;
     this.npc = npc;
     this.id = dialog.id;
 
     // let hero know that it's viewing this dialog
-    this.hero.setView(this.id);
+    this.subject.setView(this.id);
     if (this.npc) {
       this.npc.setView(this.id);
     }
@@ -96,9 +95,9 @@ class SpriteDialog {
     this.sprite.addChild(this.convoText);
 
     // listen to keys
-    this.hero.listen( 'action', () => {
+    this.subject.listen( 'action', () => {
       // do not proceed if it's not viewing this one
-      if (this.id === this.hero.getView()) {
+      if (this.subject.getView() === this.id) {
         this.nextConvo();
       }
     });
@@ -110,7 +109,7 @@ class SpriteDialog {
       }
 
       // done listening to this dialog
-      this.hero.doneView();
+      this.subject.doneView();
     }, this);
 
     this.nextConvo();
@@ -129,20 +128,18 @@ class SpriteDialog {
     } else if (current.type === 'menu') {
       this.convoText.text = '';
       this.menu = new MenuSprite({
+        id: current.id,
         game: this.game,
         parent: this.sprite,
-        subject: this.hero,
+        subject: this.subject,
         options: current.options,
         label: current.text,
-        id: current.id,
       });
       this.menu.sprite.y = 24; // TODO: manual adjustment! maybe handle this in the child instead?
 
       this.menu.onSelecting((selected) => {
-        const answerId = current.onSelect(this.hero, selected);
         this.menu.doneSelecting();
-
-        this.conversations = current.answers[answerId];
+        this.conversations = current.answers[selected.answer];
         this.nextConvo();
       });
     }

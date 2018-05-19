@@ -16,58 +16,6 @@ interface Config {
   map: any;
 };
 
-const shapedOptions = getAllItems().map(item => ({
-  id: item.id,
-  price: item.price,
-  name: `${item.name} - ${item.price} G`,
-  answer: null,
-}));
-
-const conversations = [{
-    id: '1',
-    type: 'dialog',
-    text: 'Get the best of the items here!',
-  }, {
-    id: '2',
-    type: 'menu',
-    onSelect: (subject, item) => {
-      subject.stopOppositeAnimation();
-
-      if (item.answer === 'no') return 'no';
-
-      // check if can purchase
-      if (subject.gold >= item.price) {
-        subject.purchase(item.id);
-        return 'yes';
-      }
-
-      return 'not-enough-gold';
-    },
-    options: shapedOptions.concat([{
-      id: '-1',
-      name: 'Cancel',
-      price: null,
-      answer: 'no',
-    }]),
-    answers: {
-      yes: [{
-        id: '6',
-        type: 'dialog',
-        text: 'Thanks! Come again!'
-      }],
-      no: [{
-        id: '5',
-        type: 'dialog',
-        text: 'Oh well, that\'s fine, my kids don\'t need no food anyway. Bye.'
-      }],
-      'not-enough-gold': [{
-        id: '11',
-        type: 'dialog',
-        text: 'Not enough money, son...'
-      }],
-    },
-  }];
-
 class MerchantBasic extends Npc {
   constructor({ game, group, map, hero }: Config) {
     super({
@@ -80,14 +28,14 @@ class MerchantBasic extends Npc {
       name: 'Merchant',
       dialog: {
         id: 'merchant-generic',
-        conversations,
+        conversations: [],
       },
       hero,
     });
 
     this.setAnimation('walk-right');
 
-    // const shop = new SpriteShop({ game, hero, npc: this, items: getAllItems() });
+    const shop = new SpriteShop({ game, hero, npc: this, items: getAllItems() });
     // shop.sprite.visible = false;
   }
 }

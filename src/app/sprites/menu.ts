@@ -11,11 +11,11 @@ export interface Option {
 };
 
 interface Config {
+  id: string;
   game: Phaser.Game;
   parent: Phaser.Sprite;
   options: Option[];
   subject: Hero;
-  id?: string;
   label?: string;
 };
 
@@ -34,7 +34,6 @@ class MenuSprite {
   private cursor: Phaser.Text;
   private cursorTop = cursorTop;
   private cursorLeft = cursorLeft;
-  private enabled: boolean = true;
 
   public id: string;
   public selection;
@@ -47,12 +46,11 @@ class MenuSprite {
     if (!game) return;
 
     // setup
+    this.id = id;
     this.game = game;
     this.parent = parent;
-    this.id = id;
     this.subject = subject;
 
-    // TODO: standardize this to use either id or name
     this.subject.setView(id);
 
     // styles
@@ -100,23 +98,21 @@ class MenuSprite {
   }
 
   prev() {
-    if (!this.enabled) return;
-    this.selectedIndex = Math.max(0, this.selectedIndex - 1);
-    this.signals.selection.dispatch();
+    if (this.subject.getView() === this.id) {
+      this.selectedIndex = Math.max(0, this.selectedIndex - 1);
+      this.signals.selection.dispatch();
+    }
   }
 
   next() {
-    if (!this.enabled) return;
-    this.selectedIndex = Math.min(this.selectedIndex + 1, this.options.length - 1);
-    this.signals.selection.dispatch();
+    if (this.subject.getView() === this.id) {
+      this.selectedIndex = Math.min(this.selectedIndex + 1, this.options.length - 1);
+      this.signals.selection.dispatch();
+    }
   }
 
   updateCursor() {
     this.cursor.y = (this.selectedIndex * lineHeight) + this.cursorTop;
-  }
-
-  toggle(enabled: boolean) {
-    this.enabled = enabled;
   }
 
   onChange(callback) {
