@@ -85,7 +85,6 @@ class SpriteHuman {
     this.signals.pathsStart = new Phaser.Signal();
     this.signals.pathsFinished = new Phaser.Signal();
     this.signals.pathEnd = new Phaser.Signal();
-    this.signals.action = new Phaser.Signal();
 
     this.movement = movement;
 
@@ -186,36 +185,37 @@ class SpriteHuman {
     }
   }
 
-  showDialog({ hero, npc, conversations }: { hero: Hero, npc?: Npc, conversations?: Conversation[] }) {
+  showDialog({ hero, npc, conversations, name }: { hero: Hero, npc?: Npc, conversations?: Conversation[], name: string }) {
     this.dialog = new SpriteDialog({
       game: this.game,
       hero,
       npc,
       conversations,
+      name,
     });
   }
 
   listen(name: string, callback: Function) {
-    if (this.signals[name]) {
-      this.signals[name].add(callback, this);
-    } else {
-      throw new Error(`Cannot listen to signal '${name}'.`)
+    if (!this.signals[name]) {
+      // add them as custom signal
+      this.signals[name] = new Phaser.Signal();
     }
+
+    this.signals[name].add(callback, this);
   }
 
   listenOnce(name: string, callback: Function) {
-    if (this.signals[name]) {
-      this.signals[name].addOnce(callback, this);
-    } else {
-      throw new Error(`Cannot listen once to signal '${name}'.`)
+    if (!this.signals[name]) {
+      // add them as custom signal
+      this.signals[name] = new Phaser.Signal();
     }
+
+    this.signals[name].addOnce(callback, this);
   }
 
   dispatch(name: string, params?: any) {
     if (this.signals[name]) {
       this.signals[name].dispatch(params);
-    } else {
-      throw new Error(`Cannot dispatch signal '${name}'.`)
     }
   }
 }

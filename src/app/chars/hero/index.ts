@@ -62,6 +62,12 @@ class Hero extends Human {
     this.controls.p.onDown.add(() => {
       this.dispatch('action');
     });
+    this.controls.w.onDown.add(() => {
+      this.dispatch('up');
+    });
+    this.controls.s.onDown.add(() => {
+      this.dispatch('down');
+    });
 
     // temporary UI for inventory
     this.controls.o.onDown.add(() => {
@@ -78,6 +84,7 @@ class Hero extends Human {
         this.showDialog({
           hero: this,
           conversations: conversations,
+          name: 'ingame-menu',
         });
       }
     });

@@ -108,6 +108,7 @@ class SpriteShop {
     this.menu.toggle(false);
 
     this.dialog = this.npc.showDialog({
+      name: 'shop-confirm',
       hero: this.hero,
       npc: this.npc,
       conversations: [{
@@ -133,7 +134,7 @@ class SpriteShop {
           }],
           no: [],
         },
-      }]
+      }],
     });
   }
 }

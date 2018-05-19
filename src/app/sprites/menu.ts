@@ -17,7 +17,6 @@ interface Config {
   subject: Hero;
   id?: string;
   label?: string;
-  onSelect?: (subject: Hero, option: Option) => string;
 };
 
 const lineHeight = 15;
@@ -30,7 +29,6 @@ class MenuSprite {
   private game: Phaser.Game;
   private parent: Phaser.Sprite;
   private options: Option[];
-  private onSelect: (subject: Hero, option: Option) => string;
   private subject: Hero;
   private group: Phaser.Sprite;
   private cursor: Phaser.Text;
@@ -44,7 +42,7 @@ class MenuSprite {
   public signals: { [key: string]: Phaser.Signal } = {};
   public selectedIndex = 0;
 
-  constructor({ game, subject, parent, id, label, options, onSelect }: Config) {
+  constructor({ game, subject, parent, id, label, options }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;
 
@@ -52,8 +50,9 @@ class MenuSprite {
     this.game = game;
     this.parent = parent;
     this.id = id;
-    this.onSelect = onSelect;
     this.subject = subject;
+
+    this.subject.setView(`menu-${id}`);
 
     // styles
     const optionStyle = { font: '12px Arial', fill: '#FFFFFF' };
@@ -84,16 +83,18 @@ class MenuSprite {
 
     // publish events
     this.signals.selection = new Phaser.Signal();
+    this.signals.doneSelecting = new Phaser.Signal();
     this.signals.selection.add(this.updateCursor, this);
 
     // subscribe to events
-    this.subject.controls.s.onDown.add(this.next, this);
-    this.subject.controls.w.onDown.add(this.prev, this);
-
-    this.sprite.events.onDestroy.add(() => {
-      this.subject.controls.s.onDown.remove(this.next, this);
-      this.subject.controls.w.onDown.remove(this.prev, this);
-      this.signals.selection.removeAll();
+    this.subject.listen('up', () => {
+      this.prev();
+    });
+    this.subject.listen('down', () => {
+      this.next();
+    });
+    this.subject.listen('action', () => {
+      this.signals.doneSelecting.dispatch();
     });
   }
 
@@ -117,12 +118,21 @@ class MenuSprite {
     this.enabled = enabled;
   }
 
-  select() {
-    return this.onSelect(this.subject, this.options[this.selectedIndex]);
+  onChange(callback) {
+    this.signals.selection.add(callback);
   }
 
-  onChange(cb) {
-    this.signals.selection.add(cb);
+  onSelected(callback) {
+    this.signals.doneSelecting.add(() => {
+      callback(this.options[this.selectedIndex]);
+    });
+  }
+
+  doneSelecting() {
+    this.subject.doneView();
+    this.signals.selection.removeAll();
+    this.signals.doneSelecting.removeAll();
+    this.sprite.destroy();
   }
 }
 

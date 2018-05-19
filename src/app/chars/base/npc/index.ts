@@ -78,6 +78,7 @@ class Npc extends Human {
           hero,
           npc: this,
           conversations: this.conversations,
+          name: `${this.name}-dialog`,
         });
         this.stopOppositeAnimation(hero.currentAnimation().name);
       }

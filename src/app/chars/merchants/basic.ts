@@ -84,7 +84,7 @@ class MerchantBasic extends Npc {
 
     this.setAnimation('walk-right');
 
-    const shop = new SpriteShop({ game, hero, npc: this, items: getAllItems() });
+    // const shop = new SpriteShop({ game, hero, npc: this, items: getAllItems() });
     // shop.sprite.visible = false;
   }
 }

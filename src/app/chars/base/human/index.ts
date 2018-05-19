@@ -10,6 +10,7 @@ export interface Path {
 
 class Human extends SpriteHuman {
   private map: MapPlain;
+  private overlays: string[] = ['map'];
 
   public name: string; // max speed, don't go higher than this
   public speed: number = 100; // max speed, don't go higher than this
@@ -130,6 +131,24 @@ class Human extends SpriteHuman {
   onStopMoving() {
     this.goTo(null);
     this.dispatch('pathsFinished');
+  }
+
+  setView(overlay = null) {
+    if (overlay) {
+      this.overlays.unshift(overlay);
+    } else {
+      this.overlays.splice(0, 1);
+    }
+
+    this.paused = this.getView() !== 'map';
+  }
+
+  doneView() {
+    this.setView(null);
+  }
+
+  getView(): string {
+    return this.overlays[0];
   }
 }
 

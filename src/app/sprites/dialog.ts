@@ -19,6 +19,7 @@ interface Config {
   hero: Hero;
   npc: Npc;
   conversations: Conversation[];
+  name: string;
 };
 
 const width = 400;
@@ -38,12 +39,13 @@ class SpriteDialog {
   private hero: Hero;
 
   public sprite: Phaser.Sprite;
+  public name: string = null;
 
   static loadAssets(game: Phaser.Game) {
     // no need sprite for now
   }
 
-  constructor({ game, hero, npc, conversations }: Config) {
+  constructor({ game, hero, npc, conversations, name }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;
 
@@ -51,6 +53,13 @@ class SpriteDialog {
     this.game = game;
     this.hero = hero;
     this.npc = npc;
+    this.name = name;
+
+    // let hero know that it's viewing this dialog
+    this.hero.setView(name);
+    if (this.npc) {
+      this.npc.setView(name);
+    }
 
     var graphics = this.game.add.graphics(0, 0);
 
@@ -82,20 +91,21 @@ class SpriteDialog {
     this.sprite.addChild(this.nameText);
     this.sprite.addChild(this.convoText);
 
-    this.hero.paused = true;
-    if (this.npc) this.npc.paused = true;
-
     // listen to keys
-    this.hero.controls.p.onDown.add(this.nextConvo, this);
+    this.hero.listen( 'action', () => {
+      // do not proceed if it's not viewing this one
+      if (this.name !== this.hero.getView()) return;
+      this.nextConvo();
+    });
 
     this.sprite.events.onDestroy.add(() => {
-      this.hero.paused = false;
       if (this.npc) {
-        this.npc.paused = false;
+        this.npc.doneView();
         this.npc.contact = false; // some npc stays in contact (like stationary ones), so force no contact
       }
 
-      this.hero.controls.p.onDown.remove(this.nextConvo, this);
+      // done listening to this dialog
+      this.hero.doneView();
     }, this);
 
     this.nextConvo();
@@ -112,27 +122,24 @@ class SpriteDialog {
       this.convoText.text = this.conversations[0].text;
       this.conversations = this.conversations.slice(1);
     } else if (current.type === 'menu') {
-      // coming from pressing 'action', so it's a selection of the same menu
-      if (this.menu && this.menu.id === current.id) {
-        // get the next convo id
-        const answerId = this.menu.select();
-        this.conversations = current.answers[answerId];
-        this.menu.sprite.destroy();
+      this.convoText.text = '';
+      this.menu = new MenuSprite({
+        game: this.game,
+        parent: this.sprite,
+        subject: this.hero,
+        options: current.options,
+        label: current.text,
+        id: current.id,
+      });
+      this.menu.sprite.y = 24; // TODO: manual adjustment! maybe handle this in the child instead?
 
+      this.menu.onSelected((selected) => {
+        const answerId = current.onSelect(this.hero, selected);
+        this.menu.doneSelecting();
+
+        this.conversations = current.answers[answerId];
         this.nextConvo();
-      } else {
-        this.convoText.text = '';
-        this.menu = new MenuSprite({
-          game: this.game,
-          parent: this.sprite,
-          subject: this.hero,
-          onSelect: current.onSelect,
-          options: current.options,
-          label: current.text,
-          id: current.id,
-        });
-        this.menu.sprite.y = 24; // TODO: manual adjustment! maybe handle this in the child instead?
-      }
+      });
     }
   }
 
