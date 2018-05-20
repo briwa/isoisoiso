@@ -77,7 +77,7 @@ class Hero extends Human {
     // temporary UI for menu
     this.controls.o.onDown.add(() => {
       if (this.dialog && this.dialog.sprite.alive) {
-        this.dialog.sprite.destroy();
+        this.dialog.done();
       } else {
         const inventory = this.inventory.map(item => item.name).join('\n');
         const conversations = [{

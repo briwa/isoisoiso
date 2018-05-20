@@ -38,9 +38,9 @@ class MerchantBasic extends Merchant {
           }]
         },
         confirm: {
-          id: 'shop-confirm',
+          id: 'shop-basic-confirm',
           conversations: [{
-            id: 'shop-confirm-menu',
+            id: 'shop-basic-confirm-menu',
             type: 'menu',
             text: 'Are you sure you want to buy this item?',
             options: [{
@@ -51,6 +51,14 @@ class MerchantBasic extends Merchant {
               answer: 'no',
             }],
           }],
+        },
+        nomoney: {
+          id: 'shop-basic-nomoney',
+          conversations: [{
+            id: '1',
+            type: 'dialog',
+            text: 'You don\'t have sufficient funds.'
+          }]
         },
         thanks: {
           id: 'shop-basic-thanks',

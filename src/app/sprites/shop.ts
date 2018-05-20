@@ -4,11 +4,13 @@ import MenuSprite, { Option } from 'src/app/sprites/menu';
 import SpriteDialog, { Dialog } from 'src/app/sprites/dialog';
 
 import Human from 'src/app/chars/base/human';
+import Hero from 'src/app/chars/hero';
 import { Item, Items } from 'src/app/chars/items';
 
 interface Dialogs {
+  confirm: Dialog;
+  nomoney: Dialog;
   opening?: Dialog;
-  confirm?: Dialog;
   cancel?: Dialog;
   thanks?: Dialog;
   ending?: Dialog;
@@ -17,7 +19,7 @@ interface Dialogs {
 interface Config {
   id: string;
   game: Phaser.Game;
-  subject: Human;
+  subject: Hero;
   merchant: Human;
   items: Items;
   dialogs?: Dialogs;
@@ -40,7 +42,7 @@ class SpriteShop {
   private items: Items;
   private selectedItem: Item;
   private merchant: Human;
-  private subject: Human;
+  private subject: Hero;
 
   public sprite: Phaser.Sprite;
 
@@ -120,6 +122,17 @@ class SpriteShop {
   select(dialogs: Dialogs) {
     const item = this.items[this.menu.selectedIndex];
 
+    // check if subject has enough money
+    if (this.subject.gold < item.price) {
+      this.merchant.showDialog({
+        label: this.merchant.name,
+        subject: this.subject,
+        dialog: dialogs.nomoney,
+      });
+
+      return;
+    }
+
     this.dialog = this.merchant.showDialog({
       label: this.merchant.name,
       subject: this.subject,
@@ -128,8 +141,6 @@ class SpriteShop {
 
     this.dialog.onDone((response) => {
       if (response === 'yes') {
-        // check if subject has enough money
-
         // show a thank you message, if any
         if (dialogs.thanks) {
           this.merchant.showDialog({
@@ -146,6 +157,8 @@ class SpriteShop {
             dialog: dialogs.cancel,
           });
         }
+      } else {
+        throw new Error(`Invalid response: ${response}.`);
       }
     });
   }

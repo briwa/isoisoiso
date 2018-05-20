@@ -2,7 +2,6 @@
 // - Most of the time merchants will sit behind a desk. So the hit area should be in front of the desk. Find a way to make that happen
 import Phaser from 'phaser-ce';
 
-import Human from 'src/app/chars/base/human';
 import Hero from 'src/app/chars/hero';
 import Npc, { Config } from 'src/app/chars/base/npc';
 
@@ -11,8 +10,9 @@ import { Dialog } from 'src/app/sprites/dialog';
 
 // TODO: share this between merchant and shop
 interface Dialogs {
+  confirm: Dialog;
+  nomoney: Dialog;
   opening?: Dialog;
-  confirm?: Dialog;
   cancel?: Dialog;
   thanks?: Dialog;
   ending?: Dialog;
@@ -26,7 +26,7 @@ interface ConfigMerchant extends Config {
 
 class Merchant extends Npc {
   private shop: SpriteShop;
-  private subject: Human;
+  private subject: Hero;
   private dialogs: Dialogs;
   private items: any[];
   private shopId: string;
@@ -79,6 +79,14 @@ class Merchant extends Npc {
       this.subject.doneView();
       this.doneView();
       this.contact = false;
+
+      if (this.dialogs.ending) {
+        this.showDialog({
+          label: this.name,
+          subject: this.subject,
+          dialog: this.dialogs.ending,
+        });
+      }
     }
   }
 
