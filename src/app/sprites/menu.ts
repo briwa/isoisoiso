@@ -11,12 +11,9 @@ export interface Option {
 };
 
 interface Config {
-  id: string;
   game: Phaser.Game;
   parent: Phaser.Sprite;
-  options: Option[];
   subject: Human;
-  label?: string;
 };
 
 const lineHeight = 15;
@@ -32,6 +29,7 @@ class MenuSprite {
   private subject: Human;
   private group: Phaser.Sprite;
   private cursor: Phaser.Text;
+  private label: string;
   private cursorTop = cursorTop;
   private cursorLeft = cursorLeft;
 
@@ -41,46 +39,23 @@ class MenuSprite {
   public signals: { [key: string]: Phaser.Signal } = {};
   public selectedIndex = 0;
 
-  constructor({ game, subject, parent, id, label, options }: Config) {
+  constructor({ game, subject, parent }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;
 
     // setup
-    this.id = id;
     this.game = game;
     this.parent = parent;
     this.subject = subject;
 
-    this.subject.setView(id);
-
-    // styles
-    const optionStyle = { font: '12px Arial', fill: '#FFFFFF' };
-    const labelStyle = { font: '12px Arial', fill: '#CCCCCC' };
-
     // visual cues
-    this.options = options;
-    this.sprite = this.game.add.sprite();
+    this.sprite = this.game.make.sprite(0, 0);
+    this.parent.addChild(this.sprite);
+    this.toggle(false);
 
-    const allText = label ? [{name: label, label: true}, ...this.options] : this.options;
-    const allTextSprite = allText.map((option, idx) => {
-      return this.game.make.text(
-        marginLeft, (idx * lineHeight) + marginTop,
-        option.name,
-        option.label ? labelStyle : optionStyle,
-      );
-    });
-
-    this.cursorTop = label ? this.cursorTop + lineHeight : this.cursorTop;
-    this.cursor = this.game.make.text(this.cursorLeft, this.cursorTop, '>', optionStyle);
-
-    allTextSprite.concat([this.cursor]).forEach((text) => {
-      this.sprite.addChild(text);
-    });
-
-    // make it visible in the parent
-    parent.addChild(this.sprite);
-
-    // publish events
+    // create local listeners
+    this.signals.start = new Phaser.Signal();
+    this.signals.done = new Phaser.Signal();
     this.signals.selection = new Phaser.Signal();
     this.signals.selecting = new Phaser.Signal();
     this.signals.selection.add(this.updateCursor, this);
@@ -89,18 +64,82 @@ class MenuSprite {
     this.subject.listen('up', this.prev, this);
     this.subject.listen('down', this.next, this);
     this.subject.listen('action', this.selecting, this);
+    // this.sprite.events.onDestroy.addOnce(() => {
+    //   // remove local listeners
+    //   this.signals.selection.removeAll();
+    //   this.signals.selecting.removeAll();
+
+    //   // remove subject listeners
+    //   this.subject.removeListener('up', this.prev, this);
+    //   this.subject.removeListener('down', this.next, this);
+    //   this.subject.removeListener('action', this.selecting, this);
+    // });
   }
 
-  prev() {
-    if (this.subject.getView() === this.id) {
-      this.selectedIndex = Math.max(0, this.selectedIndex - 1);
-      this.signals.selection.dispatch();
+  createOptions(id: string, options: Option[], label?: string, ) {
+    this.id = id;
+    this.label = label;
+    this.options = options;
+
+    // clean up text children
+    // TODO: review why we can't use the Phaser.Text type, instead having to fallback to any
+    while (this.sprite.children.length) {
+      const text: any = this.sprite.children[0];
+      this.sprite.removeChild(text)
+      text.destroy();
+    }
+
+    // styles
+    const optionStyle = { font: '12px Arial', fill: '#FFFFFF' };
+    const labelStyle = { font: '12px Arial', fill: '#CCCCCC' };
+
+    const allText = this.label ? [{name: this.label, label: true}, ...this.options] : this.options;
+    const allTextSprite = allText.map((option, idx) => {
+      return this.game.make.text(
+        marginLeft, (idx * lineHeight) + marginTop,
+        option.name,
+        option.label ? labelStyle : optionStyle,
+      );
+    });
+
+    this.cursorTop = this.label ? marginTop + lineHeight : marginTop;
+    this.cursor = this.game.make.text(this.cursorLeft, this.cursorTop, '>', optionStyle);
+
+    allTextSprite.concat([this.cursor]).forEach((text) => {
+      this.sprite.addChild(text);
+    });
+  }
+
+  show() {
+    if (!this.sprite.visible) {
+      this.toggle(true);
+      this.subject.setView(this.id);
+      this.selectIndex(0);
     }
   }
 
+  hide() {
+    if (this.sprite.visible) {
+      this.toggle(false);
+      this.subject.doneView();
+    }
+  }
+
+  toggle(toggle) {
+    this.sprite.visible = toggle;
+  }
+
+  prev() {
+    this.selectIndex(this.selectedIndex - 1);
+  }
+
   next() {
+    this.selectIndex(this.selectedIndex + 1);
+  }
+
+  selectIndex(index) {
     if (this.subject.getView() === this.id) {
-      this.selectedIndex = Math.min(this.selectedIndex + 1, this.options.length - 1);
+      this.selectedIndex = Math.min(Math.max(0, index), this.options.length - 1);
       this.signals.selection.dispatch();
     }
   }
@@ -125,19 +164,10 @@ class MenuSprite {
     });
   }
 
-  doneSelecting() {
-    this.subject.doneView();
-    // remove local listeners
-    this.signals.selection.removeAll();
-    this.signals.selecting.removeAll();
-
-    // remove subject listeners
-    this.subject.removeListener('up', this.prev, this);
-    this.subject.removeListener('down', this.next, this);
-    this.subject.removeListener('action', this.selecting, this);
-
-    // finally, destroy the sprite
-    this.sprite.destroy();
+  onDone(callback) {
+    this.signals.done.addOnce(() => {
+      callback();
+    });
   }
 }
 

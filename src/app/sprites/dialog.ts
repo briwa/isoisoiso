@@ -77,6 +77,13 @@ class SpriteDialog {
     graphics.destroy();
     this.toggle(false);
 
+    this.menu = new MenuSprite({
+      game: this.game,
+      parent: this.sprite,
+      subject: this.subject,
+    });
+    this.menu.sprite.y = 24; // TODO: manual adjustment! maybe handle this in the child instead?
+
     this.conversations = dialog.conversations;
 
     // styles
@@ -107,9 +114,11 @@ class SpriteDialog {
       this.signals.reload.removeAll();
     });
 
-    // one disposable dialog could just create the dialog and forget about it
+    // open immediately
     if (immediate) {
       this.show();
+
+      // also close immediately
       this.onDone(() => {
         this.hide();
       });
@@ -152,22 +161,14 @@ class SpriteDialog {
       this.conversations = this.conversations.slice(1);
     } else if (current.type === 'menu') {
       this.convoText.text = '';
-      this.menu = new MenuSprite({
-        id: current.id,
-        game: this.game,
-        parent: this.sprite,
-        subject: this.subject,
-        options: current.options,
-        label: current.text,
-      });
-      this.menu.sprite.y = 24; // TODO: manual adjustment! maybe handle this in the child instead?
+      this.menu.createOptions(current.id, current.options, current.text);
+      this.menu.show();
 
       this.menu.onSelecting((selected) => {
-        this.menu.doneSelecting();
+        this.menu.hide();
 
         if (current.answers) {
           this.conversations = current.answers[selected.answer];
-          this.nextConvo();
         } else {
           this.response = selected.answer;
           this.signals.done.dispatch();

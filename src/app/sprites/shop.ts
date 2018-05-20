@@ -7,7 +7,7 @@ import Human from 'src/app/chars/base/human';
 import Hero from 'src/app/chars/hero';
 import { Item, Items } from 'src/app/chars/items';
 
-interface Dialogs {
+export interface Dialogs {
   confirm: Dialog;
   nomoney: Dialog;
   opening?: Dialog;
@@ -82,6 +82,7 @@ class SpriteShop {
     graphics.lineTo(160, height);
 
     this.sprite = game.world.create((game.world.bounds.width / 2) - (width / 2) - 3, marginTop, graphics.generateTexture());
+    this.toggle(false);
     graphics.destroy();
 
     const style = { font: '12px Arial', fill: '#FFFFFF', wordWrap: true, wordWrapWidth: this.sprite.width };
@@ -91,21 +92,40 @@ class SpriteShop {
     this.sprite.addChild(this.description);
 
     this.menu = new MenuSprite({
-      id,
       game,
       subject: this.subject,
       parent: this.sprite,
-      options: items,
     });
     this.menu.sprite.y = 48; // TODO: manual adjustment! maybe handle this in the child instead?
+    this.menu.createOptions(id, items);
+
     this.menu.onChange(() => {
       this.updateDescription();
     });
-    this.updateDescription();
-
     this.menu.onSelecting(() => {
       this.select(dialogs);
     });
+    this.updateDescription();
+  }
+
+  show() {
+    if (!this.sprite.visible) {
+      this.toggle(true);
+      this.menu.show();
+      this.subject.setView(this.id);
+    }
+  }
+
+  hide() {
+    if (this.sprite.visible) {
+      this.toggle(false);
+      this.menu.hide();
+      this.subject.doneView();
+    }
+  }
+
+  toggle(toggle) {
+    this.sprite.visible = toggle;
   }
 
   updateDescription() {
@@ -128,11 +148,7 @@ class SpriteShop {
         label: this.merchant.name,
         subject: this.subject,
         dialog: dialogs.nomoney,
-      });
-
-      nomoney.show();
-      nomoney.onDone(() => {
-        nomoney.hide();
+        immediate: true,
       });
 
       return;
@@ -147,6 +163,8 @@ class SpriteShop {
 
     confirm.onDone((response) => {
       if (response === 'yes') {
+        this.subject.purchase(item.id);
+
         // show a thank you message, if any
         if (dialogs.thanks) {
           this.merchant.createDialog({

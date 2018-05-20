@@ -5,22 +5,13 @@ import Phaser from 'phaser-ce';
 import Hero from 'src/app/chars/hero';
 import Npc, { Config } from 'src/app/chars/base/npc';
 
-import SpriteShop from 'src/app/sprites/shop';
+import { Items } from 'src/app/chars/items';
+import SpriteShop, { Dialogs } from 'src/app/sprites/shop';
 import SpriteDialog, { Dialog } from 'src/app/sprites/dialog';
-
-// TODO: share this between merchant and shop
-interface Dialogs {
-  confirm: Dialog;
-  nomoney: Dialog;
-  opening?: Dialog;
-  cancel?: Dialog;
-  thanks?: Dialog;
-  ending?: Dialog;
-}
 
 interface ConfigMerchant extends Config {
   shopId: string;
-  items: any[]; // TODO: type this
+  items: Items;
   dialogs?: Dialogs;
 };
 
@@ -28,16 +19,25 @@ class Merchant extends Npc {
   private shop: SpriteShop;
   private subject: Hero;
   private dialogs: Dialogs;
-  private items: any[];
+  private items: Items;
   private shopId: string;
 
   constructor(config: ConfigMerchant) {
     super(config);
 
+    this.shopId = config.shopId;
     this.subject = config.hero;
     this.dialogs = config.dialogs;
     this.items = config.items;
-    this.shopId = config.shopId;
+
+    this.shop = new SpriteShop({
+      id: this.shopId,
+      game: this.game,
+      subject: this.subject,
+      items: this.items,
+      dialogs: this.dialogs,
+      merchant: this,
+    });
 
     // event setup
     // ---------------
@@ -74,10 +74,9 @@ class Merchant extends Npc {
   }
 
   endShop() {
-    if (this.shop && this.subject.getView() === this.shopId) {
-      this.shop = this.shop.done();
+    if (this.subject.getView() === this.shopId) {
+      this.shop.hide();
 
-      this.subject.doneView();
       this.doneView();
       this.contact = false;
 
@@ -93,15 +92,7 @@ class Merchant extends Npc {
   }
 
   showShop() {
-    this.shop = new SpriteShop({
-      id: this.shopId,
-      game: this.game,
-      subject: this.subject,
-      items: this.items,
-      dialogs: this.dialogs,
-      merchant: this,
-    });
-
+    this.shop.show();
     this.setView(this.shopId);
   }
 }
