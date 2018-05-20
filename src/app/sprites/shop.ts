@@ -124,37 +124,45 @@ class SpriteShop {
 
     // check if subject has enough money
     if (this.subject.gold < item.price) {
-      this.merchant.showDialog({
+      const nomoney = this.merchant.createDialog({
         label: this.merchant.name,
         subject: this.subject,
         dialog: dialogs.nomoney,
       });
 
+      nomoney.show();
+      nomoney.onDone(() => {
+        nomoney.hide();
+      });
+
       return;
     }
 
-    this.dialog = this.merchant.showDialog({
+    const confirm = this.merchant.createDialog({
       label: this.merchant.name,
       subject: this.subject,
       dialog: dialogs.confirm,
+      immediate: true,
     });
 
-    this.dialog.onDone((response) => {
+    confirm.onDone((response) => {
       if (response === 'yes') {
         // show a thank you message, if any
         if (dialogs.thanks) {
-          this.merchant.showDialog({
+          this.merchant.createDialog({
             label: this.merchant.name,
             subject: this.subject,
             dialog: dialogs.thanks,
+            immediate: true,
           });
         }
       } else if (response === 'no') {
         if (dialogs.cancel) {
-          this.merchant.showDialog({
+          this.merchant.createDialog({
             label: this.merchant.name,
             subject: this.subject,
             dialog: dialogs.cancel,
+            immediate: true,
           });
         }
       } else {

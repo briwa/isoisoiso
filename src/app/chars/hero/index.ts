@@ -19,7 +19,6 @@ interface Config {
 class Hero extends Human {
   private inventory: any[] = [];
   private debug: boolean = false;
-  private dialog: Dialog;
 
   public controls: { [key:string]: Phaser.Key };
   public gold: number = 100;
@@ -60,6 +59,21 @@ class Hero extends Human {
       });
     }
 
+    const inventory = this.inventory.map(item => item.name).join('\n');
+    const conversations = [{
+      id: '1',
+      type: 'dialog',
+      text: `Gold: ${this.gold}\n${inventory}`,
+    }];
+
+    // this.createDialog({
+    //   subject: this,
+    //   dialog: {
+    //     id: 'ingame-menu',
+    //     conversations,
+    //   },
+    // });
+
     // register keyboard controls
     this.controls.p.onDown.add(() => {
       this.dispatch('action');
@@ -75,26 +89,13 @@ class Hero extends Human {
     });
 
     // temporary UI for menu
-    this.controls.o.onDown.add(() => {
-      if (this.dialog && this.dialog.sprite.alive) {
-        this.dialog.done();
-      } else {
-        const inventory = this.inventory.map(item => item.name).join('\n');
-        const conversations = [{
-          id: '1',
-          type: 'dialog',
-          text: `Gold: ${this.gold}\n${inventory}`,
-        }];
-
-        this.dialog = this.showDialog({
-          subject: this,
-          dialog: {
-            id: 'ingame-menu',
-            conversations: conversations,
-          },
-        });
-      }
-    });
+    // this.controls.o.onDown.add(() => {
+    //   if (this.dialog && this.getView() === this.dialog.id ) {
+    //     this.dialog.hide();
+    //   } else {
+    //     this.dialog.show();
+    //   }
+    // });
 
     // DEBUGGING
     this.controls[','].onDown.add(() => {

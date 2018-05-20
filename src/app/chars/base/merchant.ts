@@ -6,7 +6,7 @@ import Hero from 'src/app/chars/hero';
 import Npc, { Config } from 'src/app/chars/base/npc';
 
 import SpriteShop from 'src/app/sprites/shop';
-import { Dialog } from 'src/app/sprites/dialog';
+import SpriteDialog, { Dialog } from 'src/app/sprites/dialog';
 
 // TODO: share this between merchant and shop
 interface Dialogs {
@@ -57,10 +57,11 @@ class Merchant extends Npc {
       this.stopOppositeAnimation(this.subject.currentAnimation().name);
 
       if (this.dialogs.opening) {
-        const opening = this.showDialog({
+        const opening = this.createDialog({
           label: this.name,
           subject: this.subject,
           dialog: this.dialogs.opening,
+          immediate: true,
         });
 
         opening.onDone(() => {
@@ -81,10 +82,11 @@ class Merchant extends Npc {
       this.contact = false;
 
       if (this.dialogs.ending) {
-        this.showDialog({
+        this.createDialog({
           label: this.name,
           subject: this.subject,
           dialog: this.dialogs.ending,
+          immediate: true,
         });
       }
     }

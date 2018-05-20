@@ -184,12 +184,13 @@ class SpriteHuman {
     }
   }
 
-  showDialog({ label, subject, dialog }: { label?: string, subject: Human, dialog: Dialog }) {
+  createDialog({ label, subject, dialog, immediate }: { label?: string, subject: Human, dialog: Dialog, immediate?: boolean }) {
     return new SpriteDialog({
       game: this.game,
       label,
       subject,
       dialog,
+      immediate,
     });
   }
 

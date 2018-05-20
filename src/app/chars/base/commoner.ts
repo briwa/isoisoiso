@@ -3,45 +3,45 @@ import Phaser from 'phaser-ce';
 import Human from 'src/app/chars/base/human';
 import Npc, { Config } from 'src/app/chars/base/npc';
 
-import { Dialog } from 'src/app/sprites/dialog';
+import SpriteDialog, { Dialog } from 'src/app/sprites/dialog';
 
 interface ConfigCommoner extends Config {
   dialog: Dialog;
 };
 
 class Commoner extends Npc {
-  private subject: Human;
-  private dialog: Dialog;
+  private dialog: SpriteDialog;
+
   constructor(config: ConfigCommoner) {
     super(config);
 
-    this.subject = config.hero;
-    this.dialog = config.dialog;
+    this.dialog = this.createDialog({
+      label: this.name,
+      subject: config.hero,
+      dialog: config.dialog,
+    });
 
     // event setup
     // ---------------
-    this.subject.listen('action', this.startDialog, this);
+    this.dialog.subject.listen('action', this.startDialog, this);
 
     // clear event on destroy
     this.sprite.events.onDestroy.addOnce(() => {
-      this.subject.removeListener('action', this.startDialog, this);
+      this.dialog.subject.removeListener('action', this.startDialog, this);
     });
   }
 
   startDialog() {
     // check if any npc is in contact
     if (this.contact && this.inMap()) {
-      const dialog = this.showDialog({
-        label: this.name,
-        subject: this.subject,
-        dialog: this.dialog,
-      });
+      this.dialog.show();
 
       // make sure the commoner is facing whatever subject is facing
-      this.stopOppositeAnimation(this.subject.currentAnimation().name);
-      this.setView(dialog.id);
+      this.stopOppositeAnimation(this.dialog.subject.currentAnimation().name);
+      this.setView(this.dialog.id);
 
-      dialog.onDone(() => {
+      this.dialog.onDone(() => {
+        this.dialog.hide()
         this.doneView();
         this.contact = false;
       });

@@ -22,6 +22,7 @@ interface Config {
   subject: Human;
   dialog: Dialog;
   label?: string;
+  immediate?: boolean;
 };
 
 const width = 400;
@@ -37,27 +38,26 @@ class SpriteDialog {
   private convoText: Phaser.Text;
   private menu: MenuSprite;
   private conversations: Conversation[];
-  private subject: Human;
-  private response: any = null; // TODO: type this
+  private signals: { [key:string]: Phaser.Signal } = {};
+  private response: string = null; // TODO: type this
+  private index: number = 0;
 
   public id: string = null;
+  public subject: Human;
   public sprite: Phaser.Sprite;
 
   static loadAssets(game: Phaser.Game) {
     // no need sprite for now
   }
 
-  constructor({ game, subject, label, dialog }: Config) {
+  constructor({ game, subject, label, dialog, immediate }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;
 
     // setup
+    this.id = dialog.id;
     this.game = game;
     this.subject = subject;
-    this.id = dialog.id;
-
-    // let hero know that it's viewing this dialog
-    this.subject.setView(this.id);
 
     var graphics = this.game.add.graphics(0, 0);
 
@@ -75,6 +75,7 @@ class SpriteDialog {
 
     this.sprite = game.world.create((game.world.bounds.width / 2) - (width / 2), game.world.bounds.height / 2, graphics.generateTexture());
     graphics.destroy();
+    this.toggle(false);
 
     this.conversations = dialog.conversations;
 
@@ -89,19 +90,60 @@ class SpriteDialog {
     this.sprite.addChild(this.nameText);
     this.sprite.addChild(this.convoText);
 
-    this.subject.listen( 'action', this.nextConvo, this);
+    // create local listeners
+    this.signals.start = new Phaser.Signal();
+    this.signals.done = new Phaser.Signal();
 
-    // trigger the first conversation
-    this.nextConvo();
+    // listening
+    this.subject.listen( 'action', this.nextConvo, this);
+    this.signals.start.add(() => {
+      this.conversations = dialog.conversations;
+      this.nextConvo();
+    });
+    this.sprite.events.onDestroy.addOnce(() => {
+      this.subject.removeListener('action', this.nextConvo, this);
+      this.signals.start.removeAll();
+      this.signals.done.removeAll();
+      this.signals.reload.removeAll();
+    });
+
+    // one disposable dialog could just create the dialog and forget about it
+    if (immediate) {
+      this.show();
+      this.onDone(() => {
+        this.hide();
+      });
+    }
+  }
+
+  show() {
+    if (!this.sprite.visible) {
+      this.toggle(true);
+      this.subject.setView(this.id);
+      this.signals.start.dispatch();
+    }
+  }
+
+  hide() {
+    if (this.sprite.visible) {
+      this.toggle(false);
+      this.subject.doneView();
+    }
+  }
+
+  toggle(toggle) {
+    this.sprite.visible = toggle;
   }
 
   nextConvo() {
-    // check if we can proceed
-    if (this.subject.getView() !== this.id) return;
+    // check if's being viewed
+    if (this.subject.getView() !== this.id) {
+      return;
+    }
 
     const current = this.conversations[0];
     if (!current) {
-      this.done();
+      this.signals.done.dispatch();
       return;
     }
 
@@ -128,21 +170,14 @@ class SpriteDialog {
           this.nextConvo();
         } else {
           this.response = selected.answer;
-          this.done();
+          this.signals.done.dispatch();
         }
       });
     }
   }
 
-  done() {
-    this.subject.doneView();
-    this.subject.removeListener('action', this.nextConvo, this);
-
-    this.sprite.destroy();
-  }
-
   onDone(callback) {
-    this.sprite.events.onDestroy.addOnce(() => {
+    this.signals.done.addOnce(() => {
       callback(this.response);
     });
   }
