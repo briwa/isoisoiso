@@ -89,18 +89,16 @@ class SpriteDialog {
     this.sprite.addChild(this.nameText);
     this.sprite.addChild(this.convoText);
 
-    // TODO: find a way to unsubscribe when done. that this.sprite.alive is a hack
-    this.subject.listen( 'action', () => {
-      // do not proceed if it's not viewing this one
-      if (this.sprite.alive && this.subject.getView() === this.id) {
-        this.nextConvo();
-      }
-    });
+    this.subject.listen( 'action', this.nextConvo, this);
 
+    // trigger the first conversation
     this.nextConvo();
   }
 
   nextConvo() {
+    // check if we can proceed
+    if (this.subject.getView() !== this.id) return;
+
     const current = this.conversations[0];
     if (!current) {
       this.done();
@@ -138,6 +136,8 @@ class SpriteDialog {
 
   done() {
     this.subject.doneView();
+    this.subject.removeListener('action', this.nextConvo, this);
+
     this.sprite.destroy();
   }
 

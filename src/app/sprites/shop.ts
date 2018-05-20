@@ -89,7 +89,7 @@ class SpriteShop {
     this.sprite.addChild(this.description);
 
     this.menu = new MenuSprite({
-      id: 'shop-selection',
+      id,
       game,
       subject: this.subject,
       parent: this.sprite,

@@ -46,10 +46,10 @@ export interface Config {
 };
 
 class SpriteHuman {
-  private game: Phaser.Game;
   private tilesize: number;
   private signals: { [key:string]: Phaser.Signal } = {};
 
+  public game: Phaser.Game;
   public anchorX: number = 1/4;
   public anchorY: number = 1/4;
   public sprite: Phaser.Plugin.Isometric.IsoSprite;
@@ -81,9 +81,9 @@ class SpriteHuman {
     this.sprite.body.collideWorldBounds = true;
 
     // events
-    this.signals.pathsStart = new Phaser.Signal();
-    this.signals.pathsFinished = new Phaser.Signal();
-    this.signals.pathEnd = new Phaser.Signal();
+    this.createListener('pathsStart');
+    this.createListener('pathsFinished');
+    this.createListener('pathEnd');
 
     this.movement = movement;
 
@@ -193,22 +193,30 @@ class SpriteHuman {
     });
   }
 
-  listen(name: string, callback: Function) {
-    if (!this.signals[name]) {
-      // add them as custom signal
-      this.signals[name] = new Phaser.Signal();
-    }
-
-    this.signals[name].add(callback, this);
+  createListener(name: string) {
+     this.signals[name] = new Phaser.Signal();
   }
 
-  listenOnce(name: string, callback: Function) {
+  removeListener(name: string, callback: Function, context?: any) {
+    this.signals[name].remove(callback, context || this);
+  }
+
+  listen(name: string, callback: Function, context?: any) {
     if (!this.signals[name]) {
       // add them as custom signal
-      this.signals[name] = new Phaser.Signal();
+      this.createListener(name);
     }
 
-    this.signals[name].addOnce(callback, this);
+    this.signals[name].add(callback, context || this);
+  }
+
+  listenOnce(name: string, callback: Function, context?: any) {
+    if (!this.signals[name]) {
+      // add them as custom signal
+      this.createListener(name);
+    }
+
+    this.signals[name].addOnce(callback, context || this);
   }
 
   dispatch(name: string, params?: any) {

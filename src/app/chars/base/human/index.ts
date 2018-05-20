@@ -133,8 +133,10 @@ class Human extends SpriteHuman {
 
   setView(overlay = null) {
     if (overlay) {
+      // put them at the first of the array for easy access
       this.overlays.unshift(overlay);
     } else {
+      // remove the currently viewed (first of the array)
       this.overlays.splice(0, 1);
     }
   }

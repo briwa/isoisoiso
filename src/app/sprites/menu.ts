@@ -82,19 +82,13 @@ class MenuSprite {
 
     // publish events
     this.signals.selection = new Phaser.Signal();
-    this.signals.doneSelecting = new Phaser.Signal();
+    this.signals.selecting = new Phaser.Signal();
     this.signals.selection.add(this.updateCursor, this);
 
     // subscribe to events
-    this.subject.listen('up', () => {
-      this.prev();
-    });
-    this.subject.listen('down', () => {
-      this.next();
-    });
-    this.subject.listen('action', () => {
-      this.signals.doneSelecting.dispatch();
-    });
+    this.subject.listen('up', this.prev, this);
+    this.subject.listen('down', this.next, this);
+    this.subject.listen('action', this.selecting, this);
   }
 
   prev() {
@@ -111,6 +105,10 @@ class MenuSprite {
     }
   }
 
+  selecting() {
+    this.signals.selecting.dispatch();
+  }
+
   updateCursor() {
     this.cursor.y = (this.selectedIndex * lineHeight) + this.cursorTop;
   }
@@ -120,7 +118,7 @@ class MenuSprite {
   }
 
   onSelecting(callback) {
-    this.signals.doneSelecting.add(() => {
+    this.signals.selecting.add(() => {
       if (this.subject.getView() === this.id) {
         callback(this.options[this.selectedIndex]);
       }
@@ -129,8 +127,16 @@ class MenuSprite {
 
   doneSelecting() {
     this.subject.doneView();
+    // remove local listeners
     this.signals.selection.removeAll();
-    this.signals.doneSelecting.removeAll();
+    this.signals.selecting.removeAll();
+
+    // remove subject listeners
+    this.subject.removeListener('up', this.prev, this);
+    this.subject.removeListener('down', this.next, this);
+    this.subject.removeListener('action', this.selecting, this);
+
+    // finally, destroy the sprite
     this.sprite.destroy();
   }
 }
