@@ -1,26 +1,16 @@
 // TODO:
 // - get this from db next time
-interface ItemBase {
+export interface Item {
   id: string;
   name: string;
   type: string; // TODO: type this
   description: string;
   price: number;
+  consumable: boolean;
   effects: { property: string; value: number }[];
 };
 
-interface Equippable extends ItemBase {
-  type: 'weapon' | 'armor' | 'accessory';
-  consumable: false;
-};
-
-interface Consumable extends ItemBase {
-  type: 'consumable';
-  consumable: true;
-};
-
-export type Items = Array<Equippable | Consumable>;
-export type Item = Equippable | Consumable;
+export type Items = Item[];
 
 const items: Items = [{
   id: '1',

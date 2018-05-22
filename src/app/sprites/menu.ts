@@ -64,16 +64,16 @@ class MenuSprite {
     this.subject.listen('up', this.prev, this);
     this.subject.listen('down', this.next, this);
     this.subject.listen('action', this.selecting, this);
-    // this.sprite.events.onDestroy.addOnce(() => {
-    //   // remove local listeners
-    //   this.signals.selection.removeAll();
-    //   this.signals.selecting.removeAll();
+    this.sprite.events.onDestroy.addOnce(() => {
+      // remove local listeners
+      this.signals.selection.removeAll();
+      this.signals.selecting.removeAll();
 
-    //   // remove subject listeners
-    //   this.subject.removeListener('up', this.prev, this);
-    //   this.subject.removeListener('down', this.next, this);
-    //   this.subject.removeListener('action', this.selecting, this);
-    // });
+      // remove subject listeners
+      this.subject.removeListener('up', this.prev, this);
+      this.subject.removeListener('down', this.next, this);
+      this.subject.removeListener('action', this.selecting, this);
+    });
   }
 
   createOptions(id: string, options: Option[], label?: string, ) {

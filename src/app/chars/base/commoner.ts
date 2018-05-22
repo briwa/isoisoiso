@@ -10,11 +10,13 @@ interface ConfigCommoner extends Config {
 };
 
 class Commoner extends Npc {
+  private subject: Human;
   private dialog: SpriteDialog;
 
   constructor(config: ConfigCommoner) {
     super(config);
 
+    this.subject = config.hero;
     this.dialog = this.createDialog({
       label: this.name,
       subject: config.hero,
@@ -33,7 +35,7 @@ class Commoner extends Npc {
 
   startDialog() {
     // check if any npc is in contact
-    if (this.contact && this.inMap()) {
+    if (this.contact && this.subject.inMap()) {
       this.dialog.show();
 
       // make sure the commoner is facing whatever subject is facing

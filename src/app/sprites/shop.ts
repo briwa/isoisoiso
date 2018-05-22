@@ -61,7 +61,7 @@ class SpriteShop {
     this.merchant = merchant;
     this.items = items;
 
-    var graphics = this.game.add.graphics(0, 0);
+    const graphics = this.game.add.graphics(0, 0);
 
     // set a fill and line style
     graphics.beginFill(0x333333);
@@ -81,9 +81,11 @@ class SpriteShop {
     graphics.moveTo(160, 40);
     graphics.lineTo(160, height);
 
-    this.sprite = game.world.create((game.world.bounds.width / 2) - (width / 2) - 3, marginTop, graphics.generateTexture());
-    this.toggle(false);
+    const texture = graphics.generateTexture();
     graphics.destroy();
+
+    this.sprite = game.world.create((game.world.bounds.width / 2) - (width / 2) - 3, marginTop, texture);
+    this.toggle(false);
 
     const style = { font: '12px Arial', fill: '#FFFFFF', wordWrap: true, wordWrapWidth: this.sprite.width };
     this.description = this.game.make.text(160 + 12, 40 + 8, '', style);
@@ -187,11 +189,6 @@ class SpriteShop {
         throw new Error(`Invalid response: ${response}.`);
       }
     });
-  }
-
-  done() {
-    this.sprite.destroy();
-    return null;
   }
 }
 
