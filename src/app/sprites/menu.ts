@@ -11,7 +11,7 @@ export interface Option {
 interface Config {
   id: string;
   game: Phaser.Game;
-  parent: Phaser.Sprite;
+  parent: Phaser.Sprite | Phaser.Group;
   subject: Human;
 };
 
@@ -23,7 +23,7 @@ const cursorTop = 0;
 
 class SpriteMenu {
   private game: Phaser.Game;
-  private parent: Phaser.Sprite;
+  private parent: Phaser.Sprite | Phaser.Group;
   private options: Option[];
   private subject: Human;
   private optionText: Phaser.Group;
@@ -92,7 +92,10 @@ class SpriteMenu {
 
     return {
       ...option,
-      bounds: text.getBounds(),
+      x: text.x,
+      y: text.y,
+      width: text.width,
+      height: lineHeight,
     };
   }
 
@@ -114,7 +117,7 @@ class SpriteMenu {
 
     // styles
     const optionStyle = { font: '12px Arial', fill: '#FFFFFF' };
-    const allTextSprite = this.options.map((option, idx) => {
+    const textSprites = this.options.map((option, idx) => {
       return this.game.make.text(
         marginLeft, (idx * lineHeight) + marginTop,
         option.name,
@@ -125,7 +128,7 @@ class SpriteMenu {
     this.cursorTop = marginTop;
     this.cursor = this.game.make.text(this.cursorLeft, this.cursorTop, '>', optionStyle);
 
-    allTextSprite.forEach((text) => {
+    textSprites.forEach((text) => {
       this.optionText.addChild(text);
     });
 

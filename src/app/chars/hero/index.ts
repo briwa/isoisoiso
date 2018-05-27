@@ -108,10 +108,11 @@ class Hero extends Human {
     });
 
     this.controls.o.onDown.add(() => {
-      if (!this.ingame.sprite.visible) {
+      if (!this.ingame.sprite.visible && this.inMap) {
         this.ingame.show();
       } else {
         this.ingame.hide();
+        this.resetView(); // force to always show the map
       }
     });
 
@@ -136,31 +137,50 @@ class Hero extends Human {
     });
   }
 
-  setEquipped(id, equipped) {
+  setEquipped(id: string, equipped: boolean) {
     const item = this.inventory.filter(i => id === i.id)[0];
     item.equipped = equipped;
   }
 
-  equip(id: string, place: string) {
+  useItem(item: Inventory) {
+    if (!item.consumable) return;
+    this.applyItemEffect(item.id);
+  }
+
+  discardItem(item: Inventory) {
+    if (item.equipped) return;
+    this.inventory = this.inventory.filter(i => item.id !== i.id);
+  }
+
+  equipItem(id: string) {
     const item = getItem(id);
     if (item.consumable) return; // shouldn't be able to equip a consumable
 
-    this.equipment[place] = item;
-    item.effects.forEach((effect) => {
-      this.status[effect.property] = this.status[effect.property] + effect.value;
-    });
+    // unequip the existing one first
+    if (this.equipment[item.type]) {
+      this.unequipItem(this.equipment[item.type].id);
+    }
+
+    this.equipment[item.type] = item;
+    this.applyItemEffect(item.id);
     this.setEquipped(id, true);
   }
 
-  unequip(id: string, place: string) {
+  unequipItem(id: string) {
     const item = getItem(id);
     if (item.consumable) return; // shouldn't be able to equip a consumable
 
-    this.equipment[place] = null;
-    item.effects.forEach((effect) => {
-      this.status[effect.property] = this.status[effect.property] - effect.value;
-    });
+    this.equipment[item.type] = null;
+    this.applyItemEffect(item.id, true);
     this.setEquipped(id, false);
+  }
+
+  applyItemEffect(id: string, negate = false) {
+    const item = getItem(id);
+
+    item.effects.forEach((effect) => {
+      this.status[effect.property] = this.status[effect.property] + (effect.value * (negate ? -1 : 1));
+    });
   }
 }
 

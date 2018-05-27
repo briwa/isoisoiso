@@ -45,6 +45,17 @@ const items: Items = [{
     property: 'def',
     value: 100
   }]
+}, {
+  id: '4',
+  name: 'Copper Sword',
+  type: 'weapon',
+  consumable: false,
+  description: 'A better toy sword.',
+  price: 650,
+  effects: [{
+    property: 'atk',
+    value: 150
+  }]
 }];
 
 export const get = (id: string) => {

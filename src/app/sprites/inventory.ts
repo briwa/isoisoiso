@@ -28,7 +28,7 @@ class SpriteInventory {
   private parent: Phaser.Sprite;
   private items: SpriteMenu;
   private subject: Hero;
-  private actionOptions: SpriteOptions;
+  private action: SpriteOptions;
 
   public sprite: Phaser.Sprite;
 
@@ -50,8 +50,6 @@ class SpriteInventory {
     this.parent.addChild(this.sprite);
     this.toggle(false);
 
-    const style = { font: '12px Arial', fill: '#FFFFFF', wordWrap: true, wordWrapWidth: this.sprite.width };
-
     this.items = new SpriteMenu({
       id,
       game,
@@ -65,30 +63,46 @@ class SpriteInventory {
     });
     this.items.onSelecting((response) => {
       // go to submenu
-      this.actionOptions.createOptions(
-        response.bounds.x,
-        response.bounds.y,
-        [{
-          id: '1',
-          text: 'Use'
-        }, {
-          id: '2',
-          text: 'Discard'
-        }]
-      );
-
-      this.actionOptions.show();
+      this.action.setActions(response);
+      this.action.show();
     });
     this.items.onCancel(() => {
       // go back to the previous menu
       this.hide();
     });
 
-    this.actionOptions = new SpriteOptions({
+    this.action = new SpriteOptions({
       id : 'ingame-options',
       game,
-      subject,
-      parent,
+      subject : this.subject,
+      parent : this.sprite,
+    });
+
+    this.action.menu.onSelecting((response) => {
+      const context = this.action.context;
+      switch(response.name) {
+        case 'Use':
+          this.subject.useItem(context);
+          this.subject.discardItem(context);
+          this.items.createOptions(this.subject.inventory); // repopulate list after discard
+          break;
+        case 'Discard':
+          this.subject.discardItem(context);
+          this.items.createOptions(this.subject.inventory);
+          break;
+        case 'Equip':
+          this.subject.equipItem(context.id);
+          break;
+        case 'Unequip':
+          this.subject.unequipItem(context.id);
+          break;
+      }
+
+      this.action.hide();
+    });
+    this.action.menu.onCancel((response) => {
+      // go to submenu
+      this.action.hide();
     });
   }
 

@@ -78,7 +78,7 @@ class SpriteDialog {
     this.toggle(false);
 
     this.menu = new SpriteMenu({
-      id: 'dialog-menu',
+      id: `${dialog.id}-menu`,
       game: this.game,
       parent: this.sprite,
       subject: this.subject,

@@ -171,6 +171,10 @@ class Human extends SpriteHuman {
     this.view = null;
   }
 
+  resetView() {
+    this.overlays = ['map'];
+  }
+
   // events
   createListener(name: string, id = 'map') {
     if (!this.signals[name]) {
