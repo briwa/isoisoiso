@@ -1,5 +1,3 @@
-// TODO:
-// - review the process on who should be listening to the select event, should we listen to hero 'action', or this should have its own listener?
 import Phaser from 'phaser-ce';
 
 import Human from 'src/app/chars/base/human';
@@ -22,14 +20,15 @@ const marginLeft = 24;
 const cursorLeft = 12;
 const cursorTop = 0;
 
-class MenuSprite {
+class SpriteMenu {
   private game: Phaser.Game;
   private parent: Phaser.Sprite;
   private options: Option[];
   private subject: Human;
-  private group: Phaser.Sprite;
+  private optionText: Phaser.Group;
   private cursor: Phaser.Text;
   private label: string;
+  private labelText: Phaser.Text;
   private cursorTop = cursorTop;
   private cursorLeft = cursorLeft;
 
@@ -58,22 +57,45 @@ class MenuSprite {
     this.signals.done = new Phaser.Signal();
     this.signals.selection = new Phaser.Signal();
     this.signals.selecting = new Phaser.Signal();
+    this.signals.cancel = new Phaser.Signal();
     this.signals.selection.add(this.updateCursor, this);
 
     // subscribe to events
     this.subject.listen('up', this.prev, this);
     this.subject.listen('down', this.next, this);
     this.subject.listen('action', this.selecting, this);
+    this.subject.listen('cancel', this.cancel, this);
     this.sprite.events.onDestroy.addOnce(() => {
       // remove local listeners
+      this.signals.start.removeAll();
+      this.signals.done.removeAll();
       this.signals.selection.removeAll();
       this.signals.selecting.removeAll();
+      this.signals.cancel.removeAll();
 
       // remove subject listeners
       this.subject.removeListener('up', this.prev, this);
       this.subject.removeListener('down', this.next, this);
       this.subject.removeListener('action', this.selecting, this);
+      this.subject.removeListener('cancel', this.cancel, this);
     });
+  }
+
+  get selected() {
+    const option = this.options[this.selectedIndex];
+    // TODO: seems like this was incorrectly typed by Phaser to pixi.displayObject
+    // where it was supposed to be just Phaser.Sprite, hence missing properties
+    // type it to any for now
+    const text: any = this.optionText.children[this.selectedIndex];
+
+    return {
+      ...option,
+      bounds: text.getBounds(),
+    };
+  }
+
+  get inView() {
+    return this.sprite.visible && this.subject.view === this.id;
   }
 
   createOptions(id: string, options: Option[], label?: string, ) {
@@ -89,31 +111,35 @@ class MenuSprite {
       text.destroy();
     }
 
+    // recreating the group
+    this.optionText = this.game.add.group();
+    this.sprite.addChild(this.optionText);
+
     // styles
     const optionStyle = { font: '12px Arial', fill: '#FFFFFF' };
-    const labelStyle = { font: '12px Arial', fill: '#CCCCCC' };
-
-    const allText = this.label ? [{name: this.label, label: true}, ...this.options] : this.options;
-    const allTextSprite = allText.map((option, idx) => {
+    const allTextSprite = this.options.map((option, idx) => {
       return this.game.make.text(
         marginLeft, (idx * lineHeight) + marginTop,
         option.name,
-        option.label ? labelStyle : optionStyle,
+        optionStyle,
       );
     });
 
-    this.cursorTop = this.label ? marginTop + lineHeight : marginTop;
+    this.cursorTop = marginTop;
     this.cursor = this.game.make.text(this.cursorLeft, this.cursorTop, '>', optionStyle);
 
-    allTextSprite.concat([this.cursor]).forEach((text) => {
-      this.sprite.addChild(text);
+    allTextSprite.forEach((text) => {
+      this.optionText.addChild(text);
     });
+
+    this.sprite.addChild(this.cursor);
+    this.sprite.addChild(this.optionText);
   }
 
   show() {
     if (!this.sprite.visible) {
       this.toggle(true);
-      this.subject.setView(this.id);
+      this.subject.view = this.id;
       this.selectIndex(0);
     }
   }
@@ -138,7 +164,7 @@ class MenuSprite {
   }
 
   selectIndex(index) {
-    if (this.subject.getView() === this.id) {
+    if (this.inView) {
       this.selectedIndex = Math.min(Math.max(0, index), this.options.length - 1);
       this.signals.selection.dispatch();
     }
@@ -148,8 +174,16 @@ class MenuSprite {
     this.signals.selecting.dispatch();
   }
 
+  cancel() {
+    this.signals.cancel.dispatch();
+  }
+
   updateCursor() {
     this.cursor.y = (this.selectedIndex * lineHeight) + this.cursorTop;
+  }
+
+  onCancel(callback) {
+    this.signals.cancel.add(callback);
   }
 
   onChange(callback) {
@@ -158,9 +192,7 @@ class MenuSprite {
 
   onSelecting(callback) {
     this.signals.selecting.add(() => {
-      if (this.subject.getView() === this.id) {
-        callback(this.options[this.selectedIndex]);
-      }
+      if (this.inView) callback(this.selected);
     });
   }
 
@@ -171,4 +203,4 @@ class MenuSprite {
   }
 }
 
-export default MenuSprite;
+export default SpriteMenu;

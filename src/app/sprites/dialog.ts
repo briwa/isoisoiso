@@ -1,6 +1,6 @@
 import Phaser from 'phaser-ce';
 
-import MenuSprite, { Option } from 'src/app/sprites/menu';
+import SpriteMenu, { Option } from 'src/app/sprites/menu';
 
 import Human from 'src/app/chars/base/human';
 
@@ -36,7 +36,7 @@ class SpriteDialog {
   private game: Phaser.Game;
   private nameText: Phaser.Text;
   private convoText: Phaser.Text;
-  private menu: MenuSprite;
+  private menu: SpriteMenu;
   private conversations: Conversation[];
   private signals: { [key:string]: Phaser.Signal } = {};
   private response: string = null; // TODO: type this
@@ -77,7 +77,7 @@ class SpriteDialog {
     graphics.destroy();
     this.toggle(false);
 
-    this.menu = new MenuSprite({
+    this.menu = new SpriteMenu({
       game: this.game,
       parent: this.sprite,
       subject: this.subject,
@@ -128,7 +128,7 @@ class SpriteDialog {
   show() {
     if (!this.sprite.visible) {
       this.toggle(true);
-      this.subject.setView(this.id);
+      this.subject.view = this.id;
       this.signals.start.dispatch();
     }
   }
@@ -146,7 +146,7 @@ class SpriteDialog {
 
   nextConvo() {
     // check if's being viewed
-    if (this.subject.getView() !== this.id) {
+    if (this.subject.view !== this.id) {
       return;
     }
 

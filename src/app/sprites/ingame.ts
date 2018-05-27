@@ -23,13 +23,13 @@ const lineSpacing = -8;
 
 const submenu = [{
   id: '1',
-  name: 'Items'
+  name: 'Inventory'
 }, {
   id: '2',
   name: 'Stats'
 }, {
   id: '3',
-  name: 'Options'
+  name: 'Settings'
 }];
 
 class SpriteIngame {
@@ -88,16 +88,19 @@ class SpriteIngame {
       parent: this.sprite,
     });
     this.submenu.sprite.y = 48; // TODO: manual adjustment! maybe handle this in the child instead?
-    this.submenu.createOptions(id, submenu);
+    this.submenu.createOptions('ingame-submenu', submenu);
 
     this.submenu.onChange(() => {
       // switch the submenu
     });
-    this.submenu.onSelecting(() => {
+    this.submenu.onSelecting((response) => {
       // go to submenu
+      if (response.name === 'Inventory') {
+        this.inventory.show();
+      }
     });
 
-    // items
+    // Inventory
     // -----------------
     this.inventory = new SpriteInventory({
       id: 'ingame-items',
@@ -111,8 +114,7 @@ class SpriteIngame {
   show() {
     if (!this.sprite.visible) {
       this.toggle(true);
-      this.submenu.show();
-      this.subject.setView(this.id);
+      this.submenu.show(); // then show the submenu
     }
   }
 
@@ -120,7 +122,6 @@ class SpriteIngame {
     if (this.sprite.visible) {
       this.toggle(false);
       this.submenu.hide();
-      this.subject.doneView();
     }
   }
 

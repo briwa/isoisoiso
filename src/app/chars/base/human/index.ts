@@ -23,6 +23,24 @@ class Human extends SpriteHuman {
     this.map = config.map;
   }
 
+  get view() {
+    return this.overlays[0];
+  }
+
+  get inMap() {
+    return this.overlays[0] === 'map';
+  }
+
+  set view(overlay) {
+    if (overlay) {
+      // put them at the first of the array for easy access
+      this.overlays.unshift(overlay);
+    } else {
+      // remove the currently viewed (first of the array)
+      this.overlays.splice(0, 1);
+    }
+  }
+
   registerMovement() {
     switch (this.movement.type) {
       case 'mouse':
@@ -68,7 +86,7 @@ class Human extends SpriteHuman {
 
   movePaths() {
     // do not move when it's not in the map
-    if (!this.inMap()) {
+    if (!this.inMap) {
       return false;
     }
 
@@ -102,7 +120,7 @@ class Human extends SpriteHuman {
 
   moveKeys() {
     // do not move when it's not in the map
-    if (!this.inMap()) {
+    if (!this.inMap) {
       return false;
     }
 
@@ -131,26 +149,8 @@ class Human extends SpriteHuman {
     this.dispatch('pathsFinished');
   }
 
-  setView(overlay = null) {
-    if (overlay) {
-      // put them at the first of the array for easy access
-      this.overlays.unshift(overlay);
-    } else {
-      // remove the currently viewed (first of the array)
-      this.overlays.splice(0, 1);
-    }
-  }
-
   doneView() {
-    this.setView(null);
-  }
-
-  getView(): string {
-    return this.overlays[0];
-  }
-
-  inMap() {
-    return this.getView() === 'map';
+    this.view = null;
   }
 }
 

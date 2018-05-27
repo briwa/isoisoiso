@@ -1,6 +1,7 @@
 import Phaser from 'phaser-ce';
 
 import SpriteMenu, { Option } from 'src/app/sprites/menu';
+import SpriteOptions from 'src/app/sprites/options';
 
 import Human from 'src/app/chars/base/human';
 import Hero from 'src/app/chars/hero';
@@ -27,6 +28,7 @@ class SpriteInventory {
   private parent: Phaser.Sprite;
   private items: SpriteMenu;
   private subject: Hero;
+  private actionOptions: SpriteOptions;
 
   public sprite: Phaser.Sprite;
 
@@ -44,29 +46,6 @@ class SpriteInventory {
     this.subject = subject;
     this.parent = parent;
 
-    // const graphics = this.game.add.graphics(0, 0);
-
-    // // set a fill and line style
-    // graphics.beginFill(0x333333);
-    // graphics.lineStyle(3, 0xdddddd, 1);
-
-    // // draw a shape
-    // graphics.moveTo(0,0);
-    // graphics.lineTo(width, 0);
-    // graphics.lineTo(width, height);
-    // graphics.lineTo(0, height);
-    // graphics.lineTo(0, 0);
-    // graphics.endFill();
-
-    // graphics.moveTo(0, 40);
-    // graphics.lineTo(width, 40);
-
-    // graphics.moveTo(80, 40);
-    // graphics.lineTo(80, height);
-
-    // const texture = graphics.generateTexture();
-    // graphics.destroy();
-
     this.sprite = game.make.sprite(80, 50);
     this.parent.addChild(this.sprite);
     this.toggle(false);
@@ -83,8 +62,32 @@ class SpriteInventory {
     this.items.onChange(() => {
       // switch the submenu
     });
-    this.items.onSelecting(() => {
+    this.items.onSelecting((response) => {
       // go to submenu
+      this.actionOptions.createOptions(
+        response.bounds.x,
+        response.bounds.y,
+        [{
+          id: '1',
+          text: 'Use'
+        }, {
+          id: '2',
+          text: 'Discard'
+        }]
+      );
+
+      this.actionOptions.show();
+    });
+    this.items.onCancel(() => {
+      // go back to the previous menu
+      this.hide();
+    });
+
+    this.actionOptions = new SpriteOptions({
+      id : 'ingame-options',
+      game,
+      subject,
+      parent,
     });
   }
 
@@ -92,7 +95,6 @@ class SpriteInventory {
     if (!this.sprite.visible) {
       this.toggle(true);
       this.items.show();
-      this.subject.setView(this.id);
     }
   }
 
@@ -100,7 +102,6 @@ class SpriteInventory {
     if (this.sprite.visible) {
       this.toggle(false);
       this.items.hide();
-      this.subject.doneView();
     }
   }
 

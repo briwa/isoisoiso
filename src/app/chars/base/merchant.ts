@@ -52,7 +52,7 @@ class Merchant extends Npc {
 
   startShop() {
     // check if the merchant is in contact
-    if (this.contact && this.subject.inMap()) {
+    if (this.contact && this.subject.inMap) {
       // make sure the commoner is facing whatever hero is facing
       this.stopOppositeAnimation(this.subject.currentAnimation().name);
 
@@ -74,7 +74,7 @@ class Merchant extends Npc {
   }
 
   endShop() {
-    if (this.subject.getView() === this.shopId) {
+    if (this.subject.view === this.shopId) {
       this.shop.hide();
 
       this.doneView();
@@ -93,7 +93,7 @@ class Merchant extends Npc {
 
   showShop() {
     this.shop.show();
-    this.setView(this.shopId);
+    this.view = this.shopId;
   }
 }
 

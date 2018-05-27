@@ -1,6 +1,6 @@
 import Phaser from 'phaser-ce';
 
-import MenuSprite, { Option } from 'src/app/sprites/menu';
+import SpriteMenu, { Option } from 'src/app/sprites/menu';
 import SpriteDialog, { Dialog } from 'src/app/sprites/dialog';
 
 import Human from 'src/app/chars/base/human';
@@ -37,7 +37,7 @@ class SpriteShop {
   private id: string;
   private game: Phaser.Game;
   private description: Phaser.Text;
-  private menu: MenuSprite;
+  private menu: SpriteMenu;
   private dialog: SpriteDialog;
   private items: Items;
   private selectedItem: Item;
@@ -93,7 +93,7 @@ class SpriteShop {
 
     this.sprite.addChild(this.description);
 
-    this.menu = new MenuSprite({
+    this.menu = new SpriteMenu({
       game,
       subject: this.subject,
       parent: this.sprite,
@@ -114,7 +114,7 @@ class SpriteShop {
     if (!this.sprite.visible) {
       this.toggle(true);
       this.menu.show();
-      this.subject.setView(this.id);
+      this.subject.view = this.id;
     }
   }
 
