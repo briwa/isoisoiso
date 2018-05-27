@@ -94,12 +94,13 @@ class SpriteShop {
     this.sprite.addChild(this.description);
 
     this.menu = new SpriteMenu({
+      id,
       game,
       subject: this.subject,
       parent: this.sprite,
     });
     this.menu.sprite.y = 48; // TODO: manual adjustment! maybe handle this in the child instead?
-    this.menu.createOptions(id, items);
+    this.menu.createOptions(items);
 
     this.menu.onChange(() => {
       this.updateDescription();

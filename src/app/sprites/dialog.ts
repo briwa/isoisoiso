@@ -78,6 +78,7 @@ class SpriteDialog {
     this.toggle(false);
 
     this.menu = new SpriteMenu({
+      id: 'dialog-menu',
       game: this.game,
       parent: this.sprite,
       subject: this.subject,
@@ -145,11 +146,6 @@ class SpriteDialog {
   }
 
   nextConvo() {
-    // check if's being viewed
-    if (this.subject.view !== this.id) {
-      return;
-    }
-
     const current = this.conversations[0];
     if (!current) {
       this.signals.done.dispatch();
@@ -161,7 +157,7 @@ class SpriteDialog {
       this.conversations = this.conversations.slice(1);
     } else if (current.type === 'menu') {
       this.convoText.text = '';
-      this.menu.createOptions(current.id, current.options, current.text);
+      this.menu.createOptions(current.options, current.text);
       this.menu.show();
 
       this.menu.onSelecting((selected) => {
@@ -169,6 +165,7 @@ class SpriteDialog {
 
         if (current.answers) {
           this.conversations = current.answers[selected.answer];
+          this.nextConvo(); // move to the next conversation right after the selection
         } else {
           this.response = selected.answer;
           this.signals.done.dispatch();

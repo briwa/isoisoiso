@@ -25,7 +25,7 @@ class Commoner extends Npc {
 
     // event setup
     // ---------------
-    this.dialog.subject.listen('action', this.startDialog, this);
+    this.dialog.subject.listen('action', this.startDialog, this, 'map');
 
     // clear event on destroy
     this.sprite.events.onDestroy.addOnce(() => {

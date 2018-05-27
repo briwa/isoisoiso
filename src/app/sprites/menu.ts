@@ -9,6 +9,7 @@ export interface Option {
 };
 
 interface Config {
+  id: string;
   game: Phaser.Game;
   parent: Phaser.Sprite;
   subject: Human;
@@ -38,7 +39,7 @@ class SpriteMenu {
   public signals: { [key: string]: Phaser.Signal } = {};
   public selectedIndex = 0;
 
-  constructor({ game, subject, parent }: Config) {
+  constructor({ id, game, subject, parent }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;
 
@@ -46,6 +47,7 @@ class SpriteMenu {
     this.game = game;
     this.parent = parent;
     this.subject = subject;
+    this.id = id;
 
     // visual cues
     this.sprite = this.game.make.sprite(0, 0);
@@ -94,12 +96,7 @@ class SpriteMenu {
     };
   }
 
-  get inView() {
-    return this.sprite.visible && this.subject.view === this.id;
-  }
-
-  createOptions(id: string, options: Option[], label?: string, ) {
-    this.id = id;
+  createOptions(options: Option[], label?: string, ) {
     this.label = label;
     this.options = options;
 
@@ -164,10 +161,8 @@ class SpriteMenu {
   }
 
   selectIndex(index) {
-    if (this.inView) {
-      this.selectedIndex = Math.min(Math.max(0, index), this.options.length - 1);
-      this.signals.selection.dispatch();
-    }
+    this.selectedIndex = Math.min(Math.max(0, index), this.options.length - 1);
+    this.signals.selection.dispatch();
   }
 
   selecting() {
@@ -192,7 +187,7 @@ class SpriteMenu {
 
   onSelecting(callback) {
     this.signals.selecting.add(() => {
-      if (this.inView) callback(this.selected);
+      callback(this.selected);
     });
   }
 

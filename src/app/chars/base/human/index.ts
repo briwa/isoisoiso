@@ -8,9 +8,16 @@ export interface Path {
   direction: Direction;
 };
 
+interface Signals {
+  [action:string]: {
+    [id:string]: Phaser.Signal;
+  }
+};
+
 class Human extends SpriteHuman {
   private map: MapPlain;
   private overlays: string[] = ['map'];
+  private signals: Signals = {};
 
   public name: string; // max speed, don't go higher than this
   public speed: number = 100; // max speed, don't go higher than this
@@ -21,6 +28,17 @@ class Human extends SpriteHuman {
 
     // setup map
     this.map = config.map;
+
+    // events
+    this.createListener('pathsStart');
+    this.createListener('pathsFinished');
+    this.createListener('pathEnd');
+
+    // actions
+    this.createListener('up');
+    this.createListener('down');
+    this.createListener('action');
+    this.createListener('cancel');
   }
 
   get view() {
@@ -151,6 +169,49 @@ class Human extends SpriteHuman {
 
   doneView() {
     this.view = null;
+  }
+
+  // events
+  createListener(name: string, id = 'map') {
+    if (!this.signals[name]) {
+      this.signals[name] = {};
+    }
+
+    this.signals[name][id] = new Phaser.Signal();
+  }
+
+  removeListener(name: string, callback: Function, context?: any) {
+    const listenerContext = context || this;
+    const listenerId = listenerContext.id || 'map'; // by default listener is listening when subject is in map
+
+    this.signals[name][listenerId].remove(callback, listenerContext);
+  }
+
+  listen(name: string, callback: Function, context?: any, id?: string, once?: boolean) {
+    const listenerContext = context || this;
+    const listenerId = id || listenerContext.id || 'map';
+
+    if (!this.signals[name]) {
+      throw new Error( `Cannot listen to signals thad doesn't exist: ${name}` );
+    }
+
+    if (!this.signals[name][listenerId]) {
+      this.createListener(name, listenerId);
+    }
+
+    const method = once ? 'addOnce' : 'add';
+    this.signals[name][listenerId][method](callback, listenerContext);
+  }
+
+  // TODO: review listenOnce since it might create junk listeners
+  listenOnce(name: string, callback: Function, context?: any, id?: string) {
+    this.listen(name, callback, context, id, true);
+  }
+
+  dispatch(name: string, params?: any) {
+    if (this.signals[name] && this.signals[name][this.view]) {
+      this.signals[name][this.view].dispatch(params);
+    }
   }
 }
 

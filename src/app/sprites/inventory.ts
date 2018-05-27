@@ -53,11 +53,12 @@ class SpriteInventory {
     const style = { font: '12px Arial', fill: '#FFFFFF', wordWrap: true, wordWrapWidth: this.sprite.width };
 
     this.items = new SpriteMenu({
+      id,
       game,
       subject: this.subject,
       parent: this.sprite,
     });
-    this.items.createOptions(id, this.subject.inventory);
+    this.items.createOptions(this.subject.inventory);
 
     this.items.onChange(() => {
       // switch the submenu

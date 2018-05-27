@@ -83,12 +83,13 @@ class SpriteIngame {
     const style = { font: '12px Arial', fill: '#FFFFFF', wordWrap: true, wordWrapWidth: this.sprite.width };
 
     this.submenu = new SpriteMenu({
+      id: 'ingame-submenu',
       game,
       subject: this.subject,
       parent: this.sprite,
     });
     this.submenu.sprite.y = 48; // TODO: manual adjustment! maybe handle this in the child instead?
-    this.submenu.createOptions('ingame-submenu', submenu);
+    this.submenu.createOptions(submenu);
 
     this.submenu.onChange(() => {
       // switch the submenu

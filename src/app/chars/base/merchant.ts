@@ -41,8 +41,8 @@ class Merchant extends Npc {
 
     // event setup
     // ---------------
-    config.hero.listen('action', this.startShop, this);
-    config.hero.listen('cancel', this.endShop, this);
+    config.hero.listen('action', this.startShop, this, 'map');
+    config.hero.listen('cancel', this.endShop, this, this.shopId);
 
     this.sprite.events.onDestroy.addOnce(() => {
       this.subject.removeListener('action', this.startShop, this);
@@ -74,20 +74,18 @@ class Merchant extends Npc {
   }
 
   endShop() {
-    if (this.subject.view === this.shopId) {
-      this.shop.hide();
+    this.shop.hide();
 
-      this.doneView();
-      this.contact = false;
+    this.doneView();
+    this.contact = false;
 
-      if (this.dialogs.ending) {
-        this.createDialog({
-          label: this.name,
-          subject: this.subject,
-          dialog: this.dialogs.ending,
-          immediate: true,
-        });
-      }
+    if (this.dialogs.ending) {
+      this.createDialog({
+        label: this.name,
+        subject: this.subject,
+        dialog: this.dialogs.ending,
+        immediate: true,
+      });
     }
   }
 

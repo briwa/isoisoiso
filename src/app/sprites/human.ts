@@ -47,7 +47,6 @@ export interface Config {
 
 class SpriteHuman {
   private tilesize: number;
-  private signals: { [key:string]: Phaser.Signal } = {};
 
   public game: Phaser.Game;
   public anchorX: number = 1/4;
@@ -79,11 +78,6 @@ class SpriteHuman {
     // arcade
     this.game.physics.isoArcade.enable(this.sprite);
     this.sprite.body.collideWorldBounds = true;
-
-    // events
-    this.createListener('pathsStart');
-    this.createListener('pathsFinished');
-    this.createListener('pathEnd');
 
     this.movement = movement;
 
@@ -192,38 +186,6 @@ class SpriteHuman {
       dialog,
       immediate,
     });
-  }
-
-  createListener(name: string) {
-     this.signals[name] = new Phaser.Signal();
-  }
-
-  removeListener(name: string, callback: Function, context?: any) {
-    this.signals[name].remove(callback, context || this);
-  }
-
-  listen(name: string, callback: Function, context?: any) {
-    if (!this.signals[name]) {
-      // add them as custom signal
-      this.createListener(name);
-    }
-
-    this.signals[name].add(callback, context || this);
-  }
-
-  listenOnce(name: string, callback: Function, context?: any) {
-    if (!this.signals[name]) {
-      // add them as custom signal
-      this.createListener(name);
-    }
-
-    this.signals[name].addOnce(callback, context || this);
-  }
-
-  dispatch(name: string, params?: any) {
-    if (this.signals[name]) {
-      this.signals[name].dispatch(params);
-    }
   }
 }
 
