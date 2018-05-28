@@ -1,11 +1,11 @@
 import Phaser from 'phaser-ce';
 
 import Human from 'src/app/chars/base/human';
-import Npc, { Config } from 'src/app/chars/base/npc';
+import Npc, { ConfigNpc } from 'src/app/chars/base/npc';
 
 import UIDialog, { Dialog } from 'src/app/sprites/ui/dialog';
 
-interface ConfigCommoner extends Config {
+interface ConfigCommoner extends ConfigNpc {
   dialog: Dialog;
 };
 

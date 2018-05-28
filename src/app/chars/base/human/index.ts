@@ -138,6 +138,7 @@ class Human extends SpriteHuman {
     }
   }
 
+  // TODO: this should not come from inputs, but from signals
   moveKeys() {
     // do not move when it's not in the map
     if (!this.inMap || this.busy) {

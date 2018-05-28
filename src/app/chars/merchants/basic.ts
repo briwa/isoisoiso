@@ -28,6 +28,7 @@ class MerchantBasic extends Merchant {
       hero,
       shopId: 'shop-basic',
       items: getAllItems(),
+      initFrame: 'right',
       dialogs: {
         opening: {
           id: 'shop-basic-opening',
@@ -78,8 +79,6 @@ class MerchantBasic extends Merchant {
         },
       },
     });
-
-    this.setAnimation('walk-right');
   }
 }
 

@@ -1,7 +1,7 @@
 import Phaser from 'phaser-ce';
 
 import Human from 'src/app/chars/base/human';
-import { MovementMouse, MovementKeys } from 'src/app/sprites/human';
+import { Config, MovementMouse, MovementKeys } from 'src/app/sprites/human';
 import UIIngame from 'src/app/sprites/ui/ingame';
 
 import { get as getItem, getAll as getAllItems, Item } from 'src/app/chars/items';
@@ -12,7 +12,7 @@ interface Equips {
   accessory: Item;
 };
 
-interface Config {
+interface ConfigHero extends Config {
   game: Phaser.Game;
   group: Phaser.Group;
   map: any;
@@ -61,7 +61,7 @@ class Hero extends Human {
     accessory: null,
   };
 
-  constructor({ x, y, game, group, map, movement, controls }: Config) {
+  constructor({ x, y, game, group, map, movement, controls, initFrame }: ConfigHero) {
     super({
       game,
       x: x * map.tilesize,
@@ -72,6 +72,7 @@ class Hero extends Human {
       group,
       map,
       movement,
+      initFrame,
     });
 
     this.name = 'Hero';
@@ -84,7 +85,7 @@ class Hero extends Human {
     });
 
     // register mouse down input upon `create` bc we only need to do it once
-    if (this.movement.type === 'mouse') {
+    if (this.movement && this.movement.type === 'mouse') {
       game.input.onDown.add(() => {
         // for hero movement
         const movement = this.movement as MovementMouse;
@@ -128,13 +129,11 @@ class Hero extends Human {
 
     // DEBUGGING
     this.controls[','].onDown.add(() => {
-      if (this.debug) {
-        this.gold += 1000;
-      }
+      this.game.state.start('Battle');
     });
 
     this.controls['.'].onDown.add(() => {
-      this.debug = !this.debug;
+      this.game.state.start('Plain');
     });
   }
 

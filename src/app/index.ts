@@ -1,16 +1,13 @@
 import Phaser from 'phaser-ce';
 import Plain from 'src/app/states/plain';
-
-const states = {
-  plain : Plain,
-};
+import Battle from 'src/app/states/battle';
 
 class Game extends Phaser.Game {
   constructor() {
-    super(600, 600, Phaser.AUTO);
+    super(600, 400, Phaser.AUTO);
 
-    this.state.add('plain', Plain, false);
-    this.state.start('plain');
+    this.state.add('Plain', Plain, false);
+    this.state.add('Battle', Battle, true);
   }
 }
 

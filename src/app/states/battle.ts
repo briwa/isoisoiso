@@ -5,17 +5,16 @@ import SomeDude from 'src/app/chars/commoners/some-dude';
 import Merchant from 'src/app/chars/merchants/basic';
 
 import SpriteHuman from 'src/app/sprites/human';
-import MapPlain from 'src/app/maps/plain';
+import SpriteBattle from 'src/app/sprites/battle';
+import MapBattle from 'src/app/maps/battle';
 
-class Plain extends Phaser.State {
+class Battle extends Phaser.State {
   private hero: Hero;
-
-  private someDude: SomeDude;
-  private merchant: Merchant;
+  private enemy: SomeDude;
 
   private cursor: Phaser.Plugin.Isometric.Point3;
   private keys: { [key:string]: Phaser.Key };
-  private map: MapPlain;
+  private map: MapBattle;
 
   private debug: boolean = false;
 
@@ -26,7 +25,7 @@ class Plain extends Phaser.State {
   preload() {
     // load all the sprites assets
     SpriteHuman.loadAssets(this.game);
-    MapPlain.loadAssets(this.game);
+    MapBattle.loadAssets(this.game);
 
     // Add and enable the plug-in.
     this.game.plugins.add(Phaser.Plugin.Isometric);
@@ -54,10 +53,10 @@ class Plain extends Phaser.State {
       '.': this.game.input.keyboard.addKey(Phaser.Keyboard.PERIOD),
     };
 
-    this.map = new MapPlain(this.game);
+    this.map = new MapBattle(this.game);
 
     this.hero = new Hero({
-      x: 6,
+      x: 5,
       y: 3,
       game: this.game,
       group: this.map.group,
@@ -67,57 +66,55 @@ class Plain extends Phaser.State {
         input: this.keys,
       },
       controls: this.keys,
+      initFrame: 'left',
     });
 
-    this.someDude = new SomeDude({
+    new SomeDude({
+      x: 1,
+      y: 4,
       game: this.game,
       group: this.map.group,
       map: this.map,
       hero: this.hero,
+      initFrame: 'right',
     });
 
-    this.merchant = new Merchant({
+    new SomeDude({
+      x: 2,
+      y: 3,
       game: this.game,
       group: this.map.group,
       map: this.map,
       hero: this.hero,
+      initFrame: 'right',
+    });
+
+    new SomeDude({
+      x: 1,
+      y: 2,
+      game: this.game,
+      group: this.map.group,
+      map: this.map,
+      hero: this.hero,
+      initFrame: 'right',
+    });
+
+    new SpriteBattle({
+      id: 'battle',
+      game: this.game,
+      subject: this.hero,
     });
   }
 
   update() {
     // project the current mouse from x/y position to x/y/z position of the isometric map, into this.cursor
     this.game.iso.unproject(this.game.input.activePointer.position, this.cursor);
-
-    this.hero.registerMovement();
-    this.someDude.registerMovement();
-
-    // sort sprites so it would look nice when other sprites are moving
-    this.map.sortSprites();
-    this.map.collisionCheck();
   }
 
   render() {
     if (this.debug) {
-      // show cursor position and current player paths
-      this.map.debug({
-        cursor: this.cursor,
-        paths: this.hero.paths,
-      });
-
-      // body debug
-      this.game.debug.body(this.hero.sprite);
-      this.game.debug.body(this.someDude.sprite);
-
-      // just some text for debugging paths
-      this.game.debug.text(`someDude contact? ${this.someDude.contact}`, 0, 16);
-      this.game.debug.text(`current x: ${this.hero.position().x.toFixed(2)}, y: ${this.hero.position().y.toFixed(2)}`, 0, 32);
-      if (this.hero.paths.length) {
-        this.hero.paths.forEach((path, idx) => {
-          this.game.debug.text(`x: ${path.x}, y: ${path.y}, dir: ${path.direction}`, 0, 48 + (idx * 16));
-        });
-      }
     }
   }
 }
 
-export default Plain;
+export default Battle;

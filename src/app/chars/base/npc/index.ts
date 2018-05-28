@@ -1,11 +1,12 @@
 import Phaser from 'phaser-ce';
 
+import { Config } from 'src/app/sprites/human';
 import Human from 'src/app/chars/base/human';
 import Hero from 'src/app/chars/hero';
 
 import { MovementTrack, MovementFollow } from 'src/app/sprites/human';
 
-export interface Config {
+export interface ConfigNpc extends Config {
   game: Phaser.Game;
   group: Phaser.Group;
   map: any;
@@ -25,7 +26,7 @@ class Npc extends Human {
 
   contact: boolean = false;
 
-  constructor({ x, y, game, group, map, movement, delimiter, name, hero }: Config) {
+  constructor({ x, y, game, group, map, movement, delimiter, name, hero, initFrame }: ConfigNpc) {
     super({
       game,
       x: x * map.tilesize,
@@ -33,6 +34,7 @@ class Npc extends Human {
       z: 0,
       sprite: 'people',
       delimiter,
+      initFrame,
       group,
       map,
       movement,

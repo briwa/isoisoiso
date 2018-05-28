@@ -4,10 +4,13 @@ import Hero from 'src/app/chars/hero';
 import Commoner from 'src/app/chars/base/commoner';
 
 interface Config {
+  x?: number;
+  y?: number;
   game: Phaser.Game;
   group: Phaser.Group;
   hero: Hero;
   map: any;
+  initFrame?: string;
 };
 
 const conversations = [{
@@ -44,10 +47,10 @@ const conversations = [{
 }];
 
 class SomeDude extends Commoner {
-  constructor({ game, group, map, hero }: Config) {
+  constructor({ game, group, map, hero, x, y, initFrame }: Config) {
     super({
-      x: 3,
-      y: 3,
+      x: x || 3,
+      y: y || 3,
       delimiter: 129,
       game,
       group,
@@ -62,6 +65,7 @@ class SomeDude extends Commoner {
         conversations,
       },
       hero,
+      initFrame,
     });
   }
 }

@@ -3,13 +3,13 @@
 import Phaser from 'phaser-ce';
 
 import Hero from 'src/app/chars/hero';
-import Npc, { Config } from 'src/app/chars/base/npc';
+import Npc, { ConfigNpc } from 'src/app/chars/base/npc';
 
 import { Items } from 'src/app/chars/items';
 import UIShop, { Dialogs } from 'src/app/sprites/ui/shop';
 import UIDialog, { Dialog } from 'src/app/sprites/ui/dialog';
 
-interface ConfigMerchant extends Config {
+interface ConfigMerchant extends ConfigNpc {
   shopId: string;
   items: Items;
   dialogs?: Dialogs;

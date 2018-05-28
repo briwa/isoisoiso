@@ -14,7 +14,7 @@ interface Config {
 };
 
 const width = 480;
-const height = 400;
+const height = 200;
 const marginTop = 12;
 const marginLeft = 12;
 const nameTop = 9;

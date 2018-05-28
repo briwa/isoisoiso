@@ -34,6 +34,7 @@ interface Children {
 const width = 400;
 const height = 100;
 const marginLeft = 12;
+const marginBottom = 12;
 const nameTop = 9;
 const convoTop = 24;
 const lineSpacing = -8;
@@ -62,7 +63,7 @@ class UIDialog extends UIToggle<Children> {
 
     return game.world.create(
       (game.world.bounds.width / 2) - (width / 2),
-      game.world.bounds.height / 2,
+      (game.world.bounds.height / 2) - height - marginBottom,
       texture);
   }
 
