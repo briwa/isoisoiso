@@ -117,6 +117,7 @@ class SpriteInventory {
     if (this.sprite.visible) {
       this.toggle(false);
       this.items.hide();
+      this.action.hide();
     }
   }
 

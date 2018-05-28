@@ -2,6 +2,7 @@ import Phaser from 'phaser-ce';
 
 import SpriteMenu, { Option } from 'src/app/sprites/menu';
 import SpriteInventory from 'src/app/sprites/inventory';
+import SpriteStats from 'src/app/sprites/stats';
 
 import Human from 'src/app/chars/base/human';
 import Hero from 'src/app/chars/hero';
@@ -37,6 +38,7 @@ class SpriteIngame {
   private game: Phaser.Game;
   private submenu: SpriteMenu;
   private inventory: SpriteInventory;
+  private stats: SpriteStats;
   private subject: Hero;
 
   public sprite: Phaser.Sprite;
@@ -95,9 +97,16 @@ class SpriteIngame {
       // switch the submenu
     });
     this.submenu.onSelecting((response) => {
+      // hide all
+      this.inventory.hide();
+      this.stats.hide();
+
       // go to submenu
       if (response.name === 'Inventory') {
         this.inventory.show();
+      } else if (response.name === 'Stats') {
+        this.stats.updateStats(this.subject.stats, this.subject.equipment);
+        this.stats.show();
       }
     });
 
@@ -110,6 +119,14 @@ class SpriteIngame {
       subject: this.subject,
     });
     this.sprite.addChild(this.inventory.sprite);
+
+    this.stats = new SpriteStats({
+      id: 'ingame-stats',
+      game,
+      parent: this.sprite,
+      subject: this.subject,
+    });
+    this.sprite.addChild(this.stats.sprite);
   }
 
   show() {
@@ -123,6 +140,9 @@ class SpriteIngame {
     if (this.sprite.visible) {
       this.toggle(false);
       this.submenu.hide();
+      this.inventory.hide();
+      this.stats.hide();
+      this.subject.resetView();
     }
   }
 

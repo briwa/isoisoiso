@@ -11,7 +11,7 @@ export interface Option {
 interface Config {
   id: string;
   game: Phaser.Game;
-  parent: Phaser.Sprite | Phaser.Group;
+  parent: Phaser.Sprite;
   subject: Human;
 };
 
@@ -23,7 +23,7 @@ const cursorTop = 0;
 
 class SpriteMenu {
   private game: Phaser.Game;
-  private parent: Phaser.Sprite | Phaser.Group;
+  private parent: Phaser.Sprite;
   private options: Option[];
   private subject: Human;
   private optionText: Phaser.Group;
@@ -99,7 +99,7 @@ class SpriteMenu {
     };
   }
 
-  createOptions(options: Option[], label?: string, ) {
+  createOptions(options: Option[], label?: string) {
     this.label = label;
     this.options = options;
 

@@ -29,21 +29,37 @@ interface Inventory extends Item {
 class Hero extends Human {
   private debug: boolean = false;
   private ingame: SpriteIngame;
-  private equipment: Equips = {
-    armor: null,
-    weapon: null,
-    accessory: null,
-  };
-  private status = {
-    hp: 100,
-    mp: 100,
-    atk: 10,
-    def: 10,
-  };
 
   public controls: { [key:string]: Phaser.Key };
   public gold: number = 100;
   public inventory: Inventory[] = [];
+  public stats = {
+    hp: {
+      base: 100,
+      extra: 0,
+      battle: 100,
+    },
+    mp: {
+      base: 100,
+      extra: 0,
+      battle: 100,
+    },
+    atk: {
+      base: 10,
+      extra: 0,
+      battle: 10,
+    },
+    def: {
+      base: 10,
+      extra: 0,
+      battle: 10,
+    },
+  };
+  public equipment: Equips = {
+    armor: null,
+    weapon: null,
+    accessory: null,
+  };
 
   constructor({ x, y, game, group, map, movement, controls }: Config) {
     super({
@@ -112,7 +128,6 @@ class Hero extends Human {
         this.ingame.show();
       } else {
         this.ingame.hide();
-        this.resetView(); // force to always show the map
       }
     });
 
@@ -179,7 +194,13 @@ class Hero extends Human {
     const item = getItem(id);
 
     item.effects.forEach((effect) => {
-      this.status[effect.property] = this.status[effect.property] + (effect.value * (negate ? -1 : 1));
+      const target = item.consumable ? 'battle' : 'extra';
+      // consumables can't go higher than the base + extra
+      // while non-consumable stacks as permanent extra
+      const maxValue = this.stats[effect.property].base + this.stats[effect.property].extra
+      const newValue = this.stats[effect.property][target] + (effect.value * (negate ? -1 : 1));
+
+      this.stats[effect.property][target] = item.consumable ? Math.min(maxValue, newValue) : newValue;
     });
   }
 }
