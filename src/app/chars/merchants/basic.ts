@@ -44,10 +44,10 @@ class MerchantBasic extends Merchant {
             type: 'menu',
             text: 'Are you sure you want to buy this item?',
             options: [{
-              name: 'Yes',
+              name: 'Buy this item',
               answer: 'yes',
             }, {
-              name: 'No',
+              name: 'Cancel',
               answer: 'no',
             }],
           }],

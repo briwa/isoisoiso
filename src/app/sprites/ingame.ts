@@ -41,6 +41,8 @@ class SpriteIngame {
   private stats: SpriteStats;
   private subject: Hero;
 
+  private gold: Phaser.Text;
+
   public sprite: Phaser.Sprite;
 
   static loadAssets(game: Phaser.Game) {
@@ -80,9 +82,10 @@ class SpriteIngame {
     graphics.destroy();
 
     this.sprite = game.world.create((game.world.bounds.width / 2) - (width / 2) - 3, marginTop, texture);
-    this.toggle(false);
+    this.gold = game.make.text(440, 15, '', { font: '12px Arial', fill: '#FFFFFF' });
+    this.sprite.addChild(this.gold);
 
-    const style = { font: '12px Arial', fill: '#FFFFFF', wordWrap: true, wordWrapWidth: this.sprite.width };
+    this.toggle(false);
 
     this.submenu = new SpriteMenu({
       id: 'ingame-submenu',
@@ -133,6 +136,7 @@ class SpriteIngame {
     if (!this.sprite.visible) {
       this.toggle(true);
       this.submenu.show(); // then show the submenu
+      this.gold.text = `${this.subject.gold} G`; // and update the gold
     }
   }
 

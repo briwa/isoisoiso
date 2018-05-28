@@ -39,6 +39,7 @@ class SpriteShop {
   private description: Phaser.Text;
   private menu: SpriteMenu;
   private dialog: SpriteDialog;
+  private gold: Phaser.Text;
   private items: Items;
   private selectedItem: Item;
   private merchant: Human;
@@ -90,8 +91,10 @@ class SpriteShop {
     const style = { font: '12px Arial', fill: '#FFFFFF', wordWrap: true, wordWrapWidth: this.sprite.width };
     this.description = this.game.make.text(160 + 12, 40 + 8, '', style);
     this.description.lineSpacing = lineSpacing; // the default line spacing was way too big for this font size
-
+    this.gold = game.make.text(440, 15, '', style);
+    this.sprite.addChild(this.gold);
     this.sprite.addChild(this.description);
+
 
     this.menu = new SpriteMenu({
       id,
@@ -115,7 +118,7 @@ class SpriteShop {
     if (!this.sprite.visible) {
       this.toggle(true);
       this.menu.show();
-      this.subject.view = this.id;
+      this.gold.text = `${this.subject.gold} G`; // and update the gold
     }
   }
 
@@ -123,7 +126,6 @@ class SpriteShop {
     if (this.sprite.visible) {
       this.toggle(false);
       this.menu.hide();
-      this.subject.doneView();
     }
   }
 
@@ -167,6 +169,7 @@ class SpriteShop {
     confirm.onDone((response) => {
       if (response === 'yes') {
         this.subject.purchase(item.id);
+        this.gold.text = `${this.subject.gold} G`; // and update the gold
 
         // show a thank you message, if any
         if (dialogs.thanks) {
