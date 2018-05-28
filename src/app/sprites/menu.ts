@@ -134,6 +134,11 @@ class SpriteMenu {
 
     this.sprite.addChild(this.cursor);
     this.sprite.addChild(this.optionText);
+
+    // reset selection
+    // TODO: this could've been smarter by find the possible selection after recreating options
+    // e.g. if the selection still exists, select them, else move one selection up/down
+    this.selectIndex(0);
   }
 
   show() {
