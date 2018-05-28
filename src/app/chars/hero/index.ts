@@ -77,12 +77,6 @@ class Hero extends Human {
     this.name = 'Hero';
     this.controls = controls;
 
-    // stupid
-    this.inventory = getAllItems().map(item => ({
-      ...item,
-      equipped: item.consumable ? null : false,
-    }))
-
     this.ingame = new SpriteIngame({
       id: 'ingame',
       game: this.game,

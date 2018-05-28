@@ -106,6 +106,7 @@ class SpriteIngame {
 
       // go to submenu
       if (response.name === 'Inventory') {
+        this.inventory.repopulateItems();
         this.inventory.show();
       } else if (response.name === 'Stats') {
         this.stats.updateStats(this.subject.stats, this.subject.equipment);

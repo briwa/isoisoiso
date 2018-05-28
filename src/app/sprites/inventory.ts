@@ -27,6 +27,7 @@ class SpriteInventory {
   private game: Phaser.Game;
   private parent: Phaser.Sprite;
   private items: SpriteMenu;
+  private noItems: Phaser.Text;
   private subject: Hero;
   private action: SpriteOptions;
 
@@ -47,6 +48,8 @@ class SpriteInventory {
     this.parent = parent;
 
     this.sprite = game.make.sprite(80, 50);
+    this.noItems = game.make.text(10, 0, 'No items', { font: '12px Arial', fill: '#FFFFFF' });
+    this.sprite.addChild(this.noItems);
     this.parent.addChild(this.sprite);
     this.toggle(false);
 
@@ -56,7 +59,6 @@ class SpriteInventory {
       subject: this.subject,
       parent: this.sprite,
     });
-    this.items.createOptions(this.subject.inventory);
 
     this.items.onChange(() => {
       // switch the submenu
@@ -84,11 +86,11 @@ class SpriteInventory {
         case 'Use':
           this.subject.useItem(context);
           this.subject.discardItem(context);
-          this.items.createOptions(this.subject.inventory); // repopulate list after discard
+          this.repopulateItems();
           break;
         case 'Discard':
           this.subject.discardItem(context);
-          this.items.createOptions(this.subject.inventory);
+          this.repopulateItems();
           break;
         case 'Equip':
           this.subject.equipItem(context.id);
@@ -109,16 +111,35 @@ class SpriteInventory {
   show() {
     if (!this.sprite.visible) {
       this.toggle(true);
-      this.items.show();
+
+      // TODO: fix this, this is just a temporary hack
+      if (this.subject.inventory.length > 0) {
+        this.items.show();
+      } else {
+        this.noItems.visible = true;
+        this.items.show();
+        this.items.sprite.visible = false;
+      }
     }
   }
 
   hide() {
     if (this.sprite.visible) {
       this.toggle(false);
-      this.items.hide();
-      this.action.hide();
+
+      // TODO: fix this, this is just a temporary hack
+      if (this.subject.inventory.length > 0) {
+        this.items.hide();
+        this.action.hide();
+      } else {
+        this.subject.doneView();
+        this.noItems.visible = false;
+      }
     }
+  }
+
+  repopulateItems() {
+    this.items.createOptions(this.subject.inventory); // repopulate list after discard
   }
 
   toggle(toggle) {
