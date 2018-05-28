@@ -137,18 +137,25 @@ class Hero extends Human {
     });
   }
 
-  purchase(id: string) {
+  setEquipped(id: string, equipped: boolean) {
+    const item = this.inventory.filter(i => id === i.id)[0];
+    item.equipped = equipped;
+  }
+
+  purchaseItem(id: string) {
     const item = getItem(id);
     this.gold -= item.price;
+
+    this.acquireItem(item.id);
+  }
+
+  acquireItem(id: string) {
+    const item = getItem(id);
+
     this.inventory.push({
       ...item,
       equipped : item.consumable ? null : false,
     });
-  }
-
-  setEquipped(id: string, equipped: boolean) {
-    const item = this.inventory.filter(i => id === i.id)[0];
-    item.equipped = equipped;
   }
 
   useItem(item: Inventory) {

@@ -32,6 +32,9 @@ const marginLeft = 12;
 const nameTop = 9;
 const convoTop = 24;
 const lineSpacing = -8;
+const dividerLeft = 160;
+const dividerTop = 40;
+const goldLeft = 440;
 
 class SpriteShop {
   private id: string;
@@ -46,10 +49,6 @@ class SpriteShop {
   private subject: Hero;
 
   public sprite: Phaser.Sprite;
-
-  static loadAssets(game: Phaser.Game) {
-    // TODO: load items sprite
-  }
 
   constructor({ id, game, subject, merchant, items, dialogs }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
@@ -76,11 +75,11 @@ class SpriteShop {
     graphics.lineTo(0, 0);
     graphics.endFill();
 
-    graphics.moveTo(0, 40);
-    graphics.lineTo(width, 40);
+    graphics.moveTo(0, dividerTop);
+    graphics.lineTo(width, dividerTop);
 
-    graphics.moveTo(160, 40);
-    graphics.lineTo(160, height);
+    graphics.moveTo(dividerLeft, dividerTop);
+    graphics.lineTo(dividerLeft, height);
 
     const texture = graphics.generateTexture();
     graphics.destroy();
@@ -89,9 +88,9 @@ class SpriteShop {
     this.toggle(false);
 
     const style = { font: '12px Arial', fill: '#FFFFFF', wordWrap: true, wordWrapWidth: this.sprite.width };
-    this.description = this.game.make.text(160 + 12, 40 + 8, '', style);
+    this.description = this.game.make.text(dividerLeft + marginLeft, dividerTop + nameTop, '', style);
     this.description.lineSpacing = lineSpacing; // the default line spacing was way too big for this font size
-    this.gold = game.make.text(440, 15, '', style);
+    this.gold = game.make.text(goldLeft, marginTop, '', style);
     this.sprite.addChild(this.gold);
     this.sprite.addChild(this.description);
 
@@ -102,7 +101,7 @@ class SpriteShop {
       subject: this.subject,
       parent: this.sprite,
     });
-    this.menu.sprite.y = 48; // TODO: manual adjustment! maybe handle this in the child instead?
+    this.menu.sprite.y = dividerTop + nameTop; // TODO: manual adjustment! maybe handle this in the child instead?
     this.menu.createOptions(items);
 
     this.menu.onChange(() => {
@@ -168,7 +167,7 @@ class SpriteShop {
 
     confirm.onDone((response) => {
       if (response === 'yes') {
-        this.subject.purchase(item.id);
+        this.subject.purchaseItem(item.id);
         this.gold.text = `${this.subject.gold} G`; // and update the gold
 
         // show a thank you message, if any

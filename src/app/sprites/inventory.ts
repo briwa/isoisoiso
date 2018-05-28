@@ -33,10 +33,6 @@ class SpriteInventory {
 
   public sprite: Phaser.Sprite;
 
-  static loadAssets(game: Phaser.Game) {
-    // TODO: load items sprite
-  }
-
   constructor({ id, game, parent, subject }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;

@@ -5,7 +5,6 @@ import SomeDude from 'src/app/chars/commoners/some-dude';
 import Merchant from 'src/app/chars/merchants/basic';
 
 import SpriteHuman from 'src/app/sprites/human';
-import SpriteDialog from 'src/app/sprites/dialog';
 import MapPlain from 'src/app/maps/plain';
 
 class Plain extends Phaser.State {
@@ -18,19 +17,16 @@ class Plain extends Phaser.State {
   private keys: { [key:string]: Phaser.Key };
   private map: MapPlain;
 
-  private debug: boolean;
+  private debug: boolean = false;
 
   constructor() {
     super();
-
-    this.debug = false;
   }
 
   preload() {
     // load all the sprites assets
     SpriteHuman.loadAssets(this.game);
     MapPlain.loadAssets(this.game);
-    SpriteDialog.loadAssets(this.game);
 
     // Add and enable the plug-in.
     this.game.plugins.add(Phaser.Plugin.Isometric);

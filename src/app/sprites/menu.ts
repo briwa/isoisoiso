@@ -85,6 +85,11 @@ class SpriteMenu {
 
   get selected() {
     const option = this.options[this.selectedIndex];
+
+    if (!option) {
+      return null;
+    }
+
     // TODO: seems like this was incorrectly typed by Phaser to pixi.displayObject
     // where it was supposed to be just Phaser.Sprite, hence missing properties
     // type it to any for now
@@ -195,7 +200,7 @@ class SpriteMenu {
 
   onSelecting(callback) {
     this.signals.selecting.add(() => {
-      callback(this.selected);
+      if (this.selected) callback(this.selected);
     });
   }
 

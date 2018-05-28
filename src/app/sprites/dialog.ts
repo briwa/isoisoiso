@@ -46,10 +46,6 @@ class SpriteDialog {
   public subject: Human;
   public sprite: Phaser.Sprite;
 
-  static loadAssets(game: Phaser.Game) {
-    // no need sprite for now
-  }
-
   constructor({ game, subject, label, dialog, immediate }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
     if (!game) return;

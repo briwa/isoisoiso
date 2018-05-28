@@ -21,6 +21,9 @@ const marginLeft = 12;
 const nameTop = 9;
 const convoTop = 24;
 const lineSpacing = -8;
+const dividerLeft = 80;
+const dividerTop = 40;
+const goldLeft = 440;
 
 const submenu = [{
   id: '1',
@@ -40,14 +43,9 @@ class SpriteIngame {
   private inventory: SpriteInventory;
   private stats: SpriteStats;
   private subject: Hero;
-
   private gold: Phaser.Text;
 
   public sprite: Phaser.Sprite;
-
-  static loadAssets(game: Phaser.Game) {
-    // TODO: load items sprite
-  }
 
   constructor({ id, game, subject }: Config) {
     // TODO: we did this because when testing, we can't the phaser side of things yet. find out how
@@ -72,17 +70,17 @@ class SpriteIngame {
     graphics.lineTo(0, 0);
     graphics.endFill();
 
-    graphics.moveTo(0, 40);
-    graphics.lineTo(width, 40);
+    graphics.moveTo(0, dividerTop);
+    graphics.lineTo(width, dividerTop);
 
-    graphics.moveTo(80, 40);
-    graphics.lineTo(80, height);
+    graphics.moveTo(dividerLeft, dividerTop);
+    graphics.lineTo(dividerLeft, height);
 
     const texture = graphics.generateTexture();
     graphics.destroy();
 
     this.sprite = game.world.create((game.world.bounds.width / 2) - (width / 2) - 3, marginTop, texture);
-    this.gold = game.make.text(440, 15, '', { font: '12px Arial', fill: '#FFFFFF' });
+    this.gold = game.make.text(goldLeft, marginTop, '', { font: '12px Arial', fill: '#FFFFFF' });
     this.sprite.addChild(this.gold);
 
     this.toggle(false);
@@ -93,7 +91,7 @@ class SpriteIngame {
       subject: this.subject,
       parent: this.sprite,
     });
-    this.submenu.sprite.y = 48; // TODO: manual adjustment! maybe handle this in the child instead?
+    this.submenu.sprite.y = dividerTop + nameTop; // TODO: manual adjustment! maybe handle this in the child instead?
     this.submenu.createOptions(submenu);
 
     this.submenu.onChange(() => {
