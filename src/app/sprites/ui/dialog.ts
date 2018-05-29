@@ -21,7 +21,7 @@ interface Config {
   id: string;
   game: Phaser.Game;
   subject: Human;
-  dialog: Dialog;
+  dialog?: Dialog;
   label?: string;
   immediate?: boolean;
   children?: { [name: string]: UIBase };
@@ -93,22 +93,13 @@ class UIDialog extends UIBase {
       config.subject.removeListener('action', this.nextConvo, this);
     });
 
-    // open immediately
-    if (config.immediate) {
-      this.show();
-
-      // also close immediately
-      this.once('done', () => {
-        this.hide();
-      });
-    }
-
     // initially hidden
     this.toggle(false);
   }
 
-  startConvo() {
-    this.conversations = this.dialog.conversations;
+  startConvo(conversations?: Conversation[]) {
+    this.conversations = conversations || this.dialog.conversations;
+    this.show();
     this.nextConvo();
   }
 

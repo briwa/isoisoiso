@@ -7,7 +7,7 @@ import Npc, { Config } from 'src/app/chars/base/npc';
 
 import { Items } from 'src/app/chars/items';
 import SpriteShop, { Dialogs } from 'src/app/sprites/shop';
-import SpriteDialog, { Dialog } from 'src/app/sprites/dialog';
+import UIDialog, { Dialog } from 'src/app/sprites/ui/dialog';
 
 interface ConfigMerchant extends Config {
   shopId: string;
@@ -22,6 +22,8 @@ class Merchant extends Npc {
   private items: Items;
   private shopId: string;
 
+  public dialog: UIDialog;
+
   constructor(config: ConfigMerchant) {
     super(config);
 
@@ -29,6 +31,13 @@ class Merchant extends Npc {
     this.subject = config.hero;
     this.dialogs = config.dialogs;
     this.items = config.items;
+
+    this.dialog = new UIDialog({
+      id: `${config.name}-dialog`,
+      game: config.game,
+      subject: config.hero,
+      label: this.name,
+    });
 
     this.shop = new SpriteShop({
       id: this.shopId,
@@ -57,14 +66,9 @@ class Merchant extends Npc {
       this.stopOppositeAnimation(this.subject.currentAnimation().name);
 
       if (this.dialogs.opening) {
-        const opening = this.createDialog({
-          label: this.name,
-          subject: this.subject,
-          dialog: this.dialogs.opening,
-          immediate: true,
-        });
-
-        opening.onDone(() => {
+        this.dialog.startConvo(this.dialogs.opening.conversations);
+        this.dialog.once('done', () => {
+          this.dialog.hide();
           this.showShop();
         });
       } else {
@@ -76,17 +80,15 @@ class Merchant extends Npc {
   endShop() {
     this.shop.hide();
 
-    this.doneView();
-    this.contact = false;
-
     if (this.dialogs.ending) {
-      this.createDialog({
-        label: this.name,
-        subject: this.subject,
-        dialog: this.dialogs.ending,
-        immediate: true,
+      this.dialog.startConvo(this.dialogs.ending.conversations);
+      this.dialog.once('done', () => {
+        this.dialog.hide();
       });
     }
+
+    this.doneView();
+    this.contact = false;
   }
 
   showShop() {

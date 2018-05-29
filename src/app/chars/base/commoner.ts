@@ -25,8 +25,6 @@ class Commoner extends Npc {
       label: this.name,
     });
 
-    this.subject = config.hero;
-
     // event setup
     // ---------------
     this.subject.listen('action', this.startDialog, this, 'map');
@@ -41,7 +39,6 @@ class Commoner extends Npc {
     // check if any npc is in contact
     if (this.contact && this.subject.inMap) {
       this.dialog.startConvo();
-      this.dialog.show();
 
       // make sure the commoner is facing whatever subject is facing
       this.stopOppositeAnimation(this.subject.currentAnimation().name);
