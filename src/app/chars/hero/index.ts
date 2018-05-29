@@ -2,7 +2,7 @@ import Phaser from 'phaser-ce';
 
 import Human from 'src/app/chars/base/human';
 import { MovementMouse, MovementKeys } from 'src/app/sprites/human';
-import SpriteIngame from 'src/app/sprites/ingame';
+import UIIngame from 'src/app/sprites/ui/ingame';
 
 import { get as getItem, getAll as getAllItems, Item } from 'src/app/chars/items';
 
@@ -28,7 +28,7 @@ interface Inventory extends Item {
 
 class Hero extends Human {
   private debug: boolean = false;
-  private ingame: SpriteIngame;
+  private ingame: UIIngame;
 
   public controls: { [key:string]: Phaser.Key };
   public gold: number = 100;
@@ -77,7 +77,7 @@ class Hero extends Human {
     this.name = 'Hero';
     this.controls = controls;
 
-    this.ingame = new SpriteIngame({
+    this.ingame = new UIIngame({
       id: 'ingame',
       game: this.game,
       subject: this,
@@ -87,7 +87,7 @@ class Hero extends Human {
     if (this.movement.type === 'mouse') {
       game.input.onDown.add(() => {
         // for hero movement
-        const movement = <MovementMouse> this.movement;
+        const movement = this.movement as MovementMouse;
         const cursor = {
           x: Math.floor(movement.input.x / map.tilesize),
           y: Math.floor(movement.input.y / map.tilesize),
@@ -119,8 +119,9 @@ class Hero extends Human {
 
     this.controls.o.onDown.add(() => {
       if (!this.ingame.sprite.visible && this.inMap) {
-        this.ingame.show();
+        this.ingame.show(false);
       } else {
+        // TODO: toggling everything to hide is still not working
         this.ingame.hide();
       }
     });

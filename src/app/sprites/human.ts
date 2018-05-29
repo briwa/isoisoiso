@@ -7,7 +7,6 @@ import Human from 'src/app/chars/base/human';
 import Npc from 'src/app/chars/base/npc';
 import Hero from 'src/app/chars/hero';
 
-import SpriteDialog, { Dialog } from 'src/app/sprites/dialog';
 import MapPlain from 'src/app/maps/plain';
 
 export interface MovementTrack {
@@ -176,16 +175,6 @@ class SpriteHuman {
         this.sprite.body.velocity.y = 0;
         break;
     }
-  }
-
-  createDialog({ label, subject, dialog, immediate }: { label?: string, subject: Human, dialog: Dialog, immediate?: boolean }) {
-    return new SpriteDialog({
-      game: this.game,
-      label,
-      subject,
-      dialog,
-      immediate,
-    });
   }
 }
 

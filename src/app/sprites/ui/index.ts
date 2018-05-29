@@ -1,5 +1,7 @@
 import Phaser from 'phaser-ce';
 
+import Hero from 'src/app/chars/hero';
+
 interface UIConfig {
   id: string;
   subject: any;
@@ -15,12 +17,12 @@ interface UIChildren extends UIBase {
 }
 
 class UIBase {
-  private subject;
   private signals: { [name: string]: Phaser.Signal } = {};
+  protected subject: Hero;
 
-  public id: string;
-  public sprite: Phaser.Sprite;
-  public children: { [name: string]: UIChildren } = {};
+  id: string;
+  sprite: Phaser.Sprite;
+  children: { [name: string]: UIChildren } = {};
 
   constructor(config: UIConfig) {
     this.id = config.id;
@@ -119,34 +121,3 @@ class UIBase {
 }
 
 export default UIBase;
-
-/*
-// battle/index.ts
-const actions = new UIActions();
-const selector = new UISelector();
-const heroesStats = new UIHeroesStats();
-const enemiesStats = new UIEnemiesStats();
-
-const battle = new UIBattle({
-  children: {
-    actions,
-    selector,
-    heroesStats,
-    enemiesStats
-  },
-});
-
-battle.on('actions', (resp) => {
-  battle.heroActions(resp)
-    .then((sth) => {
-      battle.next();
-    });
-});
-
-// battle/actions.ts
-
-this.on('select', (resp) => {
-  this.emit('actions', resp);
-});
-
-*/

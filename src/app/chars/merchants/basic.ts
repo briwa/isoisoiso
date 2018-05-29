@@ -6,7 +6,7 @@ import Hero from 'src/app/chars/hero';
 import Merchant from 'src/app/chars/base/merchant';
 import { getAll as getAllItems } from 'src/app/chars/items';
 
-import SpriteShop from 'src/app/sprites/shop';
+import UIShop from 'src/app/sprites/ui/shop';
 
 interface Config {
   game: Phaser.Game;
