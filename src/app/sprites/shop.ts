@@ -1,9 +1,9 @@
 import Phaser from 'phaser-ce';
 
 import SpriteMenu, { Option } from 'src/app/sprites/menu';
-import SpriteDialog, { Dialog } from 'src/app/sprites/dialog';
+import { Dialog } from 'src/app/sprites/ui/dialog';
 
-import Human from 'src/app/chars/base/human';
+import Merchant from 'src/app/chars/base/merchant';
 import Hero from 'src/app/chars/hero';
 import { Item, Items } from 'src/app/chars/items';
 
@@ -20,7 +20,7 @@ interface Config {
   id: string;
   game: Phaser.Game;
   subject: Hero;
-  merchant: Human;
+  merchant: Merchant;
   items: Items;
   dialogs?: Dialogs;
 };
@@ -41,11 +41,10 @@ class SpriteShop {
   private game: Phaser.Game;
   private description: Phaser.Text;
   private menu: SpriteMenu;
-  private dialog: SpriteDialog;
   private gold: Phaser.Text;
   private items: Items;
   private selectedItem: Item;
-  private merchant: Human;
+  private merchant: Merchant;
   private subject: Hero;
 
   public sprite: Phaser.Sprite;
@@ -148,45 +147,24 @@ class SpriteShop {
 
     // check if subject has enough money
     if (this.subject.gold < item.price) {
-      const nomoney = this.merchant.createDialog({
-        label: this.merchant.name,
-        subject: this.subject,
-        dialog: dialogs.nomoney,
-        immediate: true,
-      });
-
+      this.merchant.dialog.start(dialogs.nomoney.conversations, true);
       return;
     }
 
-    const confirm = this.merchant.createDialog({
-      label: this.merchant.name,
-      subject: this.subject,
-      dialog: dialogs.confirm,
-      immediate: true,
-    });
+    this.merchant.dialog.start(dialogs.confirm.conversations, true);
 
-    confirm.onDone((response) => {
+    this.merchant.dialog.once('done', (response) => {
       if (response === 'yes') {
         this.subject.purchaseItem(item.id);
         this.gold.text = `${this.subject.gold} G`; // and update the gold
 
         // show a thank you message, if any
         if (dialogs.thanks) {
-          this.merchant.createDialog({
-            label: this.merchant.name,
-            subject: this.subject,
-            dialog: dialogs.thanks,
-            immediate: true,
-          });
+          this.merchant.dialog.start(dialogs.thanks.conversations, true);
         }
       } else if (response === 'no') {
         if (dialogs.cancel) {
-          this.merchant.createDialog({
-            label: this.merchant.name,
-            subject: this.subject,
-            dialog: dialogs.cancel,
-            immediate: true,
-          });
+          this.merchant.dialog.start(dialogs.cancel.conversations, true);
         }
       } else {
         throw new Error(`Invalid response: ${response}.`);

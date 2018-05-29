@@ -41,6 +41,7 @@ class UIDialog extends UIBase {
   private response: string = null; // TODO: type this
   private index: number = 0;
   private dialog: Dialog;
+  private immediate: boolean = false;
 
   static createBase(game: Phaser.Game): Phaser.Sprite {
     const graphics = game.add.graphics(0, 0);
@@ -88,25 +89,19 @@ class UIDialog extends UIBase {
     this.sprite.addChild(this.convoText);
 
     // listening global action
-    config.subject.listen( 'action', this.nextConvo, this);
+    config.subject.listen( 'action', this.next, this);
     this.sprite.events.onDestroy.addOnce(() => {
-      config.subject.removeListener('action', this.nextConvo, this);
+      config.subject.removeListener('action', this.next, this);
     });
 
     // initially hidden
     this.toggle(false);
   }
 
-  startConvo(conversations?: Conversation[]) {
-    this.conversations = conversations || this.dialog.conversations;
-    this.show();
-    this.nextConvo();
-  }
-
-  nextConvo() {
+  private next() {
     const current = this.conversations[0];
     if (!current) {
-      this.emit('done');
+      this.done();
       return;
     }
 
@@ -124,13 +119,29 @@ class UIDialog extends UIBase {
 
         if (current.answers) {
           this.conversations = current.answers[selected.answer];
-          this.nextConvo(); // move to the next conversation right after the selection
+          this.next(); // move to the next conversation right after the selection
         } else {
-          this.response = selected.answer;
-          this.emit('done');
+          this.done(selected.answer);
         }
       });
     }
+  }
+
+  private done(response = null) {
+    // only need to do this once
+    if (this.immediate) {
+      this.hide();
+      this.immediate = false;
+    }
+
+    this.emit('done', response);
+  }
+
+  start(conversations?: Conversation[], immediate = false) {
+    this.conversations = conversations || this.dialog.conversations;
+    this.show();
+    this.next();
+    this.immediate = immediate;
   }
 }
 

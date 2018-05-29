@@ -32,13 +32,6 @@ class Merchant extends Npc {
     this.dialogs = config.dialogs;
     this.items = config.items;
 
-    this.dialog = new UIDialog({
-      id: `${config.name}-dialog`,
-      game: config.game,
-      subject: config.hero,
-      label: this.name,
-    });
-
     this.shop = new SpriteShop({
       id: this.shopId,
       game: this.game,
@@ -46,6 +39,13 @@ class Merchant extends Npc {
       items: this.items,
       dialogs: this.dialogs,
       merchant: this,
+    });
+
+    this.dialog = new UIDialog({
+      id: `${config.name}-dialog`,
+      game: config.game,
+      subject: config.hero,
+      label: this.name,
     });
 
     // event setup
@@ -66,9 +66,8 @@ class Merchant extends Npc {
       this.stopOppositeAnimation(this.subject.currentAnimation().name);
 
       if (this.dialogs.opening) {
-        this.dialog.startConvo(this.dialogs.opening.conversations);
+        this.dialog.start(this.dialogs.opening.conversations, true);
         this.dialog.once('done', () => {
-          this.dialog.hide();
           this.showShop();
         });
       } else {
@@ -81,10 +80,7 @@ class Merchant extends Npc {
     this.shop.hide();
 
     if (this.dialogs.ending) {
-      this.dialog.startConvo(this.dialogs.ending.conversations);
-      this.dialog.once('done', () => {
-        this.dialog.hide();
-      });
+      this.dialog.start(this.dialogs.ending.conversations, true);
     }
 
     this.doneView();

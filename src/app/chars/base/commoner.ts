@@ -38,7 +38,7 @@ class Commoner extends Npc {
   startDialog() {
     // check if any npc is in contact
     if (this.contact && this.subject.inMap) {
-      this.dialog.startConvo();
+      this.dialog.start();
 
       // make sure the commoner is facing whatever subject is facing
       this.stopOppositeAnimation(this.subject.currentAnimation().name);
