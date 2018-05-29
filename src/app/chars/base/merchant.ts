@@ -6,7 +6,7 @@ import Hero from 'src/app/chars/hero';
 import Npc, { Config } from 'src/app/chars/base/npc';
 
 import { Items } from 'src/app/chars/items';
-import SpriteShop, { Dialogs } from 'src/app/sprites/shop';
+import UIShop, { Dialogs } from 'src/app/sprites/ui/shop';
 import UIDialog, { Dialog } from 'src/app/sprites/ui/dialog';
 
 interface ConfigMerchant extends Config {
@@ -16,7 +16,7 @@ interface ConfigMerchant extends Config {
 };
 
 class Merchant extends Npc {
-  private shop: SpriteShop;
+  private shop: UIShop;
   private subject: Hero;
   private dialogs: Dialogs;
   private items: Items;
@@ -32,7 +32,7 @@ class Merchant extends Npc {
     this.dialogs = config.dialogs;
     this.items = config.items;
 
-    this.shop = new SpriteShop({
+    this.shop = new UIShop({
       id: this.shopId,
       game: this.game,
       subject: this.subject,
@@ -51,7 +51,7 @@ class Merchant extends Npc {
     // event setup
     // ---------------
     config.hero.listen('action', this.startShop, this, 'map');
-    config.hero.listen('cancel', this.endShop, this, this.shopId);
+    config.hero.listen('cancel', this.endShop, this, this.shop.children.menu.id);
 
     this.sprite.events.onDestroy.addOnce(() => {
       this.subject.removeListener('action', this.startShop, this);
@@ -76,6 +76,12 @@ class Merchant extends Npc {
     }
   }
 
+  showShop() {
+    this.shop.show(false); // do not set focus on the shop, rather the menu
+    this.shop.children.menu.focus();
+    this.busy = true;
+  }
+
   endShop() {
     this.shop.hide();
 
@@ -83,13 +89,8 @@ class Merchant extends Npc {
       this.dialog.start(this.dialogs.ending.conversations, true);
     }
 
-    this.doneView();
+    this.busy = false;
     this.contact = false;
-  }
-
-  showShop() {
-    this.shop.show();
-    this.view = this.shopId;
   }
 }
 

@@ -15,10 +15,10 @@ interface UIChildren extends UIBase {
 }
 
 class UIBase {
-  protected id: string;
   private subject;
   private signals: { [name: string]: Phaser.Signal } = {};
 
+  public id: string;
   public sprite: Phaser.Sprite;
   public children: { [name: string]: UIChildren } = {};
 
@@ -87,10 +87,11 @@ class UIBase {
     }
   }
 
-  show() {
+  show(focus = true) {
     if (!this.sprite.visible) {
       this.toggle(true);
-      this.subject.view = this.id;
+      if (focus) this.focus();
+
       this.emit('show');
     }
   }
@@ -98,9 +99,18 @@ class UIBase {
   hide() {
     if (this.sprite.visible) {
       this.toggle(false)
-      this.subject.doneView();
+      this.blur();
+
       this.emit('hide');
     }
+  }
+
+  focus() {
+    this.subject.view = this.id;
+  }
+
+  blur() {
+    this.subject.doneView();
   }
 
   toggle(toggle) {
