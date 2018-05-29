@@ -16,12 +16,13 @@ interface Signals {
 
 class Human extends SpriteHuman {
   private map: MapPlain;
-  private overlays: string[] = ['map'];
+  private views: string[] = ['map'];
   private signals: Signals = {};
 
   public name: string; // max speed, don't go higher than this
   public speed: number = 100; // max speed, don't go higher than this
   public paths: Path[] = [];
+  public busy: boolean = false;
 
   constructor(config: Config) {
     super(config);
@@ -41,21 +42,22 @@ class Human extends SpriteHuman {
     this.createListener('cancel');
   }
 
+  // TODO: rename this to currentView?
   get view() {
-    return this.overlays[0];
+    return this.views[0];
   }
 
   get inMap() {
-    return this.overlays[0] === 'map';
+    return this.views[0] === 'map';
   }
 
   set view(overlay) {
     if (overlay) {
       // put them at the first of the array for easy access
-      this.overlays.unshift(overlay);
+      this.views.unshift(overlay);
     } else {
       // remove the currently viewed (first of the array)
-      this.overlays.splice(0, 1);
+      this.views.splice(0, 1);
     }
   }
 
@@ -104,7 +106,7 @@ class Human extends SpriteHuman {
 
   movePaths() {
     // do not move when it's not in the map
-    if (!this.inMap) {
+    if (!this.inMap || this.busy) {
       return false;
     }
 
@@ -138,7 +140,7 @@ class Human extends SpriteHuman {
 
   moveKeys() {
     // do not move when it's not in the map
-    if (!this.inMap) {
+    if (!this.inMap || this.busy) {
       return false;
     }
 
@@ -172,7 +174,7 @@ class Human extends SpriteHuman {
   }
 
   resetView() {
-    this.overlays = ['map'];
+    this.views = ['map'];
   }
 
   // events
