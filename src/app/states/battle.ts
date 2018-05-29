@@ -69,40 +69,13 @@ class Battle extends Phaser.State {
       initFrame: 'left',
     });
 
-    new SomeDude({
-      x: 1,
-      y: 4,
-      game: this.game,
-      group: this.map.group,
-      map: this.map,
-      hero: this.hero,
-      initFrame: 'right',
-    });
-
-    new SomeDude({
-      x: 2,
-      y: 3,
-      game: this.game,
-      group: this.map.group,
-      map: this.map,
-      hero: this.hero,
-      initFrame: 'right',
-    });
-
-    new SomeDude({
-      x: 1,
-      y: 2,
-      game: this.game,
-      group: this.map.group,
-      map: this.map,
-      hero: this.hero,
-      initFrame: 'right',
-    });
-
     new SpriteBattle({
       id: 'battle',
       game: this.game,
       subject: this.hero,
+      enemies: [2,3,4],
+      heroes: [this.hero],
+      map: this.map,
     });
   }
 
