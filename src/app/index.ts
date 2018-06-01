@@ -4,7 +4,7 @@ import Battle from 'src/app/states/battle';
 
 class Game extends Phaser.Game {
   constructor() {
-    super(600, 400, Phaser.AUTO);
+    super(640, 480, Phaser.AUTO);
 
     this.state.add('Plain', Plain, false);
     this.state.add('Battle', Battle, true);
