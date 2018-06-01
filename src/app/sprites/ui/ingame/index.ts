@@ -115,51 +115,6 @@ class UIIngame extends UIBase {
     });
 
     this.toggle(false);
-
-    // this.submenu = new SpriteMenu({
-    //   id: 'ingame-submenu',
-    //   game,
-    //   subject: this.subject,
-    //   parent: this.sprite,
-    // });
-    // this.submenu.sprite.y = dividerTop + nameTop; // TODO: manual adjustment! maybe handle this in the child instead?
-    // this.submenu.createOptions(submenu);
-
-    // this.submenu.onChange(() => {
-    //   // switch the submenu
-    // });
-    // this.submenu.onSelecting((response) => {
-    //   // hide all
-    //   this.inventory.hide();
-    //   this.stats.hide();
-
-    //   // go to submenu
-    //   if (response.name === 'Inventory') {
-    //     this.inventory.repopulateItems();
-    //     this.inventory.show();
-    //   } else if (response.name === 'Stats') {
-    //     this.stats.updateStats(this.subject.stats, this.subject.equipment);
-    //     this.stats.show();
-    //   }
-    // });
-
-    // Inventory
-    // -----------------
-    // this.inventory = new SpriteInventory({
-    //   id: 'ingame-items',
-    //   game,
-    //   parent: this.sprite,
-    //   subject: this.subject,
-    // });
-    // this.sprite.addChild(this.inventory.sprite);
-
-    // this.stats = new SpriteStats({
-    //   id: 'ingame-stats',
-    //   game,
-    //   parent: this.sprite,
-    //   subject: this.subject,
-    // });
-    // this.sprite.addChild(this.stats.sprite);
   }
 }
 

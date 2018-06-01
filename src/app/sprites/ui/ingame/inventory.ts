@@ -86,7 +86,13 @@ class UIInventory extends UIBase {
 
     this.on('show', () => {
       this.repopulateItems();
-      this.children.items.show();
+
+      // TODO: also major hack
+      if (!this.children.items.sprite.visible) {
+        this.children.items.show();
+      } else {
+        this.children.items.focus();
+      }
 
       if (this.subject.inventory.length === 0) {
         // TODO: major hack, fix it later
