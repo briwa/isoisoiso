@@ -5,12 +5,14 @@ import SomeDude from 'src/app/chars/commoners/some-dude';
 import Merchant from 'src/app/chars/merchants/basic';
 
 import SpriteHuman from 'src/app/sprites/human';
-import SpriteBattle from 'src/app/sprites/battle';
+
+import UIBattle from 'src/app/sprites/ui/battle';
 import MapBattle from 'src/app/maps/battle';
 
 class Battle extends Phaser.State {
   private hero: Hero;
   private enemy: SomeDude;
+  private battle: UIBattle;
 
   private cursor: Phaser.Plugin.Isometric.Point3;
   private keys: { [key:string]: Phaser.Key };
@@ -69,7 +71,7 @@ class Battle extends Phaser.State {
       initFrame: 'left',
     });
 
-    new SpriteBattle({
+   this.battle = new UIBattle({
       id: 'battle',
       game: this.game,
       subject: this.hero,
