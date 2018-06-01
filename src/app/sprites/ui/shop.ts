@@ -26,6 +26,10 @@ interface Config {
   dialogs?: Dialogs;
 };
 
+interface Children {
+  menu: UIMenu;
+};
+
 const width = 480;
 const height = 400;
 const marginTop = 12;
@@ -37,7 +41,7 @@ const dividerLeft = 160;
 const dividerTop = 40;
 const goldLeft = 440;
 
-class UIShop extends UIToggle {
+class UIShop extends UIToggle<Children> {
   private description: Phaser.Text;
   private gold: Phaser.Text;
   private items: Items;

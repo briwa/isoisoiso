@@ -35,7 +35,13 @@ const menuOptions = [{
   name: 'Settings'
 }];
 
-class UIIngame extends UIToggle {
+interface Children {
+  menu: UIMenu;
+  inventory: UIInventory;
+  stats: UIStats;
+};
+
+class UIIngame extends UIToggle<Children> {
   private gold: Phaser.Text;
 
   static createBase(game: Phaser.Game): Phaser.Sprite {

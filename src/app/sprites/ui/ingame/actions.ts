@@ -13,6 +13,10 @@ interface Config {
   parent: UIBase;
 };
 
+interface Children {
+  menu: UIMenu;
+};
+
 const width = 100;
 const lineHeight = 12;
 const marginTop = 12;
@@ -21,7 +25,7 @@ const nameTop = 9;
 const convoTop = 24;
 const lineSpacing = -8;
 
-class UIActions extends UIToggle {
+class UIActions extends UIToggle<Children> {
   private game: Phaser.Game;
 
   // layers

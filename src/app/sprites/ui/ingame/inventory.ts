@@ -23,7 +23,12 @@ const lineSpacing = -8;
 const dividerLeft = 80;
 const dividerTop = 50;
 
-class UIInventory extends UIToggle {
+interface Children {
+  items: UIMenu;
+  itemActions: UIActions;
+};
+
+class UIInventory extends UIToggle<Children> {
   private game: Phaser.Game;
   private noItems: Phaser.Text;
 

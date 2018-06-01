@@ -1,18 +1,9 @@
 import Phaser from 'phaser-ce';
 
-import UIBase from 'src/app/sprites/ui/base';
+import UIBase, { UIConfig, UIChildren } from 'src/app/sprites/ui/base';
 import Hero from 'src/app/chars/hero';
 
-interface UIConfig {
-  id: string;
-  subject: any;
-  game: Phaser.Game;
-  sprite?: Phaser.Sprite;
-  parent?: UIBase;
-  children?: any;
-};
-
-class UIToggle extends UIBase {
+class UIToggle<C = UIChildren> extends UIBase<C> {
   constructor(config: UIConfig) {
     super(config);
 

@@ -27,6 +27,10 @@ interface Config {
   children?: { [name: string]: UIToggle };
 };
 
+interface Children {
+  options: UIMenuToggle;
+};
+
 const width = 400;
 const height = 100;
 const marginLeft = 12;
@@ -34,7 +38,7 @@ const nameTop = 9;
 const convoTop = 24;
 const lineSpacing = -8;
 
-class UIDialog extends UIToggle {
+class UIDialog extends UIToggle<Children> {
   private nameText: Phaser.Text;
   private convoText: Phaser.Text;
   private conversations: Conversation[];

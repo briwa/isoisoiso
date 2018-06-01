@@ -2,7 +2,7 @@ import Phaser from 'phaser-ce';
 
 import Hero from 'src/app/chars/hero';
 
-interface UIConfig {
+export interface UIConfig {
   id: string;
   subject: any;
   game: Phaser.Game;
@@ -12,21 +12,25 @@ interface UIConfig {
 };
 
 // TODO: for now
-interface UIChildren extends UIBase {
+export interface UIChildren extends UIBase {
   [key:string]: any;
 }
 
-class UIBase {
+class UIBase<C = UIChildren> {
   private signals: { [name: string]: Phaser.Signal } = {};
   protected subject: Hero;
 
   id: string;
   sprite: Phaser.Sprite;
-  children: { [name: string]: UIChildren } = {};
+  children: C;
 
   constructor(config: UIConfig) {
     this.id = config.id;
     this.subject = config.subject;
+
+    // TODO: in my case I need the generic types to have a default value
+    // so this had to be done
+    ( this.children as any ) = {};
 
     if (config.sprite) {
       this.sprite = config.sprite;

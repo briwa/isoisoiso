@@ -13,6 +13,10 @@ interface Config {
   parent: UIBase;
 };
 
+interface Children {
+  menu: UIMenu;
+};
+
 const width = 300;
 const lineHeight = 12;
 const marginTop = 12;
@@ -21,7 +25,7 @@ const nameTop = 9;
 const convoTop = 24;
 const lineSpacing = -8;
 
-class UIMenuToggle extends UIToggle {
+class UIMenuToggle extends UIToggle<Children> {
   constructor(config: Config) {
     super({
       id: config.id,
