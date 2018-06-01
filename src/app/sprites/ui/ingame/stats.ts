@@ -1,12 +1,13 @@
 import Phaser from 'phaser-ce';
 
 import UIBase from 'src/app/sprites/ui/base';
+import UIToggle from 'src/app/sprites/ui/base/toggle';
 import Hero from 'src/app/chars/hero';
 
 interface Config {
   id: string;
   game: Phaser.Game;
-  parent: Phaser.Sprite;
+  parent: UIBase;
   subject: Hero;
 };
 
@@ -21,7 +22,7 @@ const lineSpacing = -8;
 const dividerLeft = 80;
 const dividerTop = 50;
 
-class UIStats extends UIBase {
+class UIStats extends UIToggle {
   private game:  Phaser.Game;
   private statsLayer: Phaser.Sprite;
   private equipmentLayer: Phaser.Sprite;
@@ -51,8 +52,6 @@ class UIStats extends UIBase {
       // remove subject listeners
       this.subject.removeListener('cancel', this.hide, this);
     });
-
-    this.toggle(false);
   }
 
   updateStats(stats, equipment) {

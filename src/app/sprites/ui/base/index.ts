@@ -7,7 +7,7 @@ interface UIConfig {
   subject: any;
   game: Phaser.Game;
   sprite?: Phaser.Sprite;
-  parent?: Phaser.Sprite;
+  parent?: UIBase;
   children?: any;
 };
 
@@ -35,7 +35,7 @@ class UIBase {
     }
 
     if (config.parent) {
-      config.parent.addChild(this.sprite);
+      config.parent.sprite.addChild(this.sprite);
     } else {
       config.game.world.addChild(this.sprite);
     }
@@ -48,7 +48,7 @@ class UIBase {
           id: `${config.id}-${key}`, // TODO: this might not be correct
           subject: config.subject,
           game: config.game,
-          parent: this.sprite,
+          parent: this,
         });
       }
     }
@@ -59,6 +59,7 @@ class UIBase {
     });
   }
 
+  // Event-related
   on(name: string, callback: Function, context?: any) {
     if (!this.signals[name]) {
       this.signals[name] = new Phaser.Signal();
@@ -89,32 +90,7 @@ class UIBase {
     }
   }
 
-  show(focus = true) {
-    if (!this.sprite.visible) {
-      this.toggle(true);
-      if (focus) this.focus();
-
-      this.emit('show');
-    }
-  }
-
-  hide() {
-    if (this.sprite.visible) {
-      this.toggle(false)
-      this.blur();
-
-      this.emit('hide');
-    }
-  }
-
-  focus() {
-    this.subject.view = this.id;
-  }
-
-  blur() {
-    this.subject.doneView();
-  }
-
+  // UI-related
   toggle(toggle) {
     this.sprite.visible = toggle;
   }

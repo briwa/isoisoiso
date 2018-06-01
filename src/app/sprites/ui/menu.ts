@@ -12,7 +12,7 @@ export interface Option {
 interface Config {
   id: string;
   game: Phaser.Game;
-  parent: Phaser.Sprite;
+  parent: UIBase;
   subject: Human;
 };
 
@@ -29,6 +29,7 @@ class UIMenu extends UIBase {
   private cursor: Phaser.Text;
   private label: string;
   private labelText: Phaser.Text;
+  private parent: UIBase;
   private cursorTop = 0;
   private cursorLeft = 12;
 
@@ -44,13 +45,14 @@ class UIMenu extends UIBase {
     });
 
     this.game = config.game;
+    this.parent = config.parent;
     this.on('selection', this.updateCursor);
 
     // subscribe to events
-    config.subject.listen('up', this.prev, this);
-    config.subject.listen('down', this.next, this);
-    config.subject.listen('action', this.selecting, this);
-    config.subject.listen('cancel', this.cancel, this);
+    config.subject.listen('up', this.prev, this, this.parent.id);
+    config.subject.listen('down', this.next, this, this.parent.id);
+    config.subject.listen('action', this.selecting, this, this.parent.id);
+    config.subject.listen('cancel', this.cancel, this, this.parent.id);
 
     this.sprite.events.onDestroy.addOnce(() => {
       // remove subject listeners
@@ -59,13 +61,12 @@ class UIMenu extends UIBase {
       config.subject.removeListener('action', this.selecting, this);
       config.subject.removeListener('cancel', this.cancel, this);
     });
-
-    this.toggle(false);
   }
 
   get selected() {
     const option = this.options[this.selectedIndex];
 
+    // there are cases where selection is simply not available
     if (!option) {
       return null;
     }

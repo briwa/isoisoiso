@@ -1,6 +1,6 @@
 import Phaser from 'phaser-ce';
 
-import UIBase from 'src/app/sprites/ui/base';
+import UIToggle from 'src/app/sprites/ui/base/toggle';
 import UIMenu from 'src/app/sprites/ui/menu';
 import { Dialog } from 'src/app/sprites/ui/dialog';
 
@@ -37,7 +37,7 @@ const dividerLeft = 160;
 const dividerTop = 40;
 const goldLeft = 440;
 
-class UIShop extends UIBase {
+class UIShop extends UIToggle {
   private description: Phaser.Text;
   private gold: Phaser.Text;
   private items: Items;
@@ -101,7 +101,6 @@ class UIShop extends UIBase {
     // menu setup
     this.children.menu.sprite.y = dividerTop + nameTop;
     this.children.menu.createOptions(config.items);
-    this.children.menu.toggle(true);
     this.on('show', () => {
       this.children.menu.selectIndex(0); // reset selection to top
       this.gold.text = `${this.hero.gold} G`; // and update the gold
@@ -112,8 +111,6 @@ class UIShop extends UIBase {
     this.children.menu.on('selecting', () => {
       this.select(config.dialogs);
     });
-
-    this.toggle(false);
   }
 
   updateDescription() {

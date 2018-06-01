@@ -1,6 +1,7 @@
 import Phaser from 'phaser-ce';
 
 import UIBase from 'src/app/sprites/ui/base';
+import UIToggle from 'src/app/sprites/ui/base/toggle';
 import UIMenu from 'src/app/sprites/ui/menu';
 
 import Hero from 'src/app/chars/hero';
@@ -9,7 +10,7 @@ interface Config {
   id: string;
   game: Phaser.Game;
   subject: Hero;
-  parent: Phaser.Sprite;
+  parent: UIBase;
 };
 
 const width = 100;
@@ -20,7 +21,7 @@ const nameTop = 9;
 const convoTop = 24;
 const lineSpacing = -8;
 
-class UIOptions extends UIBase {
+class UIActions extends UIToggle {
   private game: Phaser.Game;
 
   // layers
@@ -43,14 +44,6 @@ class UIOptions extends UIBase {
     this.game = config.game;
     this.bgLayer = this.game.make.sprite(0, 0);
     this.sprite.addChildAt(this.bgLayer, 0); // always put bg at the very first layer
-    this.toggle(false);
-
-    this.on('hide', () => {
-      this.children.menu.hide();
-    });
-    this.on('show', () => {
-      this.children.menu.show();
-    });
   }
 
   setActions(item) {
@@ -100,8 +93,7 @@ class UIOptions extends UIBase {
     this.children.menu.createOptions(options);
     this.children.menu.sprite.x = x;
     this.children.menu.sprite.y = y;
-    this.children.menu.sprite.bringToTop();
   }
 }
 
-export default UIOptions;
+export default UIActions;

@@ -1,7 +1,7 @@
 import Phaser from 'phaser-ce';
 
-import UIBase from 'src/app/sprites/ui/base';
-import UIMenu, { Option } from 'src/app/sprites/ui/menu';
+import UIToggle from 'src/app/sprites/ui/base/toggle';
+import UIMenuToggle from 'src/app/sprites/ui/menu-toggle';
 import Human from 'src/app/chars/base/human';
 
 export interface Dialog {
@@ -13,7 +13,7 @@ interface Conversation {
   id: string;
   type: string;
   text?: string;
-  options?: Option[];
+  options?: any[];
   answers?: { [key: string]: Conversation[] };
 };
 
@@ -24,7 +24,7 @@ interface Config {
   dialog?: Dialog;
   label?: string;
   immediate?: boolean;
-  children?: { [name: string]: UIBase };
+  children?: { [name: string]: UIToggle };
 };
 
 const width = 400;
@@ -34,7 +34,7 @@ const nameTop = 9;
 const convoTop = 24;
 const lineSpacing = -8;
 
-class UIDialog extends UIBase {
+class UIDialog extends UIToggle {
   private nameText: Phaser.Text;
   private convoText: Phaser.Text;
   private conversations: Conversation[];
@@ -69,13 +69,13 @@ class UIDialog extends UIBase {
       subject: config.subject,
       sprite: UIDialog.createBase(config.game),
       children: {
-        menu: UIMenu,
+        options: UIMenuToggle,
       },
     });
 
     // setup
     this.dialog = config.dialog;
-    this.children.menu.sprite.y = convoTop;
+    this.children.options.sprite.y = convoTop;
 
     // // styles
     const nameStyle = { font: '12px Arial', fill: '#CCCCCC' };
@@ -93,9 +93,6 @@ class UIDialog extends UIBase {
     this.sprite.events.onDestroy.addOnce(() => {
       config.subject.removeListener('action', this.next, this);
     });
-
-    // initially hidden
-    this.toggle(false);
   }
 
   private next() {
@@ -110,12 +107,11 @@ class UIDialog extends UIBase {
       this.conversations = this.conversations.slice(1);
     } else if (current.type === 'menu') {
       this.convoText.text = '';
+      this.children.options.createOptions(current.options);
+      this.children.options.show();
 
-      this.children.menu.createOptions(current.options, current.text);
-      this.children.menu.show();
-
-      this.children.menu.on('selecting', (selected) => {
-        this.children.menu.hide();
+      this.children.options.once('selecting', (selected) => {
+        this.children.options.hide();
 
         if (current.answers) {
           this.conversations = current.answers[selected.answer];

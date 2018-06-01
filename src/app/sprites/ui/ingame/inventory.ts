@@ -1,14 +1,15 @@
 import Phaser from 'phaser-ce';
 
 import UIBase from 'src/app/sprites/ui/base';
+import UIToggle from 'src/app/sprites/ui/base/toggle';
 import UIMenu from 'src/app/sprites/ui/menu';
-import UIOptions from 'src/app/sprites/ui/options';
+import UIActions from 'src/app/sprites/ui/ingame/actions';
 import Hero from 'src/app/chars/hero';
 
 interface Config {
   id: string;
   game: Phaser.Game;
-  parent: Phaser.Sprite;
+  parent: UIBase;
   subject: Hero;
 };
 
@@ -22,7 +23,7 @@ const lineSpacing = -8;
 const dividerLeft = 80;
 const dividerTop = 50;
 
-class UIInventory extends UIBase {
+class UIInventory extends UIToggle {
   private game: Phaser.Game;
   private noItems: Phaser.Text;
 
@@ -34,7 +35,7 @@ class UIInventory extends UIBase {
       parent: config.parent,
       children: {
         items: UIMenu,
-        itemActions: UIOptions,
+        itemActions: UIActions,
       },
     });
 
@@ -51,9 +52,6 @@ class UIInventory extends UIBase {
     });
 
     this.children.items.on('cancel', (response) => {
-      // TODO: also major hack, fix it later
-      this.children.items.toggle(true);
-      this.children.items.hide();
       this.hide();
     });
 
@@ -87,23 +85,14 @@ class UIInventory extends UIBase {
     this.on('show', () => {
       this.repopulateItems();
 
-      // TODO: also major hack
-      if (!this.children.items.sprite.visible) {
-        this.children.items.show();
-      } else {
-        this.children.items.focus();
-      }
-
       if (this.subject.inventory.length === 0) {
-        // TODO: major hack, fix it later
         this.noItems.visible = true;
         this.children.items.toggle(false);
       } else {
         this.noItems.visible = false;
+        this.children.items.toggle(true);
       }
     });
-
-    this.toggle(false);
   }
 
   repopulateItems() {

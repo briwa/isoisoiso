@@ -174,9 +174,7 @@ class Human extends SpriteHuman {
   }
 
   resetView() {
-    while (this.view !== 'map') {
-      this.view = null;
-    }
+    this.views = ['map'];
   }
 
   // events

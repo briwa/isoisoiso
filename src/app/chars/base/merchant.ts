@@ -20,20 +20,20 @@ class Merchant extends Npc {
   private subject: Hero;
   private dialogs: Dialogs;
   private items: Items;
-  private shopId: string;
+  private id: string;
 
   public dialog: UIDialog;
 
   constructor(config: ConfigMerchant) {
     super(config);
 
-    this.shopId = config.shopId;
+    this.id = config.shopId;
     this.subject = config.hero;
     this.dialogs = config.dialogs;
     this.items = config.items;
 
     this.shop = new UIShop({
-      id: this.shopId,
+      id: this.id,
       game: this.game,
       subject: this.subject,
       items: this.items,
@@ -51,7 +51,7 @@ class Merchant extends Npc {
     // event setup
     // ---------------
     config.hero.listen('action', this.startShop, this, 'map');
-    config.hero.listen('cancel', this.endShop, this, this.shop.children.menu.id);
+    config.hero.listen('cancel', this.endShop, this);
 
     this.sprite.events.onDestroy.addOnce(() => {
       this.subject.removeListener('action', this.startShop, this);
@@ -77,8 +77,7 @@ class Merchant extends Npc {
   }
 
   showShop() {
-    this.shop.show(false); // do not set focus on the shop, rather the menu
-    this.shop.children.menu.focus();
+    this.shop.show();
     this.busy = true;
   }
 

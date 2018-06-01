@@ -1,6 +1,6 @@
 import Phaser from 'phaser-ce';
 
-import UIBase from 'src/app/sprites/ui/base';
+import UIToggle from 'src/app/sprites/ui/base/toggle';
 import UIMenu from 'src/app/sprites/ui/menu';
 import UIStats from 'src/app/sprites/ui/ingame/stats';
 import UIInventory from 'src/app/sprites/ui/ingame/inventory';
@@ -35,7 +35,7 @@ const menuOptions = [{
   name: 'Settings'
 }];
 
-class UIIngame extends UIBase {
+class UIIngame extends UIToggle {
   private gold: Phaser.Text;
 
   static createBase(game: Phaser.Game): Phaser.Sprite {
@@ -86,7 +86,6 @@ class UIIngame extends UIBase {
 
     menu.sprite.y = dividerTop + nameTop; // TODO: manual adjustment! maybe handle this in the child instead?
     menu.createOptions(menuOptions);
-    menu.toggle(true);
 
     // events
     menu.on('selecting', (response) => {
@@ -103,7 +102,6 @@ class UIIngame extends UIBase {
     });
 
     this.on('show', () => {
-      menu.focus();
       this.gold.text = `${this.subject.gold} G`; // and update the gold
     });
 
@@ -113,8 +111,6 @@ class UIIngame extends UIBase {
       stats.hide();
       this.subject.resetView();
     });
-
-    this.toggle(false);
   }
 }
 

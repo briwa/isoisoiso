@@ -119,7 +119,7 @@ class Hero extends Human {
 
     this.controls.o.onDown.add(() => {
       if (!this.ingame.sprite.visible && this.inMap) {
-        this.ingame.show(false);
+        this.ingame.show();
       } else {
         // TODO: toggling everything to hide is still not working
         this.ingame.hide();
