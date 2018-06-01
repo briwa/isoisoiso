@@ -27,11 +27,9 @@ const lineSpacing = -8;
 
 class UIActions extends UIToggle<Children> {
   private game: Phaser.Game;
-
-  // layers
   private bgLayer: Phaser.Sprite;
 
-  public context: any;
+  context: any;
 
   constructor(config: Config) {
     super({

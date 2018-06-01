@@ -47,11 +47,11 @@ export interface Config {
 class SpriteHuman {
   private tilesize: number;
 
-  public game: Phaser.Game;
-  public anchorX: number = 1/4;
-  public anchorY: number = 1/4;
-  public sprite: Phaser.Plugin.Isometric.IsoSprite;
-  public movement: MovementTrack | MovementFollow | MovementKeys | MovementMouse;
+  game: Phaser.Game;
+  anchorX: number = 1/4;
+  anchorY: number = 1/4;
+  sprite: Phaser.Plugin.Isometric.IsoSprite;
+  movement: MovementTrack | MovementFollow | MovementKeys | MovementMouse;
 
   static loadAssets(game: Phaser.Game) {
     // https://opengameart.org/content/isometric-people

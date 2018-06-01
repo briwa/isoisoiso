@@ -1,6 +1,10 @@
 import Phaser from 'phaser-ce';
-
 import Hero from 'src/app/chars/hero';
+
+// TODO: any for now
+export interface UIChildren {
+  [key:string]: any;
+}
 
 export interface UIConfig {
   id: string;
@@ -8,13 +12,8 @@ export interface UIConfig {
   game: Phaser.Game;
   sprite?: Phaser.Sprite;
   parent?: UIBase;
-  children?: any;
+  children?: UIChildren;
 };
-
-// TODO: for now
-export interface UIChildren extends UIBase {
-  [key:string]: any;
-}
 
 class UIBase<C = UIChildren> {
   private signals: { [name: string]: Phaser.Signal } = {};

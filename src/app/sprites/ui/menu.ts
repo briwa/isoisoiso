@@ -33,8 +33,8 @@ class UIMenu extends UIBase {
   private cursorTop = 0;
   private cursorLeft = 12;
 
-  public selection;
-  public selectedIndex = 0;
+  selection;
+  selectedIndex = 0;
 
   constructor(config: Config) {
     super({

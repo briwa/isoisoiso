@@ -49,10 +49,10 @@ const TILE = [
 export default class MapPlain {
   private game: Phaser.Game;
 
-  public grid: number[][];
-  public tile: Tile[];
-  public group: Phaser.Group;
-  public tilesize: number;
+  grid: number[][];
+  tile: Tile[];
+  group: Phaser.Group;
+  tilesize: number;
 
   static loadAssets(game: Phaser.Game) {
     // http://www.pixeljoint.com/pixelart/66809.htm

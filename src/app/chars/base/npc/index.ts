@@ -23,7 +23,7 @@ class Npc extends Human {
   private pause: number = 2000;
   private npc: boolean = true;
 
-  public contact: boolean = false;
+  contact: boolean = false;
 
   constructor({ x, y, game, group, map, movement, delimiter, name, hero }: Config) {
     super({

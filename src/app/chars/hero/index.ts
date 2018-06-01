@@ -30,10 +30,10 @@ class Hero extends Human {
   private debug: boolean = false;
   private ingame: UIIngame;
 
-  public controls: { [key:string]: Phaser.Key };
-  public gold: number = 100;
-  public inventory: Inventory[] = [];
-  public stats = {
+  controls: { [key:string]: Phaser.Key };
+  gold: number = 100;
+  inventory: Inventory[] = [];
+  stats = {
     hp: {
       base: 100,
       extra: 0,
@@ -55,7 +55,7 @@ class Hero extends Human {
       battle: 10,
     },
   };
-  public equipment: Equips = {
+  equipment: Equips = {
     armor: null,
     weapon: null,
     accessory: null,

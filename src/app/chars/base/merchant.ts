@@ -22,7 +22,7 @@ class Merchant extends Npc {
   private items: Items;
   private id: string;
 
-  public dialog: UIDialog;
+  dialog: UIDialog;
 
   constructor(config: ConfigMerchant) {
     super(config);

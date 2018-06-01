@@ -19,10 +19,10 @@ class Human extends SpriteHuman {
   private views: string[] = ['map'];
   private signals: Signals = {};
 
-  public name: string; // max speed, don't go higher than this
-  public speed: number = 100; // max speed, don't go higher than this
-  public paths: Path[] = [];
-  public busy: boolean = false;
+  name: string;
+  speed: number = 100; // max speed, don't go higher than this
+  paths: Path[] = [];
+  busy: boolean = false;
 
   constructor(config: Config) {
     super(config);
