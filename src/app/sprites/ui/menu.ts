@@ -1,6 +1,6 @@
 import Phaser from 'phaser-ce';
 
-import UIBase from 'src/app/sprites/ui';
+import UIBase from 'src/app/sprites/ui/base';
 import Human from 'src/app/chars/base/human';
 
 export interface Option {

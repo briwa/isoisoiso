@@ -1,6 +1,6 @@
 import Phaser from 'phaser-ce';
 
-import UIBase from 'src/app/sprites/ui';
+import UIBase from 'src/app/sprites/ui/base';
 import Hero from 'src/app/chars/hero';
 
 interface Config {
