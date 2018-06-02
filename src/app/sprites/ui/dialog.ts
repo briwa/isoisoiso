@@ -63,7 +63,7 @@ class UIDialog extends UIToggle<Children> {
 
     return game.world.create(
       (game.world.bounds.width / 2) - (width / 2),
-      (game.world.bounds.height / 2) - height - marginBottom,
+      game.world.bounds.height - height - marginBottom,
       texture);
   }
 

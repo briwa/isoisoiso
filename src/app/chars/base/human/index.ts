@@ -38,6 +38,8 @@ class Human extends SpriteHuman {
     // actions
     this.createListener('up');
     this.createListener('down');
+    this.createListener('left');
+    this.createListener('right');
     this.createListener('action');
     this.createListener('cancel');
   }
@@ -145,7 +147,7 @@ class Human extends SpriteHuman {
       return false;
     }
 
-    const movement = <MovementKeys> this.movement;
+    const movement = this.movement as MovementKeys;
 
     let direction = null;
     if (movement.input.w.isDown) {
